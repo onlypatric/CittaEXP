@@ -1,0 +1,32 @@
+# Gradle / Java build output
+.gradle/
+build/
+out/
+target/
+*.class
+
+# IDE / editors
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.vscode/
+
+# OS / temp
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Local runtime folders (Paper test runs)
+run/
+runs/
+.paper-local/
+plugins/
+logs/
+world/
+world_nether/
+world_the_end/
