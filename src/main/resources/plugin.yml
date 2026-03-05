@@ -1,0 +1,6 @@
+name: CittaEXP
+version: ${version}
+main: it.patric.cittaexp.CittaExpPlugin
+api-version: '1.21'
+authors: [Patric]
+description: Plugin Paper base per gestione esperienza cittadina (outline iniziale).
