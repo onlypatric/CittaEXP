@@ -43,6 +43,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class DefaultCityLifecycleService implements
@@ -99,24 +100,52 @@ public final class DefaultCityLifecycleService implements
         UUID creator = Objects.requireNonNull(command.creatorUuid(), "creatorUuid");
         String name = normalizeCityName(command.cityName());
         String tag = normalizeCityTag(command.cityTag());
+        logger.info(
+                "[CittaEXP][city-create] request received"
+                        + " player=" + creator
+                        + " cityName=" + name
+                        + " tag=" + tag
+                        + " world=" + command.world()
+                        + " x=" + command.centerX()
+                        + " z=" + command.centerZ()
+        );
 
         if (readPort.findActiveMember(creator).isPresent()) {
+            logger.warning("[CittaEXP][city-create] rejected: player already in city player=" + creator);
             throw new IllegalStateException("player-already-in-city");
         }
         if (readPort.findCityByName(name).isPresent() || readPort.findCityByTag(tag).isPresent()) {
+            logger.warning(
+                    "[CittaEXP][city-create] rejected: city name/tag conflict name="
+                            + name + " tag=" + tag
+            );
             throw new IllegalStateException("city-name-tag-conflict");
         }
         if (!huskClaimsPort.available()) {
+            logger.warning("[CittaEXP][city-create] rejected: huskclaims unavailable");
             throw new IllegalStateException("huskclaims-unavailable");
         }
 
         UUID cityId = UUID.randomUUID();
+        logger.info(
+                "[CittaEXP][city-create] creating claim cityId="
+                        + cityId + " world=" + command.world()
+                        + " center=" + command.centerX() + "," + command.centerZ()
+        );
         return huskClaimsPort.createAutoClaim100x100Async(
                 creator,
                 command.world(),
                 command.centerX(),
                 command.centerZ()
         ).thenCompose(result -> {
+            logger.info(
+                    "[CittaEXP][city-create] claim result cityId="
+                            + cityId
+                            + " success=" + result.success()
+                            + " reason=" + safe(result.reason())
+                            + " min=" + result.minX() + "," + result.minZ()
+                            + " max=" + result.maxX() + "," + result.maxZ()
+            );
             if (!result.success()) {
                 return CompletableFuture.failedFuture(
                         new IllegalStateException("claim-create-failed:" + safe(result.reason()))
@@ -151,6 +180,7 @@ public final class DefaultCityLifecycleService implements
                     0
             );
             try {
+                logger.info("[CittaEXP][city-create] persisting city aggregate cityId=" + cityId);
                 txPort.withTransaction(connection -> {
                     expect(writePort.createCity(city), "create-city");
                     bootstrapDefaultRoles(cityId, now);
@@ -161,17 +191,34 @@ public final class DefaultCityLifecycleService implements
                     appendAudit(audit(cityId, "CITY", "claim_created", creator, jsonPayload("world", command.world()), now));
                     return null;
                 });
+                logger.info(
+                        "[CittaEXP][city-create] completed cityId="
+                                + cityId + " name=" + name + " tag=" + tag
+                );
                 return CompletableFuture.completedFuture(toCity(city));
             } catch (RuntimeException writeFailure) {
+                logger.log(
+                        Level.SEVERE,
+                        "[CittaEXP][city-create] persistence failed cityId="
+                                + cityId
+                                + " name=" + name
+                                + " tag=" + tag
+                                + " error=" + safe(writeFailure.getMessage()),
+                        writeFailure
+                );
                 return huskClaimsPort.deleteClaimAtAsync(command.world(), command.centerX(), command.centerZ())
                         .handle((rollbackOk, rollbackError) -> {
                             boolean rollbackSuccess = rollbackError == null && Boolean.TRUE.equals(rollbackOk);
-                            if (!rollbackSuccess) {
-                                logger.warning(
-                                        "[CittaEXP] claim rollback failed after city write failure cityId="
+                            if (rollbackSuccess) {
+                                logger.info("[CittaEXP][city-create] claim rollback OK cityId=" + cityId);
+                            } else {
+                                logger.log(
+                                        Level.SEVERE,
+                                        "[CittaEXP][city-create] claim rollback FAILED cityId="
                                                 + cityId
                                                 + " error="
-                                                + (rollbackError == null ? "unknown" : rollbackError.getClass().getSimpleName())
+                                                + (rollbackError == null ? "unknown" : rollbackError.getClass().getSimpleName()),
+                                        rollbackError
                                 );
                             }
                             String reason = rollbackSuccess
@@ -829,6 +876,12 @@ public final class DefaultCityLifecycleService implements
 
     private void expect(it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome outcome, String op) {
         if (!outcome.success()) {
+            logger.warning(
+                    "[CittaEXP][city] persistence op failed op="
+                            + op
+                            + " conflict=" + outcome.conflict()
+                            + " message=" + outcome.message()
+            );
             throw new IllegalStateException(op + ":" + outcome.message());
         }
     }

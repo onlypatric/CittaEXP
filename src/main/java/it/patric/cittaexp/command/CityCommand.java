@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
+import java.util.logging.Level;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -106,6 +107,12 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                         return;
                     }
                     if (throwable == null) {
+                        plugin.getLogger().info(
+                                "[CittaEXP][command] /city create success"
+                                        + " player=" + player.getUniqueId()
+                                        + " city=" + created.name()
+                                        + " tag=" + created.tag()
+                        );
                         player.sendMessage(msg(player, "cittaexp.city.create.success", Map.of(
                                 "city", created.name(),
                                 "tag", created.tag(),
@@ -114,6 +121,16 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                         return;
                     }
                     RuntimeException runtime = unwrapRuntime(throwable);
+                    plugin.getLogger().log(
+                            Level.WARNING,
+                            "[CittaEXP][command] /city create failed"
+                                    + " player=" + player.getUniqueId()
+                                    + " city=" + args[1]
+                                    + " tag=" + args[2]
+                                    + " mappedKey=" + mapErrorKey(runtime)
+                                    + " reason=" + safe(runtime.getMessage()),
+                            runtime
+                    );
                     player.sendMessage(msg(player, mapErrorKey(runtime), Map.of("reason", safe(runtime.getMessage()))));
                 })
         );

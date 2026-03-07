@@ -921,6 +921,7 @@ public final class CityPersistenceService
             try {
                 return transaction.execute(txConnection.get());
             } catch (SQLException ex) {
+                logger.log(Level.SEVERE, "[CittaEXP][persistence] nested transaction failed", ex);
                 throw new IllegalStateException("nested transaction failed", ex);
             }
         }
@@ -932,13 +933,27 @@ public final class CityPersistenceService
                 connection.commit();
                 return result;
             } catch (SQLException ex) {
-                connection.rollback();
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackError) {
+                    logger.log(Level.SEVERE, "[CittaEXP][persistence] transaction rollback failed", rollbackError);
+                }
+                logger.log(
+                        Level.SEVERE,
+                        "[CittaEXP][persistence] transaction failed mode=" + modeManager.currentMode(),
+                        ex
+                );
                 throw new IllegalStateException("transaction failed", ex);
             } finally {
                 txConnection.remove();
-                connection.setAutoCommit(true);
+                try {
+                    connection.setAutoCommit(true);
+                } catch (SQLException autoCommitError) {
+                    logger.log(Level.WARNING, "[CittaEXP][persistence] restore autocommit failed", autoCommitError);
+                }
             }
         } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] cannot open transaction", ex);
             throw new IllegalStateException("cannot open transaction", ex);
         }
     }
