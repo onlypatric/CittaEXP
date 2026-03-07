@@ -1,10 +1,16 @@
 package it.patric.cittaexp.persistence.runtime;
 
+import it.patric.cittaexp.core.model.CityStatus;
+import it.patric.cittaexp.core.model.CityTier;
 import it.patric.cittaexp.persistence.config.PersistenceSettings;
+import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
+import it.patric.cittaexp.core.model.FreezeReason;
+import it.patric.cittaexp.core.model.InvitationStatus;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,9 +65,13 @@ class CityPersistenceServiceSqliteTest {
                 "Aurora",
                 "AUR",
                 leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
                 false,
                 false,
                 1200L,
+                1,
+                10,
                 now,
                 now,
                 0
@@ -86,9 +96,13 @@ class CityPersistenceServiceSqliteTest {
                 "Brina",
                 "BRI",
                 leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
                 false,
                 false,
                 2000L,
+                1,
+                10,
                 now,
                 now,
                 0
@@ -99,9 +113,13 @@ class CityPersistenceServiceSqliteTest {
                 "Brina Nuova",
                 "BRI",
                 leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
                 false,
                 false,
                 2500L,
+                1,
+                10,
                 now,
                 now + 1000,
                 0
@@ -123,9 +141,13 @@ class CityPersistenceServiceSqliteTest {
                 "Cenere",
                 "CEN",
                 leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
                 false,
                 false,
                 1000L,
+                1,
+                10,
                 now,
                 now,
                 0
@@ -134,5 +156,55 @@ class CityPersistenceServiceSqliteTest {
         service.upsertRole(new CityRoleRecord(cityId, "membro", "Membro", 1, "{\"invite\":false}"));
 
         assertTrue(service.pendingCount() >= 3L);
+    }
+
+    @Test
+    void invitationAndFreezeReadWriteWorks() {
+        long now = System.currentTimeMillis();
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+        service.createCity(new CityRecord(
+                cityId,
+                "Fortezza",
+                "FOR",
+                leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
+                false,
+                false,
+                0L,
+                1,
+                10,
+                now,
+                now,
+                0
+        ));
+
+        CityInvitationRecord invitation = new CityInvitationRecord(
+                UUID.randomUUID(),
+                cityId,
+                UUID.randomUUID(),
+                leaderId,
+                InvitationStatus.PENDING,
+                now,
+                now + 1000L,
+                now
+        );
+        FreezeCaseRecord freezeCase = new FreezeCaseRecord(
+                UUID.randomUUID(),
+                cityId,
+                FreezeReason.STAFF_MANUAL,
+                "manual",
+                true,
+                leaderId,
+                null,
+                now,
+                0L
+        );
+
+        assertTrue(service.upsertInvitation(invitation).success());
+        assertTrue(service.upsertFreezeCase(freezeCase).success());
+        assertTrue(service.findInvitation(invitation.invitationId()).isPresent());
+        assertTrue(service.findActiveFreezeCase(cityId).isPresent());
     }
 }

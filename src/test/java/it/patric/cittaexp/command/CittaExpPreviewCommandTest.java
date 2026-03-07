@@ -21,6 +21,8 @@ import it.patric.cittaexp.runtime.integration.AdapterStatus;
 import it.patric.cittaexp.runtime.integration.IntegrationStatusSnapshot;
 import it.patric.cittaexp.runtime.integration.RankingScanStats;
 import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
+import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
+import it.patric.cittaexp.core.service.CityModerationService;
 import java.util.List;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import java.util.Locale;
@@ -58,7 +60,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -84,7 +88,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -113,7 +119,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -142,7 +150,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -165,7 +175,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -192,7 +204,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -220,7 +234,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -249,7 +265,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -274,7 +292,9 @@ class CittaExpPreviewCommandTest {
                 mock(PersistenceStatusService.class),
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -309,7 +329,9 @@ class CittaExpPreviewCommandTest {
                 persistenceStatusService,
                 messageService,
                 dependencyStatusService(),
-                integrationStatusService()
+                integrationStatusService(),
+                moderationService(),
+                lifecycleDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -354,6 +376,16 @@ class CittaExpPreviewCommandTest {
                 ),
                 new RankingScanStats(100, 95, 5, 123456L)
         ));
+        return service;
+    }
+
+    private static CityModerationService moderationService() {
+        return mock(CityModerationService.class);
+    }
+
+    private static CityLifecycleDiagnosticsService lifecycleDiagnosticsService() {
+        CityLifecycleDiagnosticsService service = mock(CityLifecycleDiagnosticsService.class);
+        when(service.snapshot()).thenReturn(new CityLifecycleDiagnosticsService.Snapshot(true, 1L, 2L, 3L));
         return service;
     }
 }

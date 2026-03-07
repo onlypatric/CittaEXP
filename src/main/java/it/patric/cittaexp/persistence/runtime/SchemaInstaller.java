@@ -79,14 +79,19 @@ final class SchemaInstaller {
                         tag VARCHAR(16) NOT NULL,
                         tag_normalized VARCHAR(16) NOT NULL UNIQUE,
                         leader_uuid VARCHAR(36) NOT NULL,
+                        tier VARCHAR(32) NOT NULL,
+                        status VARCHAR(32) NOT NULL,
                         capital INTEGER NOT NULL,
                         frozen INTEGER NOT NULL,
                         treasury_balance BIGINT NOT NULL,
+                        member_count INTEGER NOT NULL,
+                        max_members INTEGER NOT NULL,
                         created_at BIGINT NOT NULL,
                         updated_at BIGINT NOT NULL,
                         revision INTEGER NOT NULL
                     )
                     """);
+            ensureCityColumns(statement);
 
             statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS city_members (
@@ -303,6 +308,21 @@ final class SchemaInstaller {
             statement.executeUpdate("CREATE INDEX " + indexName + " ON " + expression);
         } catch (SQLException ignored) {
             // index already exists
+        }
+    }
+
+    private static void ensureCityColumns(Statement statement) {
+        addColumnIfMissing(statement, "ALTER TABLE cities ADD COLUMN tier VARCHAR(32) NOT NULL DEFAULT 'BORGO'");
+        addColumnIfMissing(statement, "ALTER TABLE cities ADD COLUMN status VARCHAR(32) NOT NULL DEFAULT 'ACTIVE'");
+        addColumnIfMissing(statement, "ALTER TABLE cities ADD COLUMN member_count INTEGER NOT NULL DEFAULT 0");
+        addColumnIfMissing(statement, "ALTER TABLE cities ADD COLUMN max_members INTEGER NOT NULL DEFAULT 10");
+    }
+
+    private static void addColumnIfMissing(Statement statement, String ddl) {
+        try {
+            statement.executeUpdate(ddl);
+        } catch (SQLException ignored) {
+            // column already exists / unsupported alter variant
         }
     }
 }

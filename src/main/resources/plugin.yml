@@ -9,8 +9,20 @@ depend: [Vault, HuskClaims, ClassificheEXP]
 commands:
   cittaexp:
     description: Comandi anteprima GUI e diagnostica di CittaEXP
-    usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog>
+    usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog|staff>
+  city:
+    description: Comandi lifecycle città per player
+    usage: /city <create|info|invite|request|kick|leave|roles|freeze>
 permissions:
   cittaexp.admin.gui.preview:
     description: Allows opening GUI previews and controlling scenarios/themes
+    default: op
+  cittaexp.city.player:
+    description: Accesso ai comandi player /city
+    default: true
+  cittaexp.city.moderation:
+    description: Moderazione membri/ruoli città (leader o ruoli delegati)
+    default: true
+  cittaexp.staff.freeze:
+    description: Freeze/unfreeze staff via /cittaexp staff city
     default: op

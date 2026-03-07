@@ -12,6 +12,8 @@ public interface MembershipService {
 
     CityMember acceptInvite(UUID invitationId, UUID playerUuid);
 
+    void declineInvite(UUID invitationId, UUID playerUuid, String note);
+
     JoinRequest requestJoin(UUID cityId, UUID playerUuid, String message);
 
     CityMember approveJoinRequest(UUID requestId, UUID reviewerUuid, String note);

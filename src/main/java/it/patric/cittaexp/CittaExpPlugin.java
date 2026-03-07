@@ -14,18 +14,27 @@ import dev.patric.commonlib.api.itemsadder.ItemsAdderService;
 import dev.patric.commonlib.api.MessageService;
 import it.patric.cittaexp.capability.RuntimeUiCapabilityGate;
 import it.patric.cittaexp.command.CittaExpPreviewCommand;
-import it.patric.cittaexp.data.InMemoryCityViewReadPort;
+import it.patric.cittaexp.command.CityCommand;
+import it.patric.cittaexp.core.port.HuskClaimsPort;
+import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
+import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
+import it.patric.cittaexp.core.service.CityModerationService;
+import it.patric.cittaexp.data.DatabaseCityViewReadPort;
 import it.patric.cittaexp.dialog.CreationDialogTemplates;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseTemplates;
 import it.patric.cittaexp.permission.StaffUiPermissionGate;
 import it.patric.cittaexp.persistence.runtime.CittaExpPersistenceComponent;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
+import it.patric.cittaexp.persistence.port.CityReadPort;
+import it.patric.cittaexp.persistence.port.CityTxPort;
+import it.patric.cittaexp.persistence.port.CityWritePort;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.runtime.dependency.RequiredDependenciesComponent;
 import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
 import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
 import it.patric.cittaexp.runtime.integration.RequiredIntegrationsComponent;
+import it.patric.cittaexp.core.port.RankingPort;
 import it.patric.cittaexp.ui.framework.GuiActionRouter;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import it.patric.cittaexp.ui.framework.GuiStateComposer;
@@ -88,13 +97,29 @@ public final class CittaExpPlugin extends JavaPlugin {
         RequiredDependencyStatusService requiredDependencyStatusService = runtime.services().require(RequiredDependencyStatusService.class);
         RequiredIntegrationStatusService requiredIntegrationStatusService =
                 runtime.services().require(RequiredIntegrationStatusService.class);
+        CityReadPort cityReadPort = runtime.services().require(CityReadPort.class);
+        CityWritePort cityWritePort = runtime.services().require(CityWritePort.class);
+        CityTxPort cityTxPort = runtime.services().require(CityTxPort.class);
+        HuskClaimsPort huskClaimsPort = runtime.services().require(HuskClaimsPort.class);
+        RankingPort rankingPort = runtime.services().require(RankingPort.class);
+
+        DefaultCityLifecycleService cityLifecycleService = new DefaultCityLifecycleService(
+                cityReadPort,
+                cityWritePort,
+                cityTxPort,
+                huskClaimsPort,
+                getLogger()
+        );
 
         PreviewSettings previewSettings = new PreviewSettings();
         RuntimeUiCapabilityGate capabilityGate = new RuntimeUiCapabilityGate(capabilityRegistry);
         StaffUiPermissionGate permissionGate = new StaffUiPermissionGate("cittaexp.admin.gui.preview");
         DefaultUiAssetResolver assetResolver = new DefaultUiAssetResolver(itemsAdderService);
         GuiActionRouter actionRouter = new GuiActionRouter();
-        GuiStateComposer stateComposer = new GuiStateComposer(new InMemoryCityViewReadPort(), capabilityGate);
+        GuiStateComposer stateComposer = new GuiStateComposer(
+                new DatabaseCityViewReadPort(cityLifecycleService, cityReadPort, rankingPort),
+                capabilityGate
+        );
         DefaultGuiCatalog guiCatalog = new DefaultGuiCatalog(assetResolver, actionRouter);
         GuiFlowOrchestrator guiFlowOrchestrator = new GuiFlowOrchestrator(
                 guiDefinitionRegistry,
@@ -121,11 +146,18 @@ public final class CittaExpPlugin extends JavaPlugin {
                 persistenceStatusService,
                 messageService,
                 requiredDependencyStatusService,
-                requiredIntegrationStatusService
+                requiredIntegrationStatusService,
+                cityLifecycleService,
+                cityLifecycleService
         );
         if (getCommand("cittaexp") != null) {
             getCommand("cittaexp").setExecutor(previewCommand);
             getCommand("cittaexp").setTabCompleter(previewCommand);
+        }
+        CityCommand cityCommand = new CityCommand(cityLifecycleService, messageService);
+        if (getCommand("city") != null) {
+            getCommand("city").setExecutor(cityCommand);
+            getCommand("city").setTabCompleter(cityCommand);
         }
 
         getLogger().info(

@@ -3,8 +3,13 @@ default:
     command:
       no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.admin.gui.preview</yellow>"
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questa azione richiede un player in gioco.</red>"
+      staff:
+        no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso staff mancante:</red> <yellow>cittaexp.staff.freeze</yellow>"
+        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze> <city> <reason></white>"
+        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Staff <action></aqua> <white><city></white> <gray>-></gray> <yellow><status></yellow>"
+        error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione staff fallita:</red> <yellow><reason></yellow>"
       usage:
-        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog></white>"
+        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog|staff></white>"
         scenario: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp scenario <default|freeze|capital|lowfunds|kingdom></white>"
         theme: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp theme <auto|vanilla|itemsadder></white>"
         hud: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp hud <show|hide> <hudId></white>"
@@ -37,6 +42,8 @@ default:
         status: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Integrazione <name></white> <gray>-></gray> <yellow><state></yellow> <gray>(v:<version>, reason:<reason>)</gray>"
         ranking:
           scan: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Ranking scan</white> <gray>-></gray> <yellow>scanned=<scanned> valid=<valid> invalid=<invalid> lastScan=<lastScan></yellow>"
+      lifecycle:
+        summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Lifecycle</white> <gray>-></gray> <yellow>enabled=<enabled> freeze=<freeze> invites=<invites> requests=<requests></yellow>"
       capability:
         available: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <green>available</green> <gray>(<metadata>)</gray>"
         unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <red>unavailable</red> <gray>(<reason>)</gray>"
@@ -50,3 +57,60 @@ default:
         outbox_pending: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxPending=</white><yellow><value></yellow>"
         outbox_conflicts: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxConflicts=</white><yellow><value></yellow>"
         last_switch: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence lastSwitch=</white><yellow><timestamp></yellow> <gray>(<reason>)</gray>"
+  city:
+    no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.player</yellow>"
+    no_permission_moderation: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.moderation</yellow>"
+    player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questo comando è solo per player.</red>"
+    usage:
+      root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <create|info|invite|request|kick|leave|roles|freeze></white>"
+      create: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city create <name> <tag></white>"
+      invite: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite <player></white>"
+      invite_accept: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite accept <invitationId></white>"
+      invite_deny: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite deny <invitationId></white>"
+      request: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request <join|approve|reject> ...</white>"
+      request_join: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request join <city> [messaggio]</white>"
+      request_approve: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request approve <requestId></white>"
+      request_reject: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request reject <requestId> [nota]</white>"
+      kick: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city kick <player></white>"
+      roles: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles <list|toggle></white>"
+      roles_toggle: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles toggle <roleKey> <invite|kick|manage_members|manage_roles|request_upgrade|expand_claims|manage_settings> <on|off></white>"
+      freeze: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city freeze status</white>"
+    create:
+      success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Città creata:</green> <aqua><city> [<tag>]</aqua> <gray>(tier=<tier>)</gray>"
+    info:
+      not_found: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Città non trovata.</red>"
+      line1: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua><city> [<tag>]</aqua> <gray>Tier:</gray> <yellow><tier></yellow>"
+      line2: "<gray>[<gold>CittaEXP</gold>]</gray> <gray>Status:</gray> <yellow><status></yellow> <gray>Membri:</gray> <white><members>/<max></white>"
+    invite:
+      sent: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Invito inviato a</green> <aqua><player></aqua>"
+      accepted: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Invito accettato.</green>"
+      denied: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Invito rifiutato.</yellow>"
+    request:
+      join:
+        sent: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Richiesta inviata a</green> <aqua><city></aqua>"
+      approved: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Richiesta approvata.</green>"
+      rejected: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Richiesta rifiutata.</yellow>"
+    kick:
+      success: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Membro espulso:</yellow> <aqua><player></aqua>"
+    leave:
+      success: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Hai lasciato la città.</yellow>"
+    roles:
+      list:
+        title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Ruoli città: <city></aqua>"
+        entry: "<gray>[<gold>CittaEXP</gold>]</gray> <white><role></white> <gray>invite=<invite> kick=<kick> manage=<manage></gray>"
+      toggle:
+        success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Ruolo</green> <aqua><role></aqua> <green>flag</green> <yellow><flag></yellow> <green>-></green> <white><value></white>"
+    freeze:
+      status: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Freeze status <city></white> <gray>-></gray> <yellow><value></yellow>"
+    error:
+      generic: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione fallita.</red> <gray>(<reason>)</gray>"
+      city_not_found: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Città non trovata.</red>"
+      city_name_tag_conflict: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Nome o tag già in uso.</red>"
+      player_already_in_city: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Sei già in una città.</red>"
+      player_not_in_city: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Non sei membro attivo di una città.</red>"
+      freeze_restricted: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Azione bloccata: città in freeze.</red>"
+      permission_denied: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso ruolo insufficiente.</red>"
+      leader_restricted: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Azione non consentita al leader in questo stato.</red>"
+      expired: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Richiesta o invito scaduto.</red>"
+      member_limit: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Limite membri raggiunto.</red>"
+      role_invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ruolo o flag non valido.</red>"

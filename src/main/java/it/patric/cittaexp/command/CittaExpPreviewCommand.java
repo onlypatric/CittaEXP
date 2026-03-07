@@ -7,6 +7,8 @@ import dev.patric.commonlib.api.capability.StandardCapabilities;
 import dev.patric.commonlib.api.itemsadder.ItemsAdderService;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseKey;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
+import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
+import it.patric.cittaexp.core.service.CityModerationService;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewScenario;
 import it.patric.cittaexp.preview.PreviewSettings;
@@ -23,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +50,8 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
     private final MessageService messageService;
     private final RequiredDependencyStatusService requiredDependencyStatusService;
     private final RequiredIntegrationStatusService requiredIntegrationStatusService;
+    private final CityModerationService cityModerationService;
+    private final CityLifecycleDiagnosticsService cityLifecycleDiagnosticsService;
 
     public CittaExpPreviewCommand(
             GuiFlowOrchestrator guiFlowOrchestrator,
@@ -58,7 +63,9 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             PersistenceStatusService persistenceStatusService,
             MessageService messageService,
             RequiredDependencyStatusService requiredDependencyStatusService,
-            RequiredIntegrationStatusService requiredIntegrationStatusService
+            RequiredIntegrationStatusService requiredIntegrationStatusService,
+            CityModerationService cityModerationService,
+            CityLifecycleDiagnosticsService cityLifecycleDiagnosticsService
     ) {
         this.guiFlowOrchestrator = Objects.requireNonNull(guiFlowOrchestrator, "guiFlowOrchestrator");
         this.previewSettings = Objects.requireNonNull(previewSettings, "previewSettings");
@@ -76,10 +83,18 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
                 requiredIntegrationStatusService,
                 "requiredIntegrationStatusService"
         );
+        this.cityModerationService = Objects.requireNonNull(cityModerationService, "cityModerationService");
+        this.cityLifecycleDiagnosticsService = Objects.requireNonNull(
+                cityLifecycleDiagnosticsService,
+                "cityLifecycleDiagnosticsService"
+        );
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length > 0 && "staff".equalsIgnoreCase(args[0])) {
+            return handleStaff(sender, args);
+        }
         if (!permissionGate.canOpenPreview(sender)) {
             sender.sendMessage(msg(sender, "cittaexp.command.no_permission"));
             return true;
@@ -267,7 +282,66 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
                         "lastScan", String.valueOf(integrations.rankingScan().lastScanEpochMilli())
                 )
         ));
+        var lifecycle = cityLifecycleDiagnosticsService.snapshot();
+        sender.sendMessage(msg(
+                sender,
+                "cittaexp.probe.lifecycle.summary",
+                Map.of(
+                        "enabled", String.valueOf(lifecycle.cityCommandsEnabled()),
+                        "freeze", String.valueOf(lifecycle.activeFreezeCases()),
+                        "invites", String.valueOf(lifecycle.pendingInvitations()),
+                        "requests", String.valueOf(lifecycle.pendingJoinRequests())
+                )
+        ));
         return true;
+    }
+
+    private boolean handleStaff(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("cittaexp.staff.freeze")) {
+            sender.sendMessage(msg(sender, "cittaexp.command.staff.no_permission"));
+            return true;
+        }
+        if (args.length < 5 || !"city".equalsIgnoreCase(args[1])) {
+            sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
+            return true;
+        }
+        String action = args[2].toLowerCase(Locale.ROOT);
+        if (!action.equals("freeze") && !action.equals("unfreeze")) {
+            sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
+            return true;
+        }
+
+        String cityRef = args[3];
+        String reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length)).trim();
+        if (reason.isBlank()) {
+            sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
+            return true;
+        }
+
+        UUID actor = sender instanceof Player player ? player.getUniqueId() : UUID.randomUUID();
+        try {
+            var city = action.equals("freeze")
+                    ? cityModerationService.freezeCity(cityRef, actor, reason)
+                    : cityModerationService.unfreezeCity(cityRef, actor, reason);
+            sender.sendMessage(msg(
+                    sender,
+                    "cittaexp.command.staff.result",
+                    Map.of(
+                            "action", action,
+                            "city", city.name(),
+                            "status", city.status().name()
+                    )
+            ));
+            return true;
+        } catch (RuntimeException ex) {
+            LOGGER.log(Level.WARNING, "Staff city moderation failed action=" + action + " city=" + cityRef, ex);
+            sender.sendMessage(msg(
+                    sender,
+                    "cittaexp.command.staff.error",
+                    Map.of("reason", ex.getMessage() == null ? "internal" : ex.getMessage())
+            ));
+            return true;
+        }
     }
 
     private boolean handleDialog(CommandSender sender, String[] args) {
@@ -373,13 +447,20 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!permissionGate.canOpenPreview(sender)) {
-            return List.of();
+            if (!(args.length > 0 && "staff".equalsIgnoreCase(args[0]) && sender.hasPermission("cittaexp.staff.freeze"))) {
+                return List.of();
+            }
         }
 
         if (args.length == 1) {
             List<String> first = new ArrayList<>();
-            first.addAll(Arrays.stream(UiScreenKey.values()).map(UiScreenKey::commandToken).distinct().toList());
-            first.addAll(List.of("scenario", "theme", "hud", "probe", "dialog"));
+            if (permissionGate.canOpenPreview(sender)) {
+                first.addAll(Arrays.stream(UiScreenKey.values()).map(UiScreenKey::commandToken).distinct().toList());
+                first.addAll(List.of("scenario", "theme", "hud", "probe", "dialog"));
+            }
+            if (sender.hasPermission("cittaexp.staff.freeze")) {
+                first.add("staff");
+            }
             return complete(first, args[0]);
         }
 
@@ -404,6 +485,14 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
 
         if (args.length == 3 && args[0].equalsIgnoreCase("dialog") && args[1].equalsIgnoreCase("list")) {
             return complete(List.of("open"), args[2]);
+        }
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("staff")) {
+            return complete(List.of("city"), args[1]);
+        }
+
+        if (args.length == 3 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("city")) {
+            return complete(List.of("freeze", "unfreeze"), args[2]);
         }
 
         return List.of();
