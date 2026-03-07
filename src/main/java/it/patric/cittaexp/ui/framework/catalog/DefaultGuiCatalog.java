@@ -48,7 +48,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         GuiDsl.Builder builder = GuiDsl.chest(UiScreenKey.DASHBOARD.key(), 6)
                 .title("<gold>CittaEXP <gray>- " + city.cityName() + " [" + city.cityTag() + "]")
                 .fill(0, 8, pane("BLACK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("BLACK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(45, 52, pane("BLACK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .subMenuSlot(20, assets.resolve(UiAssetKey.ICON_MEMBERS, state), UiScreenKey.MEMBERS.key())
                 .subMenuSlot(22, assets.resolve(UiAssetKey.ICON_ROLES, state), UiScreenKey.ROLES.key())
                 .subMenuSlot(24, assets.resolve(UiAssetKey.ICON_TAXES, state), UiScreenKey.TAXES.key())
@@ -82,7 +82,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         GuiDsl.Builder builder = GuiDsl.chest(UiScreenKey.MEMBERS.key(), 6)
                 .title("<aqua>Members <gray>- " + state.city().cityName())
                 .fill(0, 8, pane("CYAN_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("CYAN_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("CYAN_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .backSlot(45, assets.resolve(UiAssetKey.CTA_BACK, state))
                 .button(53, assets.resolve(UiAssetKey.CTA_CANCEL, state), actions.actions(UiActionKey.CLOSE));
 
@@ -111,7 +111,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         GuiDsl.Builder builder = GuiDsl.chest(UiScreenKey.ROLES.key(), 6)
                 .title("<yellow>Roles <gray>- " + state.city().cityName())
                 .fill(0, 8, pane("YELLOW_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("YELLOW_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("YELLOW_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .backSlot(45, assets.resolve(UiAssetKey.CTA_BACK, state))
                 .button(53, assets.resolve(UiAssetKey.CTA_CANCEL, state), actions.actions(UiActionKey.CLOSE));
 
@@ -150,7 +150,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         return GuiDsl.chest(UiScreenKey.TAXES.key(), 6)
                 .title("<gold>Taxes <gray>- " + city.cityName())
                 .fill(0, 8, pane("ORANGE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("ORANGE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("ORANGE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .slot(13, s -> s
                         .item(item(
                                 assets.resolve(UiAssetKey.ICON_TAXES, state).materialKey(),
@@ -181,7 +181,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         return GuiDsl.chest(UiScreenKey.WIZARD_START.key(), 6)
                 .title("<light_purple>Creation Wizard <gray>- Step 1")
                 .fill(0, 8, pane("PURPLE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("PURPLE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("PURPLE_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .dialogInputSlot(
                         20,
                         assets.resolve(UiAssetKey.CTA_DIALOG_NAME, state),
@@ -204,7 +204,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         return GuiDsl.chest(UiScreenKey.WIZARD_BANNER_ARMOR.key(), 6)
                 .title("<light_purple>Creation Wizard <gray>- Step 2")
                 .fill(0, 8, pane("MAGENTA_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("MAGENTA_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("MAGENTA_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .slot(20, s -> s
                         .item(assets.resolve(UiAssetKey.CTA_BANNER, state))
                         .interaction(SlotInteractionPolicy.BUTTON_ONLY)
@@ -223,7 +223,7 @@ public final class DefaultGuiCatalog implements GuiCatalog {
         return GuiDsl.chest(UiScreenKey.WIZARD_CONFIRM.key(), 6)
                 .title("<light_purple>Creation Wizard <gray>- Confirm")
                 .fill(0, 8, pane("PINK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
-                .fill(45, 53, pane("PINK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
+                .fill(46, 52, pane("PINK_STAINED_GLASS_PANE"), SlotInteractionPolicy.LOCKED)
                 .slot(22, s -> s
                         .item(item(
                                 assets.resolve(UiAssetKey.CTA_CONFIRM, state).materialKey(),

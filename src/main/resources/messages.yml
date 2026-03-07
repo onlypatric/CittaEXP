@@ -1,0 +1,46 @@
+default:
+  cittaexp:
+    command:
+      no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.admin.gui.preview</yellow>"
+      player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questa azione richiede un player in gioco.</red>"
+      usage:
+        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog></white>"
+        scenario: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp scenario <default|freeze|capital|lowfunds|kingdom></white>"
+        theme: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp theme <auto|vanilla|itemsadder></white>"
+        hud: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp hud <show|hide> <hudId></white>"
+        dialog: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp dialog <list|notice|confirm|multi|form|links></white>"
+      open:
+        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Apertura <screen></aqua> <gray>-></gray> <green><result></green>"
+        internal_error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Apertura <screen> fallita:</red> <yellow>OPEN_FAILED_INTERNAL</yellow>"
+      scenario:
+        invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Scenario non valido.</red>"
+        set: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Scenario impostato su:</green> <aqua><scenario></aqua>"
+      theme:
+        invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Tema non valido.</red>"
+        set: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Tema impostato su:</green> <aqua><theme></aqua>"
+      hud:
+        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>HUD <action>(<hudId>)</aqua> <gray>-></gray> <yellow><result></yellow>"
+    dialog:
+      list:
+        title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Dialog showcase disponibili:</aqua>"
+        entry: "<gray>[<gold>CittaEXP</gold>]</gray> <white>- <alias></white> <gray>-></gray> <yellow><template></yellow>"
+        hint: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Per aprire il showcase list:</yellow> <white>/cittaexp dialog list open</white>"
+      invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Dialog showcase non valido.</red>"
+      open:
+        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Dialog <alias></aqua> <gray>-></gray> <green><result></green>"
+        internal_error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Dialog <alias> fallito:</red> <yellow>OPEN_FAILED_INTERNAL</yellow>"
+    probe:
+      title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Capability probe</aqua>"
+      capability:
+        available: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <green>available</green> <gray>(<metadata>)</gray>"
+        unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <red>unavailable</red> <gray>(<reason>)</gray>"
+      itemsadder:
+        available: "<gray>[<gold>CittaEXP</gold>]</gray> <white>ItemsAdderService available=</white><yellow><value></yellow>"
+        features: "<gray>[<gold>CittaEXP</gold>]</gray> <white>ItemsAdder features=</white><yellow><value></yellow>"
+      persistence:
+        mode: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence mode=</white><yellow><value></yellow>"
+        mysql_reachable: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence mysqlReachable=</white><yellow><value></yellow>"
+        fallback_enabled: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence fallbackEnabled=</white><yellow><value></yellow>"
+        outbox_pending: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxPending=</white><yellow><value></yellow>"
+        outbox_conflicts: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxConflicts=</white><yellow><value></yellow>"
+        last_switch: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence lastSwitch=</white><yellow><timestamp></yellow> <gray>(<reason>)</gray>"

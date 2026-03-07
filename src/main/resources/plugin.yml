@@ -3,12 +3,12 @@ version: ${version}
 main: it.patric.cittaexp.CittaExpPlugin
 api-version: '1.21'
 authors: [Patric]
-description: GUI-first city plugin preview framework for Paper.
+description: Framework plugin city-first con GUI di anteprima per Paper.
 softdepend: [ItemsAdder]
 commands:
   cittaexp:
-    description: GUI preview and scenario controls for CittaEXP
-    usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe>
+    description: Comandi anteprima GUI e diagnostica di CittaEXP
+    usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog>
 permissions:
   cittaexp.admin.gui.preview:
     description: Allows opening GUI previews and controlling scenarios/themes

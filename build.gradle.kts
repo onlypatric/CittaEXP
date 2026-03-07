@@ -15,9 +15,6 @@ java {
 val defaultCommonLibJar = "../minecraft-common-lib/build/libs/minecraft-common-lib-3.0.0.jar"
 val commonLibJarPath = providers.gradleProperty("commonLibJar").orElse(defaultCommonLibJar)
 val commonLibJar = file(commonLibJarPath.get())
-val defaultInvUiAdapterJar = "../minecraft-common-lib/adapter-invui/build/libs/adapter-invui-3.0.0.jar"
-val invUiAdapterJarPath = providers.gradleProperty("invUiAdapterJar").orElse(defaultInvUiAdapterJar)
-val invUiAdapterJar = file(invUiAdapterJarPath.get())
 val defaultItemsAdderAdapterJar = "../minecraft-common-lib/adapter-itemsadder/build/libs/adapter-itemsadder-3.0.0.jar"
 val itemsAdderAdapterJarPath = providers.gradleProperty("itemsAdderAdapterJar").orElse(defaultItemsAdderAdapterJar)
 val itemsAdderAdapterJar = file(itemsAdderAdapterJarPath.get())
@@ -29,9 +26,11 @@ repositories {
 
 dependencies {
     implementation(files(commonLibJar))
-    implementation(files(invUiAdapterJar))
     implementation(files(itemsAdderAdapterJar))
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    implementation("org.xerial:sqlite-jdbc:3.50.3.0")
+    implementation("com.mysql:mysql-connector-j:9.4.0")
+    implementation("com.google.code.gson:gson:2.13.2")
 
     testImplementation(files(commonLibJar))
     testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
@@ -52,7 +51,7 @@ tasks.processResources {
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(21)
-    dependsOn("verifyCommonLibJar", "verifyInvUiAdapterJar", "verifyItemsAdderAdapterJar")
+    dependsOn("verifyCommonLibJar", "verifyItemsAdderAdapterJar")
 }
 
 tasks.test {
@@ -79,17 +78,6 @@ tasks.register("verifyCommonLibJar") {
             throw GradleException(
                 "Common-lib jar non trovato: ${commonLibJar.absolutePath}. " +
                     "Passa -PcommonLibJar=/path/minecraft-common-lib-3.0.0.jar"
-            )
-        }
-    }
-}
-
-tasks.register("verifyInvUiAdapterJar") {
-    doLast {
-        if (!invUiAdapterJar.exists()) {
-            throw GradleException(
-                "Adapter InvUI jar non trovato: ${invUiAdapterJar.absolutePath}. " +
-                    "Passa -PinvUiAdapterJar=/path/adapter-invui-3.0.0.jar"
             )
         }
     }

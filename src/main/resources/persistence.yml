@@ -1,0 +1,16 @@
+persistence:
+  mode: auto
+  fallback:
+    enabled: true
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    database: cittaexp
+    username: root
+    password: ""
+    params: "useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+  sqlite:
+    file: data/cittaexp.sqlite
+  replay:
+    batchSize: 100
+    intervalSeconds: 10

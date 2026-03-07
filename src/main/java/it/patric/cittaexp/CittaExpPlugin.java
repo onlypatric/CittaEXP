@@ -1,20 +1,25 @@
 package it.patric.cittaexp;
 
-import dev.patric.commonlib.adapter.invui.InvUiAdapterComponent;
 import dev.patric.commonlib.adapter.itemsadder.ItemsAdderAdapterComponent;
 import dev.patric.commonlib.api.CommonRuntime;
 import dev.patric.commonlib.api.bootstrap.RuntimeBootstrap;
 import dev.patric.commonlib.api.capability.CapabilityRegistry;
+import dev.patric.commonlib.api.dialog.DialogService;
 import dev.patric.commonlib.api.dialog.DialogTemplateRegistry;
 import dev.patric.commonlib.api.error.OperationResult;
 import dev.patric.commonlib.api.gui.GuiDefinitionRegistry;
 import dev.patric.commonlib.api.gui.GuiSessionService;
 import dev.patric.commonlib.api.itemsadder.ItemsAdderService;
+import dev.patric.commonlib.api.MessageService;
 import it.patric.cittaexp.capability.RuntimeUiCapabilityGate;
 import it.patric.cittaexp.command.CittaExpPreviewCommand;
 import it.patric.cittaexp.data.InMemoryCityViewReadPort;
 import it.patric.cittaexp.dialog.CreationDialogTemplates;
+import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
+import it.patric.cittaexp.dialog.showcase.DialogShowcaseTemplates;
 import it.patric.cittaexp.permission.StaffUiPermissionGate;
+import it.patric.cittaexp.persistence.runtime.CittaExpPersistenceComponent;
+import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.ui.framework.GuiActionRouter;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
@@ -30,8 +35,8 @@ public final class CittaExpPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         OperationResult<CommonRuntime> built = RuntimeBootstrap.build(this, builder ->
-                builder.component(new InvUiAdapterComponent())
-                        .component(new ItemsAdderAdapterComponent())
+                builder.component(new ItemsAdderAdapterComponent())
+                        .component(new CittaExpPersistenceComponent())
         );
         if (built.isFailure()) {
             throw new IllegalStateException(
@@ -67,8 +72,11 @@ public final class CittaExpPlugin extends JavaPlugin {
         GuiSessionService guiSessionService = runtime.services().require(GuiSessionService.class);
         GuiDefinitionRegistry guiDefinitionRegistry = runtime.services().require(GuiDefinitionRegistry.class);
         DialogTemplateRegistry dialogTemplateRegistry = runtime.services().require(DialogTemplateRegistry.class);
+        DialogService dialogService = runtime.services().require(DialogService.class);
         CapabilityRegistry capabilityRegistry = runtime.services().require(CapabilityRegistry.class);
         ItemsAdderService itemsAdderService = runtime.services().require(ItemsAdderService.class);
+        PersistenceStatusService persistenceStatusService = runtime.services().require(PersistenceStatusService.class);
+        MessageService messageService = runtime.services().require(MessageService.class);
 
         PreviewSettings previewSettings = new PreviewSettings();
         RuntimeUiCapabilityGate capabilityGate = new RuntimeUiCapabilityGate(capabilityRegistry);
@@ -85,13 +93,22 @@ public final class CittaExpPlugin extends JavaPlugin {
         );
 
         new CreationDialogTemplates().register(dialogTemplateRegistry);
+        new DialogShowcaseTemplates().register(dialogTemplateRegistry);
+        DialogShowcaseService dialogShowcaseService = new DialogShowcaseService(
+                dialogService,
+                dialogTemplateRegistry,
+                getLogger()
+        );
 
         CittaExpPreviewCommand previewCommand = new CittaExpPreviewCommand(
                 guiFlowOrchestrator,
                 previewSettings,
                 permissionGate,
                 capabilityRegistry,
-                itemsAdderService
+                itemsAdderService,
+                dialogShowcaseService,
+                persistenceStatusService,
+                messageService
         );
         if (getCommand("cittaexp") != null) {
             getCommand("cittaexp").setExecutor(previewCommand);
