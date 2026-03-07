@@ -961,15 +961,46 @@ public final class CityPersistenceService
     @Override
     public void enqueue(OutboxEvent event) {
         Objects.requireNonNull(event, "event");
-        try (Connection connection = openSqliteConnection();
-             PreparedStatement stmt = connection.prepareStatement(
-                     """
-                     INSERT INTO city_outbox (
-                         event_id, aggregate_type, aggregate_id, event_type,
-                         payload_json, occurred_at, replay_status, replay_attempts, last_error
-                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                     """
-             )) {
+        Connection activeTx = txConnection.get();
+        if (activeTx != null) {
+            try {
+                insertOutboxEvent(activeTx, event);
+                return;
+            } catch (SQLException ex) {
+                logger.log(
+                        Level.SEVERE,
+                        "[CittaEXP][persistence] enqueue failed on active transaction event="
+                                + event.eventId()
+                                + " type=" + event.eventType(),
+                        ex
+                );
+                throw new IllegalStateException("Cannot enqueue outbox event", ex);
+            }
+        }
+
+        try (Connection connection = openSqliteConnection()) {
+            insertOutboxEvent(connection, event);
+        } catch (SQLException ex) {
+            logger.log(
+                    Level.SEVERE,
+                    "[CittaEXP][persistence] enqueue failed event="
+                            + event.eventId()
+                            + " type=" + event.eventType(),
+                    ex
+            );
+            throw new IllegalStateException("Cannot enqueue outbox event", ex);
+        }
+    }
+
+    private static void insertOutboxEvent(Connection connection, OutboxEvent event) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                """
+                INSERT INTO city_outbox (
+                    event_id, aggregate_type, aggregate_id, event_type,
+                    payload_json, occurred_at, replay_status, replay_attempts, last_error
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """
+        )) {
             stmt.setString(1, event.eventId().toString());
             stmt.setString(2, event.aggregateType());
             stmt.setString(3, event.aggregateId());
@@ -980,8 +1011,6 @@ public final class CityPersistenceService
             stmt.setInt(8, event.replayAttempts());
             stmt.setString(9, event.lastError());
             stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new IllegalStateException("Cannot enqueue outbox event", ex);
         }
     }
 

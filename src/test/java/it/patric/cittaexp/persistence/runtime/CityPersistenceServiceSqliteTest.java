@@ -23,6 +23,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -157,6 +158,39 @@ class CityPersistenceServiceSqliteTest {
         service.upsertRole(new CityRoleRecord(cityId, "membro", "Membro", 1, "{\"invite\":false}"));
 
         assertTrue(service.pendingCount() >= 3L);
+    }
+
+    @Test
+    void enqueueInsideTransactionDoesNotLockSqlite() {
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+        long now = System.currentTimeMillis();
+
+        assertDoesNotThrow(() ->
+                service.withTransaction(connection -> {
+                    PersistenceWriteOutcome created = service.createCity(new CityRecord(
+                            cityId,
+                            "TransCity",
+                            "TRN",
+                            leaderId,
+                            CityTier.BORGO,
+                            CityStatus.ACTIVE,
+                            false,
+                            false,
+                            0L,
+                            1,
+                            10,
+                            now,
+                            now,
+                            0
+                    ));
+                    assertTrue(created.success());
+                    return null;
+                })
+        );
+
+        assertTrue(service.findCityById(cityId).isPresent());
+        assertTrue(service.pendingCount() >= 1L);
     }
 
     @Test
