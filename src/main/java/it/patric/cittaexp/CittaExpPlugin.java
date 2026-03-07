@@ -1,5 +1,6 @@
 package it.patric.cittaexp;
 
+import dev.patric.commonlib.adapter.huskclaims.HuskClaimsAdapterComponent;
 import dev.patric.commonlib.adapter.itemsadder.ItemsAdderAdapterComponent;
 import dev.patric.commonlib.api.CommonRuntime;
 import dev.patric.commonlib.api.bootstrap.RuntimeBootstrap;
@@ -23,6 +24,8 @@ import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.runtime.dependency.RequiredDependenciesComponent;
 import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
+import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
+import it.patric.cittaexp.runtime.integration.RequiredIntegrationsComponent;
 import it.patric.cittaexp.ui.framework.GuiActionRouter;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import it.patric.cittaexp.ui.framework.GuiStateComposer;
@@ -38,7 +41,9 @@ public final class CittaExpPlugin extends JavaPlugin {
     public void onLoad() {
         OperationResult<CommonRuntime> built = RuntimeBootstrap.build(this, builder ->
                 builder.component(new RequiredDependenciesComponent())
+                        .component(new HuskClaimsAdapterComponent())
                         .component(new ItemsAdderAdapterComponent())
+                        .component(new RequiredIntegrationsComponent())
                         .component(new CittaExpPersistenceComponent())
         );
         if (built.isFailure()) {
@@ -81,6 +86,8 @@ public final class CittaExpPlugin extends JavaPlugin {
         PersistenceStatusService persistenceStatusService = runtime.services().require(PersistenceStatusService.class);
         MessageService messageService = runtime.services().require(MessageService.class);
         RequiredDependencyStatusService requiredDependencyStatusService = runtime.services().require(RequiredDependencyStatusService.class);
+        RequiredIntegrationStatusService requiredIntegrationStatusService =
+                runtime.services().require(RequiredIntegrationStatusService.class);
 
         PreviewSettings previewSettings = new PreviewSettings();
         RuntimeUiCapabilityGate capabilityGate = new RuntimeUiCapabilityGate(capabilityRegistry);
@@ -113,7 +120,8 @@ public final class CittaExpPlugin extends JavaPlugin {
                 dialogShowcaseService,
                 persistenceStatusService,
                 messageService,
-                requiredDependencyStatusService
+                requiredDependencyStatusService,
+                requiredIntegrationStatusService
         );
         if (getCommand("cittaexp") != null) {
             getCommand("cittaexp").setExecutor(previewCommand);

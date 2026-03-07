@@ -12,6 +12,7 @@ import it.patric.cittaexp.preview.PreviewScenario;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.preview.ThemeMode;
 import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
+import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
 import it.patric.cittaexp.ui.contract.UiPermissionGate;
 import it.patric.cittaexp.ui.contract.UiScreenKey;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
@@ -45,6 +46,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
     private final PersistenceStatusService persistenceStatusService;
     private final MessageService messageService;
     private final RequiredDependencyStatusService requiredDependencyStatusService;
+    private final RequiredIntegrationStatusService requiredIntegrationStatusService;
 
     public CittaExpPreviewCommand(
             GuiFlowOrchestrator guiFlowOrchestrator,
@@ -55,7 +57,8 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             DialogShowcaseService dialogShowcaseService,
             PersistenceStatusService persistenceStatusService,
             MessageService messageService,
-            RequiredDependencyStatusService requiredDependencyStatusService
+            RequiredDependencyStatusService requiredDependencyStatusService,
+            RequiredIntegrationStatusService requiredIntegrationStatusService
     ) {
         this.guiFlowOrchestrator = Objects.requireNonNull(guiFlowOrchestrator, "guiFlowOrchestrator");
         this.previewSettings = Objects.requireNonNull(previewSettings, "previewSettings");
@@ -68,6 +71,10 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
         this.requiredDependencyStatusService = Objects.requireNonNull(
                 requiredDependencyStatusService,
                 "requiredDependencyStatusService"
+        );
+        this.requiredIntegrationStatusService = Objects.requireNonNull(
+                requiredIntegrationStatusService,
+                "requiredIntegrationStatusService"
         );
     }
 
@@ -237,6 +244,29 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
                     )
             ));
         }
+        var integrations = requiredIntegrationStatusService.snapshot();
+        for (var adapter : integrations.adapters()) {
+            sender.sendMessage(msg(
+                    sender,
+                    "cittaexp.probe.integration.status",
+                    Map.of(
+                            "name", adapter.name(),
+                            "state", adapter.state().name(),
+                            "version", adapter.version(),
+                            "reason", adapter.reason()
+                    )
+            ));
+        }
+        sender.sendMessage(msg(
+                sender,
+                "cittaexp.probe.integration.ranking.scan",
+                Map.of(
+                        "scanned", String.valueOf(integrations.rankingScan().scannedEntries()),
+                        "valid", String.valueOf(integrations.rankingScan().validCityKeys()),
+                        "invalid", String.valueOf(integrations.rankingScan().invalidKeys()),
+                        "lastScan", String.valueOf(integrations.rankingScan().lastScanEpochMilli())
+                )
+        ));
         return true;
     }
 
