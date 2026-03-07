@@ -5,15 +5,20 @@ import com.google.gson.JsonObject;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import it.patric.cittaexp.core.model.JoinRequestStatus;
 import it.patric.cittaexp.persistence.domain.AuditEventRecord;
+import it.patric.cittaexp.persistence.domain.CapitalStateRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityTreasuryLedgerRecord;
 import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
 import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
+import it.patric.cittaexp.persistence.domain.MonthlyCycleStateRecord;
+import it.patric.cittaexp.persistence.domain.RankingSnapshotRecord;
+import it.patric.cittaexp.persistence.domain.TaxPolicyRecord;
 import java.util.UUID;
 import java.util.Locale;
 
@@ -190,6 +195,75 @@ final class OutboxEventCodec {
         JsonObject root = new JsonObject();
         root.addProperty("cityId", cityId.toString());
         root.addProperty("playerUuid", playerUuid.toString());
+        return GSON.toJson(root);
+    }
+
+    String taxPolicyUpsertPayload(TaxPolicyRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("policyId", record.policyId());
+        root.addProperty("borgoMonthlyCost", record.borgoMonthlyCost());
+        root.addProperty("villaggioMonthlyCost", record.villaggioMonthlyCost());
+        root.addProperty("regnoMonthlyCost", record.regnoMonthlyCost());
+        root.addProperty("regnoShopMonthlyExtra", record.regnoShopMonthlyExtra());
+        root.addProperty("capitaleMonthlyBonus", record.capitaleMonthlyBonus());
+        root.addProperty("dueDayOfMonth", record.dueDayOfMonth());
+        root.addProperty("timezoneId", record.timezoneId());
+        root.addProperty("updatedAt", record.updatedAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String ledgerAppendPayload(CityTreasuryLedgerRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("entryId", record.entryId().toString());
+        root.addProperty("cityId", record.cityId().toString());
+        root.addProperty("entryType", record.entryType().name());
+        root.addProperty("amount", record.amount());
+        root.addProperty("resultingBalance", record.resultingBalance());
+        root.addProperty("reason", record.reason());
+        root.addProperty("actorUuid", record.actorUuid() == null ? "" : record.actorUuid().toString());
+        root.addProperty("occurredAt", record.occurredAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String capitalStateUpsertPayload(CapitalStateRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("capitalSlot", record.capitalSlot());
+        root.addProperty("cityId", record.cityId().toString());
+        root.addProperty("assignedAt", record.assignedAtEpochMilli());
+        root.addProperty("updatedAt", record.updatedAtEpochMilli());
+        root.addProperty("sourceRankingVersion", record.sourceRankingVersion());
+        return GSON.toJson(root);
+    }
+
+    String capitalStateClearPayload(String capitalSlot) {
+        JsonObject root = new JsonObject();
+        root.addProperty("capitalSlot", capitalSlot);
+        return GSON.toJson(root);
+    }
+
+    String rankingSnapshotUpsertPayload(RankingSnapshotRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", record.cityId().toString());
+        root.addProperty("rank", record.rank());
+        root.addProperty("score", record.score());
+        root.addProperty("sourceVersion", record.sourceVersion());
+        root.addProperty("fetchedAt", record.fetchedAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String rankingSnapshotDeletePayload(UUID cityId) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", cityId.toString());
+        return GSON.toJson(root);
+    }
+
+    String monthlyCycleStateUpsertPayload(MonthlyCycleStateRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cycleKey", record.cycleKey());
+        root.addProperty("lastProcessedMonth", record.lastProcessedMonth());
+        root.addProperty("lastRunAt", record.lastRunAtEpochMilli());
+        root.addProperty("lastStatus", record.lastStatus());
+        root.addProperty("lastError", record.lastError());
         return GSON.toJson(root);
     }
 

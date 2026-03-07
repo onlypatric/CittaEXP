@@ -9,6 +9,7 @@ import it.patric.cittaexp.dialog.showcase.DialogShowcaseKey;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
 import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
 import it.patric.cittaexp.core.service.CityModerationService;
+import it.patric.cittaexp.core.service.EconomyDiagnosticsService;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewScenario;
 import it.patric.cittaexp.preview.PreviewSettings;
@@ -52,6 +53,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
     private final RequiredIntegrationStatusService requiredIntegrationStatusService;
     private final CityModerationService cityModerationService;
     private final CityLifecycleDiagnosticsService cityLifecycleDiagnosticsService;
+    private final EconomyDiagnosticsService economyDiagnosticsService;
 
     public CittaExpPreviewCommand(
             GuiFlowOrchestrator guiFlowOrchestrator,
@@ -65,7 +67,8 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             RequiredDependencyStatusService requiredDependencyStatusService,
             RequiredIntegrationStatusService requiredIntegrationStatusService,
             CityModerationService cityModerationService,
-            CityLifecycleDiagnosticsService cityLifecycleDiagnosticsService
+            CityLifecycleDiagnosticsService cityLifecycleDiagnosticsService,
+            EconomyDiagnosticsService economyDiagnosticsService
     ) {
         this.guiFlowOrchestrator = Objects.requireNonNull(guiFlowOrchestrator, "guiFlowOrchestrator");
         this.previewSettings = Objects.requireNonNull(previewSettings, "previewSettings");
@@ -87,6 +90,10 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
         this.cityLifecycleDiagnosticsService = Objects.requireNonNull(
                 cityLifecycleDiagnosticsService,
                 "cityLifecycleDiagnosticsService"
+        );
+        this.economyDiagnosticsService = Objects.requireNonNull(
+                economyDiagnosticsService,
+                "economyDiagnosticsService"
         );
     }
 
@@ -291,6 +298,28 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
                         "freeze", String.valueOf(lifecycle.activeFreezeCases()),
                         "invites", String.valueOf(lifecycle.pendingInvitations()),
                         "requests", String.valueOf(lifecycle.pendingJoinRequests())
+                )
+        ));
+        var economy = economyDiagnosticsService.snapshot();
+        sender.sendMessage(msg(
+                sender,
+                "cittaexp.probe.economy.summary",
+                Map.of(
+                        "enabled", String.valueOf(economy.enabled()),
+                        "lastMonth", economy.lastProcessedMonth(),
+                        "backlog", String.valueOf(economy.backlogMonths()),
+                        "taxFreeze", String.valueOf(economy.taxFreezeActiveCount())
+                )
+        ));
+        sender.sendMessage(msg(
+                sender,
+                "cittaexp.probe.economy.capital",
+                Map.of(
+                        "cityId", economy.capitalCityId() == null ? "-" : economy.capitalCityId().toString(),
+                        "bonusEntries", String.valueOf(economy.capitalBonusEntries()),
+                        "lastRun", String.valueOf(economy.lastRunAtEpochMilli()),
+                        "status", economy.lastStatus(),
+                        "error", economy.lastError().isBlank() ? "-" : economy.lastError()
                 )
         ));
         return true;

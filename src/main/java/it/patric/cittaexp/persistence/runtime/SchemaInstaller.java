@@ -212,6 +212,16 @@ final class SchemaInstaller {
                     """);
 
             statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS monthly_cycle_state (
+                        cycle_key VARCHAR(32) PRIMARY KEY,
+                        last_processed_month VARCHAR(7) NOT NULL,
+                        last_run_at BIGINT NOT NULL,
+                        last_status VARCHAR(32) NOT NULL,
+                        last_error TEXT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS staff_approval_tickets (
                         ticket_id VARCHAR(36) PRIMARY KEY,
                         city_id VARCHAR(36) NOT NULL,
@@ -302,8 +312,10 @@ final class SchemaInstaller {
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_claim_perms_city ON city_member_claim_permissions(city_id)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_claim_perms_player ON city_member_claim_permissions(player_uuid)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_ledger_city_time ON city_treasury_ledger(city_id, occurred_at)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_ledger_type_time ON city_treasury_ledger(entry_type, occurred_at)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_tickets_status_time ON staff_approval_tickets(status, requested_at)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_freeze_city_active ON freeze_cases(city_id, active)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_freeze_reason_active ON freeze_cases(reason, active)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_invite_city_status ON city_invitations(city_id, status)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_join_city_status ON join_requests(city_id, status)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_audit_agg_time ON audit_events(aggregate_type, aggregate_id, occurred_at)");
@@ -321,8 +333,10 @@ final class SchemaInstaller {
                 createIndexIfMissing(statement, "idx_city_claim_perms_city", "city_member_claim_permissions(city_id)");
                 createIndexIfMissing(statement, "idx_city_claim_perms_player", "city_member_claim_permissions(player_uuid)");
                 createIndexIfMissing(statement, "idx_ledger_city_time", "city_treasury_ledger(city_id, occurred_at)");
+                createIndexIfMissing(statement, "idx_ledger_type_time", "city_treasury_ledger(entry_type, occurred_at)");
                 createIndexIfMissing(statement, "idx_tickets_status_time", "staff_approval_tickets(status, requested_at)");
                 createIndexIfMissing(statement, "idx_freeze_city_active", "freeze_cases(city_id, active)");
+                createIndexIfMissing(statement, "idx_freeze_reason_active", "freeze_cases(reason, active)");
                 createIndexIfMissing(statement, "idx_invite_city_status", "city_invitations(city_id, status)");
                 createIndexIfMissing(statement, "idx_join_city_status", "join_requests(city_id, status)");
                 createIndexIfMissing(statement, "idx_audit_agg_time", "audit_events(aggregate_type, aggregate_id, occurred_at)");

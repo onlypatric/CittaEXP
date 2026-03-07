@@ -6,20 +6,29 @@ import it.patric.cittaexp.core.model.CityTier;
 import it.patric.cittaexp.core.model.FreezeReason;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import it.patric.cittaexp.core.model.JoinRequestStatus;
+import it.patric.cittaexp.core.model.LedgerEntryType;
+import it.patric.cittaexp.core.port.CityTreasuryLedgerPort;
+import it.patric.cittaexp.core.port.EconomyStatePort;
+import it.patric.cittaexp.core.port.TaxPolicyPort;
 import it.patric.cittaexp.persistence.config.PersistenceSettings;
 import it.patric.cittaexp.persistence.domain.AuditEventRecord;
+import it.patric.cittaexp.persistence.domain.CapitalStateRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityTreasuryLedgerRecord;
 import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
 import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
+import it.patric.cittaexp.persistence.domain.MonthlyCycleStateRecord;
 import it.patric.cittaexp.persistence.domain.OutboxEvent;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
+import it.patric.cittaexp.persistence.domain.RankingSnapshotRecord;
 import it.patric.cittaexp.persistence.domain.ReplayStatus;
+import it.patric.cittaexp.persistence.domain.TaxPolicyRecord;
 import it.patric.cittaexp.persistence.port.CityReadPort;
 import it.patric.cittaexp.persistence.port.CityTxPort;
 import it.patric.cittaexp.persistence.port.CityWritePort;
@@ -41,7 +50,8 @@ import java.util.logging.Logger;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CityPersistenceService
-        implements CityReadPort, CityWritePort, CityTxPort, DomainEventOutboxPort, PersistenceStatusService {
+        implements CityReadPort, CityWritePort, CityTxPort, DomainEventOutboxPort, PersistenceStatusService,
+        TaxPolicyPort, CityTreasuryLedgerPort, EconomyStatePort {
 
     private static final String EVENT_CITY_UPSERT = "CITY_UPSERT";
     private static final String EVENT_CITY_HARD_DELETE = "CITY_HARD_DELETE";
@@ -60,6 +70,13 @@ public final class CityPersistenceService
     private static final String EVENT_CITY_VICE_CLEAR = "CITY_VICE_CLEAR";
     private static final String EVENT_MEMBER_CLAIM_PERMISSIONS_UPSERT = "MEMBER_CLAIM_PERMISSIONS_UPSERT";
     private static final String EVENT_MEMBER_CLAIM_PERMISSIONS_DELETE = "MEMBER_CLAIM_PERMISSIONS_DELETE";
+    private static final String EVENT_TAX_POLICY_UPSERT = "TAX_POLICY_UPSERT";
+    private static final String EVENT_LEDGER_APPEND = "LEDGER_APPEND";
+    private static final String EVENT_CAPITAL_STATE_UPSERT = "CAPITAL_STATE_UPSERT";
+    private static final String EVENT_CAPITAL_STATE_CLEAR = "CAPITAL_STATE_CLEAR";
+    private static final String EVENT_RANKING_SNAPSHOT_UPSERT = "RANKING_SNAPSHOT_UPSERT";
+    private static final String EVENT_RANKING_SNAPSHOT_DELETE = "RANKING_SNAPSHOT_DELETE";
+    private static final String EVENT_MONTHLY_CYCLE_STATE_UPSERT = "MONTHLY_CYCLE_STATE_UPSERT";
     private static final String EVENT_AUDIT_APPEND = "AUDIT_APPEND";
 
     private final JavaPlugin plugin;
@@ -341,8 +358,148 @@ public final class CityPersistenceService
     }
 
     @Override
+    public Optional<TaxPolicyRecord> findTaxPolicy(String policyId) {
+        Objects.requireNonNull(policyId, "policyId");
+        return withReadConnection(
+                "SELECT * FROM tax_policy WHERE policy_id = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, policyId);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? Optional.of(mapTaxPolicy(rs)) : Optional.empty();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public List<CityTreasuryLedgerRecord> listLedger(UUID cityId, int limit) {
+        Objects.requireNonNull(cityId, "cityId");
+        int bounded = Math.max(1, limit);
+        return withReadConnection(
+                "SELECT * FROM city_treasury_ledger WHERE city_id = ? ORDER BY occurred_at DESC LIMIT ?",
+                stmt -> {
+                    stmt.setString(1, cityId.toString());
+                    stmt.setInt(2, bounded);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        List<CityTreasuryLedgerRecord> rows = new ArrayList<>();
+                        while (rs.next()) {
+                            rows.add(mapLedger(rs));
+                        }
+                        return List.copyOf(rows);
+                    }
+                }
+        );
+    }
+
+    @Override
+    public boolean existsLedgerEntry(UUID cityId, LedgerEntryType entryType, String reason) {
+        Objects.requireNonNull(cityId, "cityId");
+        Objects.requireNonNull(entryType, "entryType");
+        Objects.requireNonNull(reason, "reason");
+        return withReadConnection(
+                "SELECT 1 FROM city_treasury_ledger WHERE city_id = ? AND entry_type = ? AND reason = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, cityId.toString());
+                    stmt.setString(2, entryType.name());
+                    stmt.setString(3, reason);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public long countLedgerByType(LedgerEntryType entryType) {
+        Objects.requireNonNull(entryType, "entryType");
+        return withReadConnection(
+                "SELECT COUNT(*) AS c FROM city_treasury_ledger WHERE entry_type = ?",
+                stmt -> {
+                    stmt.setString(1, entryType.name());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? rs.getLong("c") : 0L;
+                    }
+                }
+        );
+    }
+
+    @Override
+    public Optional<CapitalStateRecord> findCapitalState(String capitalSlot) {
+        Objects.requireNonNull(capitalSlot, "capitalSlot");
+        return withReadConnection(
+                "SELECT * FROM capital_state WHERE capital_slot = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, capitalSlot);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? Optional.of(mapCapitalState(rs)) : Optional.empty();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public Optional<RankingSnapshotRecord> findRankingSnapshot(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        return withReadConnection(
+                "SELECT * FROM ranking_snapshot WHERE city_id = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, cityId.toString());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? Optional.of(mapRankingSnapshot(rs)) : Optional.empty();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public List<RankingSnapshotRecord> listRankingSnapshots(int limit) {
+        int bounded = Math.max(1, limit);
+        return withReadConnection(
+                "SELECT * FROM ranking_snapshot ORDER BY rank_pos ASC, fetched_at DESC LIMIT ?",
+                stmt -> {
+                    stmt.setInt(1, bounded);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        List<RankingSnapshotRecord> rows = new ArrayList<>();
+                        while (rs.next()) {
+                            rows.add(mapRankingSnapshot(rs));
+                        }
+                        return List.copyOf(rows);
+                    }
+                }
+        );
+    }
+
+    @Override
+    public Optional<MonthlyCycleStateRecord> findMonthlyCycleState(String cycleKey) {
+        Objects.requireNonNull(cycleKey, "cycleKey");
+        return withReadConnection(
+                "SELECT * FROM monthly_cycle_state WHERE cycle_key = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, cycleKey);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? Optional.of(mapMonthlyCycleState(rs)) : Optional.empty();
+                    }
+                }
+        );
+    }
+
+    @Override
     public long countActiveFreezeCases() {
         return countByQuery("SELECT COUNT(*) AS c FROM freeze_cases WHERE active = 1");
+    }
+
+    @Override
+    public long countActiveFreezeCasesByReason(FreezeReason reason) {
+        Objects.requireNonNull(reason, "reason");
+        return withReadConnection(
+                "SELECT COUNT(*) AS c FROM freeze_cases WHERE active = 1 AND reason = ?",
+                stmt -> {
+                    stmt.setString(1, reason.name());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? rs.getLong("c") : 0L;
+                    }
+                }
+        );
     }
 
     @Override
@@ -1080,6 +1237,266 @@ public final class CityPersistenceService
     }
 
     @Override
+    public PersistenceWriteOutcome upsertTaxPolicy(TaxPolicyRecord policy) {
+        Objects.requireNonNull(policy, "policy");
+        try {
+            runWritable("upsertTaxPolicy", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "tax_policy",
+                        "policy_id, borgo_monthly_cost, villaggio_monthly_cost, regno_monthly_cost, regno_shop_monthly_extra, capitale_monthly_bonus, due_day_of_month, timezone_id, updated_at",
+                        "borgo_monthly_cost = excluded.borgo_monthly_cost, villaggio_monthly_cost = excluded.villaggio_monthly_cost, regno_monthly_cost = excluded.regno_monthly_cost, regno_shop_monthly_extra = excluded.regno_shop_monthly_extra, capitale_monthly_bonus = excluded.capitale_monthly_bonus, due_day_of_month = excluded.due_day_of_month, timezone_id = excluded.timezone_id, updated_at = excluded.updated_at",
+                        "borgo_monthly_cost = VALUES(borgo_monthly_cost), villaggio_monthly_cost = VALUES(villaggio_monthly_cost), regno_monthly_cost = VALUES(regno_monthly_cost), regno_shop_monthly_extra = VALUES(regno_shop_monthly_extra), capitale_monthly_bonus = VALUES(capitale_monthly_bonus), due_day_of_month = VALUES(due_day_of_month), timezone_id = VALUES(timezone_id), updated_at = VALUES(updated_at)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, policy.policyId());
+                    stmt.setLong(2, policy.borgoMonthlyCost());
+                    stmt.setLong(3, policy.villaggioMonthlyCost());
+                    stmt.setLong(4, policy.regnoMonthlyCost());
+                    stmt.setLong(5, policy.regnoShopMonthlyExtra());
+                    stmt.setLong(6, policy.capitaleMonthlyBonus());
+                    stmt.setInt(7, policy.dueDayOfMonth());
+                    stmt.setString(8, policy.timezoneId());
+                    stmt.setLong(9, policy.updatedAtEpochMilli());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "TAX_POLICY",
+                            policy.policyId(),
+                            EVENT_TAX_POLICY_UPSERT,
+                            codec.taxPolicyUpsertPayload(policy),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("tax-policy-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertTaxPolicy failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome appendLedger(CityTreasuryLedgerRecord entry) {
+        Objects.requireNonNull(entry, "entry");
+        try {
+            runWritable("appendLedger", connection -> {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "INSERT INTO city_treasury_ledger (entry_id, city_id, entry_type, amount, resulting_balance, reason, actor_uuid, occurred_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                )) {
+                    stmt.setString(1, entry.entryId().toString());
+                    stmt.setString(2, entry.cityId().toString());
+                    stmt.setString(3, entry.entryType().name());
+                    stmt.setLong(4, entry.amount());
+                    stmt.setLong(5, entry.resultingBalance());
+                    stmt.setString(6, entry.reason());
+                    stmt.setString(7, entry.actorUuid() == null ? null : entry.actorUuid().toString());
+                    stmt.setLong(8, entry.occurredAtEpochMilli());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY_LEDGER",
+                            entry.entryId().toString(),
+                            EVENT_LEDGER_APPEND,
+                            codec.ledgerAppendPayload(entry),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("ledger-appended");
+        } catch (SQLException ex) {
+            if (isConflict(ex)) {
+                return PersistenceWriteOutcome.success("ledger-duplicate-ignored");
+            }
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] appendLedger failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome upsertCapitalState(CapitalStateRecord state) {
+        Objects.requireNonNull(state, "state");
+        try {
+            runWritable("upsertCapitalState", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "capital_state",
+                        "capital_slot, city_id, assigned_at, updated_at, source_ranking_version",
+                        "city_id = excluded.city_id, assigned_at = excluded.assigned_at, updated_at = excluded.updated_at, source_ranking_version = excluded.source_ranking_version",
+                        "city_id = VALUES(city_id), assigned_at = VALUES(assigned_at), updated_at = VALUES(updated_at), source_ranking_version = VALUES(source_ranking_version)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, state.capitalSlot());
+                    stmt.setString(2, state.cityId().toString());
+                    stmt.setLong(3, state.assignedAtEpochMilli());
+                    stmt.setLong(4, state.updatedAtEpochMilli());
+                    stmt.setString(5, state.sourceRankingVersion());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CAPITAL_STATE",
+                            state.capitalSlot(),
+                            EVENT_CAPITAL_STATE_UPSERT,
+                            codec.capitalStateUpsertPayload(state),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("capital-state-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertCapitalState failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome clearCapitalState(String capitalSlot) {
+        Objects.requireNonNull(capitalSlot, "capitalSlot");
+        try {
+            runWritable("clearCapitalState", connection -> {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "DELETE FROM capital_state WHERE capital_slot = ?"
+                )) {
+                    stmt.setString(1, capitalSlot);
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CAPITAL_STATE",
+                            capitalSlot,
+                            EVENT_CAPITAL_STATE_CLEAR,
+                            codec.capitalStateClearPayload(capitalSlot),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("capital-state-cleared");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] clearCapitalState failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome upsertRankingSnapshot(RankingSnapshotRecord snapshot) {
+        Objects.requireNonNull(snapshot, "snapshot");
+        try {
+            runWritable("upsertRankingSnapshot", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "ranking_snapshot",
+                        "city_id, rank_pos, score, source_version, fetched_at",
+                        "rank_pos = excluded.rank_pos, score = excluded.score, source_version = excluded.source_version, fetched_at = excluded.fetched_at",
+                        "rank_pos = VALUES(rank_pos), score = VALUES(score), source_version = VALUES(source_version), fetched_at = VALUES(fetched_at)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, snapshot.cityId().toString());
+                    stmt.setInt(2, snapshot.rank());
+                    stmt.setLong(3, snapshot.score());
+                    stmt.setString(4, snapshot.sourceVersion());
+                    stmt.setLong(5, snapshot.fetchedAtEpochMilli());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "RANKING_SNAPSHOT",
+                            snapshot.cityId().toString(),
+                            EVENT_RANKING_SNAPSHOT_UPSERT,
+                            codec.rankingSnapshotUpsertPayload(snapshot),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("ranking-snapshot-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertRankingSnapshot failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome deleteRankingSnapshot(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        try {
+            runWritable("deleteRankingSnapshot", connection -> {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "DELETE FROM ranking_snapshot WHERE city_id = ?"
+                )) {
+                    stmt.setString(1, cityId.toString());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "RANKING_SNAPSHOT",
+                            cityId.toString(),
+                            EVENT_RANKING_SNAPSHOT_DELETE,
+                            codec.rankingSnapshotDeletePayload(cityId),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("ranking-snapshot-deleted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] deleteRankingSnapshot failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome upsertMonthlyCycleState(MonthlyCycleStateRecord cycleState) {
+        Objects.requireNonNull(cycleState, "cycleState");
+        try {
+            runWritable("upsertMonthlyCycleState", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "monthly_cycle_state",
+                        "cycle_key, last_processed_month, last_run_at, last_status, last_error",
+                        "last_processed_month = excluded.last_processed_month, last_run_at = excluded.last_run_at, last_status = excluded.last_status, last_error = excluded.last_error",
+                        "last_processed_month = VALUES(last_processed_month), last_run_at = VALUES(last_run_at), last_status = VALUES(last_status), last_error = VALUES(last_error)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, cycleState.cycleKey());
+                    stmt.setString(2, cycleState.lastProcessedMonth());
+                    stmt.setLong(3, cycleState.lastRunAtEpochMilli());
+                    stmt.setString(4, cycleState.lastStatus());
+                    stmt.setString(5, cycleState.lastError());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "MONTHLY_CYCLE_STATE",
+                            cycleState.cycleKey(),
+                            EVENT_MONTHLY_CYCLE_STATE_UPSERT,
+                            codec.monthlyCycleStateUpsertPayload(cycleState),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("monthly-cycle-state-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertMonthlyCycleState failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
     public PersistenceWriteOutcome appendAuditEvent(AuditEventRecord event) {
         Objects.requireNonNull(event, "event");
         try {
@@ -1369,6 +1786,13 @@ public final class CityPersistenceService
                 case EVENT_CITY_VICE_CLEAR -> replayCityViceClear(connection, payload);
                 case EVENT_MEMBER_CLAIM_PERMISSIONS_UPSERT -> replayMemberClaimPermissionsUpsert(connection, payload);
                 case EVENT_MEMBER_CLAIM_PERMISSIONS_DELETE -> replayMemberClaimPermissionsDelete(connection, payload);
+                case EVENT_TAX_POLICY_UPSERT -> replayTaxPolicyUpsert(connection, payload);
+                case EVENT_LEDGER_APPEND -> replayLedgerAppend(connection, payload);
+                case EVENT_CAPITAL_STATE_UPSERT -> replayCapitalStateUpsert(connection, payload);
+                case EVENT_CAPITAL_STATE_CLEAR -> replayCapitalStateClear(connection, payload);
+                case EVENT_RANKING_SNAPSHOT_UPSERT -> replayRankingSnapshotUpsert(connection, payload);
+                case EVENT_RANKING_SNAPSHOT_DELETE -> replayRankingSnapshotDelete(connection, payload);
+                case EVENT_MONTHLY_CYCLE_STATE_UPSERT -> replayMonthlyCycleStateUpsert(connection, payload);
                 case EVENT_AUDIT_APPEND -> replayAuditAppend(connection, payload);
                 default -> throw new IllegalStateException("Unknown outbox eventType: " + event.eventType());
             }
@@ -1752,6 +2176,145 @@ public final class CityPersistenceService
         }
     }
 
+    private void replayTaxPolicyUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "tax_policy",
+                    "policy_id, borgo_monthly_cost, villaggio_monthly_cost, regno_monthly_cost, regno_shop_monthly_extra, capitale_monthly_bonus, due_day_of_month, timezone_id, updated_at",
+                    "borgo_monthly_cost = excluded.borgo_monthly_cost, villaggio_monthly_cost = excluded.villaggio_monthly_cost, regno_monthly_cost = excluded.regno_monthly_cost, regno_shop_monthly_extra = excluded.regno_shop_monthly_extra, capitale_monthly_bonus = excluded.capitale_monthly_bonus, due_day_of_month = excluded.due_day_of_month, timezone_id = excluded.timezone_id, updated_at = excluded.updated_at",
+                    "borgo_monthly_cost = VALUES(borgo_monthly_cost), villaggio_monthly_cost = VALUES(villaggio_monthly_cost), regno_monthly_cost = VALUES(regno_monthly_cost), regno_shop_monthly_extra = VALUES(regno_shop_monthly_extra), capitale_monthly_bonus = VALUES(capitale_monthly_bonus), due_day_of_month = VALUES(due_day_of_month), timezone_id = VALUES(timezone_id), updated_at = VALUES(updated_at)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("policyId").getAsString());
+                stmt.setLong(2, payload.get("borgoMonthlyCost").getAsLong());
+                stmt.setLong(3, payload.get("villaggioMonthlyCost").getAsLong());
+                stmt.setLong(4, payload.get("regnoMonthlyCost").getAsLong());
+                stmt.setLong(5, payload.get("regnoShopMonthlyExtra").getAsLong());
+                stmt.setLong(6, payload.get("capitaleMonthlyBonus").getAsLong());
+                stmt.setInt(7, payload.get("dueDayOfMonth").getAsInt());
+                stmt.setString(8, payload.get("timezoneId").getAsString());
+                stmt.setLong(9, payload.get("updatedAt").getAsLong());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("tax policy replay failed", ex);
+        }
+    }
+
+    private void replayLedgerAppend(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "city_treasury_ledger",
+                    "entry_id, city_id, entry_type, amount, resulting_balance, reason, actor_uuid, occurred_at",
+                    "city_id = excluded.city_id, entry_type = excluded.entry_type, amount = excluded.amount, resulting_balance = excluded.resulting_balance, reason = excluded.reason, actor_uuid = excluded.actor_uuid, occurred_at = excluded.occurred_at",
+                    "city_id = VALUES(city_id), entry_type = VALUES(entry_type), amount = VALUES(amount), resulting_balance = VALUES(resulting_balance), reason = VALUES(reason), actor_uuid = VALUES(actor_uuid), occurred_at = VALUES(occurred_at)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("entryId").getAsString());
+                stmt.setString(2, payload.get("cityId").getAsString());
+                stmt.setString(3, payload.get("entryType").getAsString());
+                stmt.setLong(4, payload.get("amount").getAsLong());
+                stmt.setLong(5, payload.get("resultingBalance").getAsLong());
+                stmt.setString(6, payload.get("reason").getAsString());
+                stmt.setString(7, toNullableValue(payload.get("actorUuid").getAsString()));
+                stmt.setLong(8, payload.get("occurredAt").getAsLong());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("ledger replay failed", ex);
+        }
+    }
+
+    private void replayCapitalStateUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "capital_state",
+                    "capital_slot, city_id, assigned_at, updated_at, source_ranking_version",
+                    "city_id = excluded.city_id, assigned_at = excluded.assigned_at, updated_at = excluded.updated_at, source_ranking_version = excluded.source_ranking_version",
+                    "city_id = VALUES(city_id), assigned_at = VALUES(assigned_at), updated_at = VALUES(updated_at), source_ranking_version = VALUES(source_ranking_version)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("capitalSlot").getAsString());
+                stmt.setString(2, payload.get("cityId").getAsString());
+                stmt.setLong(3, payload.get("assignedAt").getAsLong());
+                stmt.setLong(4, payload.get("updatedAt").getAsLong());
+                stmt.setString(5, payload.get("sourceRankingVersion").getAsString());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("capital state replay failed", ex);
+        }
+    }
+
+    private void replayCapitalStateClear(Connection connection, JsonObject payload) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM capital_state WHERE capital_slot = ?"
+        )) {
+            stmt.setString(1, payload.get("capitalSlot").getAsString());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new IllegalStateException("capital state clear replay failed", ex);
+        }
+    }
+
+    private void replayRankingSnapshotUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "ranking_snapshot",
+                    "city_id, rank_pos, score, source_version, fetched_at",
+                    "rank_pos = excluded.rank_pos, score = excluded.score, source_version = excluded.source_version, fetched_at = excluded.fetched_at",
+                    "rank_pos = VALUES(rank_pos), score = VALUES(score), source_version = VALUES(source_version), fetched_at = VALUES(fetched_at)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("cityId").getAsString());
+                stmt.setInt(2, payload.get("rank").getAsInt());
+                stmt.setLong(3, payload.get("score").getAsLong());
+                stmt.setString(4, payload.get("sourceVersion").getAsString());
+                stmt.setLong(5, payload.get("fetchedAt").getAsLong());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("ranking snapshot replay failed", ex);
+        }
+    }
+
+    private void replayRankingSnapshotDelete(Connection connection, JsonObject payload) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM ranking_snapshot WHERE city_id = ?"
+        )) {
+            stmt.setString(1, payload.get("cityId").getAsString());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new IllegalStateException("ranking snapshot delete replay failed", ex);
+        }
+    }
+
+    private void replayMonthlyCycleStateUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "monthly_cycle_state",
+                    "cycle_key, last_processed_month, last_run_at, last_status, last_error",
+                    "last_processed_month = excluded.last_processed_month, last_run_at = excluded.last_run_at, last_status = excluded.last_status, last_error = excluded.last_error",
+                    "last_processed_month = VALUES(last_processed_month), last_run_at = VALUES(last_run_at), last_status = VALUES(last_status), last_error = VALUES(last_error)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("cycleKey").getAsString());
+                stmt.setString(2, payload.get("lastProcessedMonth").getAsString());
+                stmt.setLong(3, payload.get("lastRunAt").getAsLong());
+                stmt.setString(4, payload.get("lastStatus").getAsString());
+                stmt.setString(5, payload.get("lastError").getAsString());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("monthly cycle state replay failed", ex);
+        }
+    }
+
     private void replayAuditAppend(Connection connection, JsonObject payload) {
         try {
             String sql = upsertSql(
@@ -2059,6 +2622,63 @@ public final class CityPersistenceService
                 rs.getInt("perm_build") == 1,
                 nullableUuid(rs.getString("updated_by")),
                 rs.getLong("updated_at")
+        );
+    }
+
+    private static TaxPolicyRecord mapTaxPolicy(ResultSet rs) throws SQLException {
+        return new TaxPolicyRecord(
+                rs.getString("policy_id"),
+                rs.getLong("borgo_monthly_cost"),
+                rs.getLong("villaggio_monthly_cost"),
+                rs.getLong("regno_monthly_cost"),
+                rs.getLong("regno_shop_monthly_extra"),
+                rs.getLong("capitale_monthly_bonus"),
+                rs.getInt("due_day_of_month"),
+                rs.getString("timezone_id"),
+                rs.getLong("updated_at")
+        );
+    }
+
+    private static CityTreasuryLedgerRecord mapLedger(ResultSet rs) throws SQLException {
+        return new CityTreasuryLedgerRecord(
+                UUID.fromString(rs.getString("entry_id")),
+                UUID.fromString(rs.getString("city_id")),
+                LedgerEntryType.valueOf(rs.getString("entry_type")),
+                rs.getLong("amount"),
+                rs.getLong("resulting_balance"),
+                rs.getString("reason"),
+                nullableUuid(rs.getString("actor_uuid")),
+                rs.getLong("occurred_at")
+        );
+    }
+
+    private static CapitalStateRecord mapCapitalState(ResultSet rs) throws SQLException {
+        return new CapitalStateRecord(
+                rs.getString("capital_slot"),
+                UUID.fromString(rs.getString("city_id")),
+                rs.getLong("assigned_at"),
+                rs.getLong("updated_at"),
+                rs.getString("source_ranking_version")
+        );
+    }
+
+    private static RankingSnapshotRecord mapRankingSnapshot(ResultSet rs) throws SQLException {
+        return new RankingSnapshotRecord(
+                UUID.fromString(rs.getString("city_id")),
+                rs.getInt("rank_pos"),
+                rs.getLong("score"),
+                rs.getString("source_version"),
+                rs.getLong("fetched_at")
+        );
+    }
+
+    private static MonthlyCycleStateRecord mapMonthlyCycleState(ResultSet rs) throws SQLException {
+        return new MonthlyCycleStateRecord(
+                rs.getString("cycle_key"),
+                rs.getString("last_processed_month"),
+                rs.getLong("last_run_at"),
+                rs.getString("last_status"),
+                rs.getString("last_error")
         );
     }
 

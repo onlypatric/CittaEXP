@@ -5,10 +5,15 @@ import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityViceRecord;
+import it.patric.cittaexp.persistence.domain.CityTreasuryLedgerRecord;
+import it.patric.cittaexp.persistence.domain.CapitalStateRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
 import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
+import it.patric.cittaexp.persistence.domain.MonthlyCycleStateRecord;
+import it.patric.cittaexp.persistence.domain.RankingSnapshotRecord;
+import it.patric.cittaexp.persistence.domain.TaxPolicyRecord;
 import it.patric.cittaexp.persistence.domain.AuditEventRecord;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import it.patric.cittaexp.core.model.JoinRequestStatus;
@@ -55,6 +60,20 @@ public interface CityWritePort {
     PersistenceWriteOutcome upsertClaimPermissions(MemberClaimPermissionRecord permissions);
 
     PersistenceWriteOutcome deleteClaimPermissions(UUID cityId, UUID playerUuid);
+
+    PersistenceWriteOutcome upsertTaxPolicy(TaxPolicyRecord policy);
+
+    PersistenceWriteOutcome appendLedger(CityTreasuryLedgerRecord entry);
+
+    PersistenceWriteOutcome upsertCapitalState(CapitalStateRecord state);
+
+    PersistenceWriteOutcome clearCapitalState(String capitalSlot);
+
+    PersistenceWriteOutcome upsertRankingSnapshot(RankingSnapshotRecord snapshot);
+
+    PersistenceWriteOutcome deleteRankingSnapshot(UUID cityId);
+
+    PersistenceWriteOutcome upsertMonthlyCycleState(MonthlyCycleStateRecord cycleState);
 
     PersistenceWriteOutcome appendAuditEvent(AuditEventRecord event);
 

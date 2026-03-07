@@ -26,6 +26,7 @@ import it.patric.cittaexp.runtime.integration.RankingScanStats;
 import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
 import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
 import it.patric.cittaexp.core.service.CityModerationService;
+import it.patric.cittaexp.core.service.EconomyDiagnosticsService;
 import java.util.List;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import java.util.Locale;
@@ -65,7 +66,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -93,7 +95,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -124,7 +127,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -155,7 +159,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -180,7 +185,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -209,7 +215,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -239,7 +246,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -270,7 +278,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -297,7 +306,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         Player sender = mock(Player.class);
@@ -334,7 +344,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService(),
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -347,6 +358,8 @@ class CittaExpPreviewCommandTest {
         verify(messageService, atLeastOnce()).render(eq("cittaexp.probe.dependency.status"), anyMap(), any(Locale.class));
         verify(messageService, atLeastOnce()).render(eq("cittaexp.probe.integration.status"), anyMap(), any(Locale.class));
         verify(messageService).render(eq("cittaexp.probe.integration.ranking.scan"), anyMap(), any(Locale.class));
+        verify(messageService).render(eq("cittaexp.probe.economy.summary"), anyMap(), any(Locale.class));
+        verify(messageService).render(eq("cittaexp.probe.economy.capital"), anyMap(), any(Locale.class));
     }
 
     @Test
@@ -368,7 +381,8 @@ class CittaExpPreviewCommandTest {
                 dependencyStatusService(),
                 integrationStatusService(),
                 moderationService,
-                lifecycleDiagnosticsService()
+                lifecycleDiagnosticsService(),
+                economyDiagnosticsService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -427,6 +441,22 @@ class CittaExpPreviewCommandTest {
     private static CityLifecycleDiagnosticsService lifecycleDiagnosticsService() {
         CityLifecycleDiagnosticsService service = mock(CityLifecycleDiagnosticsService.class);
         when(service.snapshot()).thenReturn(new CityLifecycleDiagnosticsService.Snapshot(true, 1L, 2L, 3L));
+        return service;
+    }
+
+    private static EconomyDiagnosticsService economyDiagnosticsService() {
+        EconomyDiagnosticsService service = mock(EconomyDiagnosticsService.class);
+        when(service.snapshot()).thenReturn(new EconomyDiagnosticsService.Snapshot(
+                true,
+                "2026-03",
+                0,
+                1L,
+                java.util.UUID.randomUUID(),
+                2L,
+                123L,
+                "SUCCESS",
+                ""
+        ));
         return service;
     }
 

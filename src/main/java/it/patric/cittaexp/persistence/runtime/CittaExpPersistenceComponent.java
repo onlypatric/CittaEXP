@@ -8,6 +8,9 @@ import dev.patric.commonlib.api.capability.StandardCapabilities;
 import dev.patric.commonlib.api.persistence.SchemaMigration;
 import dev.patric.commonlib.api.persistence.SchemaMigrationContext;
 import dev.patric.commonlib.api.persistence.SchemaMigrationService;
+import it.patric.cittaexp.core.port.CityTreasuryLedgerPort;
+import it.patric.cittaexp.core.port.EconomyStatePort;
+import it.patric.cittaexp.core.port.TaxPolicyPort;
 import it.patric.cittaexp.persistence.config.PersistenceConfigLoader;
 import it.patric.cittaexp.persistence.config.PersistenceSettings;
 import it.patric.cittaexp.persistence.port.CityReadPort;
@@ -49,6 +52,9 @@ public final class CittaExpPersistenceComponent implements CommonComponent {
         context.services().register(CityTxPort.class, persistenceService);
         context.services().register(DomainEventOutboxPort.class, persistenceService);
         context.services().register(PersistenceStatusService.class, persistenceService);
+        context.services().register(TaxPolicyPort.class, persistenceService);
+        context.services().register(CityTreasuryLedgerPort.class, persistenceService);
+        context.services().register(EconomyStatePort.class, persistenceService);
 
         SchemaMigrationService migrationService = context.services().require(SchemaMigrationService.class);
         migrationService.register(MIGRATION_NAMESPACE, new SchemaMigration() {
@@ -60,6 +66,22 @@ public final class CittaExpPersistenceComponent implements CommonComponent {
             @Override
             public int toVersion() {
                 return 1;
+            }
+
+            @Override
+            public void migrate(SchemaMigrationContext migrationContext) {
+                persistenceService.ensureSchema();
+            }
+        });
+        migrationService.register(MIGRATION_NAMESPACE, new SchemaMigration() {
+            @Override
+            public int fromVersion() {
+                return 1;
+            }
+
+            @Override
+            public int toVersion() {
+                return 2;
             }
 
             @Override

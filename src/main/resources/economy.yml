@@ -1,0 +1,17 @@
+economy:
+  enabled: true
+  schedule:
+    timezone: "Europe/Rome"
+    runTime: "00:05"
+    catchUp: true
+    skipCreationMonth: true
+    tickIntervalSeconds: 30
+  tax:
+    borgoMonthlyCost: 1000
+    villaggioMonthlyCost: 2500
+    regnoMonthlyCost: 5000
+    regnoShopMonthlyExtraCost: 0
+    dueDayOfMonth: 1
+  capital:
+    monthlyBonus: 1500
+    slotKey: "PRIMARY"

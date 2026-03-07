@@ -2,16 +2,22 @@ package it.patric.cittaexp.persistence.runtime;
 
 import it.patric.cittaexp.core.model.CityStatus;
 import it.patric.cittaexp.core.model.CityTier;
+import it.patric.cittaexp.core.model.LedgerEntryType;
 import it.patric.cittaexp.persistence.config.PersistenceSettings;
+import it.patric.cittaexp.persistence.domain.CapitalStateRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityTreasuryLedgerRecord;
 import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
+import it.patric.cittaexp.persistence.domain.MonthlyCycleStateRecord;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
+import it.patric.cittaexp.persistence.domain.RankingSnapshotRecord;
+import it.patric.cittaexp.persistence.domain.TaxPolicyRecord;
 import it.patric.cittaexp.core.model.FreezeReason;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import java.nio.file.Path;
@@ -364,5 +370,87 @@ class CityPersistenceServiceSqliteTest {
         assertTrue(service.findCityVice(cityId).isPresent());
         assertTrue(service.findCityVice(cityId).orElseThrow().viceUuid() == null);
         assertTrue(service.findClaimPermissions(cityId, memberId).isEmpty());
+    }
+
+    @Test
+    void economyPersistenceReadWriteWorks() {
+        long now = System.currentTimeMillis();
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+
+        assertTrue(service.createCity(new CityRecord(
+                cityId,
+                "Economia",
+                "ECO",
+                leaderId,
+                CityTier.REGNO,
+                CityStatus.ACTIVE,
+                false,
+                false,
+                100L,
+                1,
+                50,
+                now,
+                now,
+                0
+        )).success());
+
+        assertTrue(service.upsertTaxPolicy(new TaxPolicyRecord(
+                "default",
+                100L,
+                200L,
+                300L,
+                50L,
+                25L,
+                1,
+                "Europe/Rome",
+                now
+        )).success());
+        assertTrue(service.findTaxPolicy("default").isPresent());
+
+        assertTrue(service.appendLedger(new CityTreasuryLedgerRecord(
+                UUID.randomUUID(),
+                cityId,
+                LedgerEntryType.TAX_CHARGE,
+                -100L,
+                0L,
+                "tax:2026-03",
+                leaderId,
+                now
+        )).success());
+        assertTrue(service.existsLedgerEntry(cityId, LedgerEntryType.TAX_CHARGE, "tax:2026-03"));
+        assertEquals(1L, service.countLedgerByType(LedgerEntryType.TAX_CHARGE));
+
+        assertTrue(service.upsertCapitalState(new CapitalStateRecord(
+                "PRIMARY",
+                cityId,
+                now,
+                now,
+                "v1"
+        )).success());
+        assertTrue(service.findCapitalState("PRIMARY").isPresent());
+        assertTrue(service.clearCapitalState("PRIMARY").success());
+        assertTrue(service.findCapitalState("PRIMARY").isEmpty());
+
+        assertTrue(service.upsertRankingSnapshot(new RankingSnapshotRecord(
+                cityId,
+                1,
+                999L,
+                "v1",
+                now
+        )).success());
+        assertTrue(service.findRankingSnapshot(cityId).isPresent());
+        assertFalse(service.listRankingSnapshots(5).isEmpty());
+        assertTrue(service.deleteRankingSnapshot(cityId).success());
+        assertTrue(service.findRankingSnapshot(cityId).isEmpty());
+
+        assertTrue(service.upsertMonthlyCycleState(new MonthlyCycleStateRecord(
+                "monthly-economy",
+                "2026-03",
+                now,
+                "SUCCESS",
+                ""
+        )).success());
+        assertTrue(service.findMonthlyCycleState("monthly-economy").isPresent());
     }
 }

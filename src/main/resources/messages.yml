@@ -44,6 +44,9 @@ default:
           scan: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Ranking scan</white> <gray>-></gray> <yellow>scanned=<scanned> valid=<valid> invalid=<invalid> lastScan=<lastScan></yellow>"
       lifecycle:
         summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Lifecycle</white> <gray>-></gray> <yellow>enabled=<enabled> freeze=<freeze> invites=<invites> requests=<requests></yellow>"
+      economy:
+        summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Economy</white> <gray>-></gray> <yellow>enabled=<enabled> lastMonth=<lastMonth> backlog=<backlog> taxFreeze=<taxFreeze></yellow>"
+        capital: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Capitale</white> <gray>-></gray> <yellow>cityId=<cityId> bonusEntries=<bonusEntries> lastRun=<lastRun> status=<status> error=<error></yellow>"
       capability:
         available: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <green>available</green> <gray>(<metadata>)</gray>"
         unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <red>unavailable</red> <gray>(<reason>)</gray>"

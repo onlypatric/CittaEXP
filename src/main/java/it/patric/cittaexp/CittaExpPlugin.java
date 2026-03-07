@@ -18,12 +18,14 @@ import it.patric.cittaexp.command.CittaExpPreviewCommand;
 import it.patric.cittaexp.command.CityCommand;
 import it.patric.cittaexp.core.port.HuskClaimsPort;
 import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
+import it.patric.cittaexp.core.service.EconomyDiagnosticsService;
 import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
 import it.patric.cittaexp.core.service.CityModerationService;
 import it.patric.cittaexp.data.DatabaseCityViewReadPort;
 import it.patric.cittaexp.dialog.CreationDialogTemplates;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseTemplates;
+import it.patric.cittaexp.economy.runtime.CittaExpEconomyComponent;
 import it.patric.cittaexp.permission.StaffUiPermissionGate;
 import it.patric.cittaexp.persistence.runtime.CittaExpPersistenceComponent;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
@@ -61,6 +63,7 @@ public final class CittaExpPlugin extends JavaPlugin {
                         .component(new ItemsAdderAdapterComponent())
                         .component(new RequiredIntegrationsComponent())
                         .component(new CittaExpPersistenceComponent())
+                        .component(new CittaExpEconomyComponent())
         );
         if (built.isFailure()) {
             throw new IllegalStateException(
@@ -88,6 +91,7 @@ public final class CittaExpPlugin extends JavaPlugin {
         mergeBundledYamlDefaults("messages.yml");
         mergeBundledYamlDefaults("integration.yml");
         mergeBundledYamlDefaults("persistence.yml");
+        mergeBundledYamlDefaults("economy.yml");
         runtime.services().require(ConfigService.class).reloadAll();
 
         OperationResult<Void> enableResult = RuntimeBootstrap.safeEnable(runtime);
@@ -109,6 +113,8 @@ public final class CittaExpPlugin extends JavaPlugin {
         RequiredDependencyStatusService requiredDependencyStatusService = runtime.services().require(RequiredDependencyStatusService.class);
         RequiredIntegrationStatusService requiredIntegrationStatusService =
                 runtime.services().require(RequiredIntegrationStatusService.class);
+        EconomyDiagnosticsService economyDiagnosticsService =
+                runtime.services().require(EconomyDiagnosticsService.class);
         CityReadPort cityReadPort = runtime.services().require(CityReadPort.class);
         CityWritePort cityWritePort = runtime.services().require(CityWritePort.class);
         CityTxPort cityTxPort = runtime.services().require(CityTxPort.class);
@@ -160,7 +166,8 @@ public final class CittaExpPlugin extends JavaPlugin {
                 requiredDependencyStatusService,
                 requiredIntegrationStatusService,
                 cityLifecycleService,
-                cityLifecycleService
+                cityLifecycleService,
+                economyDiagnosticsService
         );
         if (getCommand("cittaexp") != null) {
             getCommand("cittaexp").setExecutor(previewCommand);
