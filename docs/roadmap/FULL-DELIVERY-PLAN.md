@@ -19,6 +19,7 @@ Stato: `COMPLETATO` (7 marzo 2026)
   - test smoke su server locale con dipendenze reali
 
 ## Milestone 3 - City Lifecycle completo
+Stato: `COMPLETATO` (7 marzo 2026)
 - Creazione citta (wizard + dialog), auto-claim 100x100, membership flow completo.
 - Ruoli custom completi con matrix permission.
 - Freeze engine operativo con gate azioni.
