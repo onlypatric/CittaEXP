@@ -7,6 +7,7 @@
 
 Policy:
 - se una dipendenza obbligatoria e `missing` o `disabled`, il plugin fallisce in enable con motivo esplicito.
+- se API/plugin non bindabile (`Vault Economy`, `LeaderboardApiProvider`) il plugin fallisce in enable (`integration.failFast=true`).
 - probe runtime espone lo stato dependency-by-dependency.
 
 ## Vault contract
@@ -25,6 +26,7 @@ Policy:
   - expand claim su richiesta (con costo configurato)
 - Regole:
   - validazione hard area iniziale (claim valido e area coerente)
+  - create/expand via template command configurabile in `integration.yml`
   - error mapping deterministico verso error taxonomy CittaEXP
 
 ## ClassificheEXP contract
@@ -33,6 +35,8 @@ Policy:
   - fetch top kingdom
   - fetch top N snapshot
 - Regole:
+  - chiave canonica ranking: `city:<uuid>`
+  - `findByCityId` ritorna `Optional.empty()` se la citta non compare nel top-scan
   - read-only: CittaEXP non scrive mai punteggi classifica
   - snapshot con `sourceVersion` e `fetchedAt` per tracciabilita
 
@@ -50,3 +54,7 @@ Policy:
   - non prevista per dipendenze obbligatorie (fail-fast).
 - Logging:
   - log strutturato con `dependency`, `operation`, `error_code`, `correlation_id`.
+- Taxonomy errori integrazione:
+  - `DEPENDENCY_UNAVAILABLE`
+  - `EXTERNAL_INTEGRATION_ERROR`
+  - `VALIDATION_ERROR`

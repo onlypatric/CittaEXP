@@ -10,6 +10,7 @@
   - probe persistence completo
 
 ## Milestone 2 - External Integrations Hard-Required
+Stato: `COMPLETATO` (7 marzo 2026)
 - Implementare adapter runtime per Vault, HuskClaims, ClassificheEXP.
 - Applicare dependency guard fail-fast in enable.
 - Mappare errori esterni in taxonomy CittaEXP.

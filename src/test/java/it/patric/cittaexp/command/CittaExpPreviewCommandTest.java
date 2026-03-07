@@ -16,6 +16,11 @@ import it.patric.cittaexp.runtime.dependency.DependencyState;
 import it.patric.cittaexp.runtime.dependency.ExternalDependencyStatus;
 import it.patric.cittaexp.runtime.dependency.RequiredDependencySnapshot;
 import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
+import it.patric.cittaexp.runtime.integration.AdapterState;
+import it.patric.cittaexp.runtime.integration.AdapterStatus;
+import it.patric.cittaexp.runtime.integration.IntegrationStatusSnapshot;
+import it.patric.cittaexp.runtime.integration.RankingScanStats;
+import it.patric.cittaexp.runtime.integration.RequiredIntegrationStatusService;
 import java.util.List;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import java.util.Locale;
@@ -52,7 +57,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -77,7 +83,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -105,7 +112,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -133,7 +141,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -155,7 +164,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -181,7 +191,8 @@ class CittaExpPreviewCommandTest {
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -208,7 +219,8 @@ class CittaExpPreviewCommandTest {
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -236,7 +248,8 @@ class CittaExpPreviewCommandTest {
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -260,7 +273,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -294,7 +308,8 @@ class CittaExpPreviewCommandTest {
                 mock(DialogShowcaseService.class),
                 persistenceStatusService,
                 messageService,
-                dependencyStatusService()
+                dependencyStatusService(),
+                integrationStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -305,6 +320,8 @@ class CittaExpPreviewCommandTest {
         verify(messageService).render(eq("cittaexp.probe.persistence.mode"), anyMap(), any(Locale.class));
         verify(messageService).render(eq("cittaexp.probe.persistence.outbox_pending"), anyMap(), any(Locale.class));
         verify(messageService, atLeastOnce()).render(eq("cittaexp.probe.dependency.status"), anyMap(), any(Locale.class));
+        verify(messageService, atLeastOnce()).render(eq("cittaexp.probe.integration.status"), anyMap(), any(Locale.class));
+        verify(messageService).render(eq("cittaexp.probe.integration.ranking.scan"), anyMap(), any(Locale.class));
     }
 
     private static MessageService messageService() {
@@ -324,6 +341,19 @@ class CittaExpPreviewCommandTest {
                 new ExternalDependencyStatus("HuskClaims", DependencyState.AVAILABLE, "3.0.0", ""),
                 new ExternalDependencyStatus("ClassificheEXP", DependencyState.AVAILABLE, "1.0.0", "")
         )));
+        return service;
+    }
+
+    private static RequiredIntegrationStatusService integrationStatusService() {
+        RequiredIntegrationStatusService service = mock(RequiredIntegrationStatusService.class);
+        when(service.snapshot()).thenReturn(new IntegrationStatusSnapshot(
+                List.of(
+                        new AdapterStatus("Vault", AdapterState.AVAILABLE, "1.7", "api-registered"),
+                        new AdapterStatus("HuskClaims", AdapterState.AVAILABLE, "4.0.0", "api-registered"),
+                        new AdapterStatus("ClassificheEXP", AdapterState.AVAILABLE, "0.2.0", "api-registered")
+                ),
+                new RankingScanStats(100, 95, 5, 123456L)
+        ));
         return service;
     }
 }

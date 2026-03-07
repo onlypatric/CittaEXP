@@ -19,11 +19,17 @@
 4. Eseguire `/cittaexp probe` e verificare:
    - capability GUI/DIALOG/PERSISTENCE
    - stato dependency (Vault/HuskClaims/ClassificheEXP)
+   - stato integrazioni bindate (`Vault`, `HuskClaims`, `ClassificheEXP`)
+   - ranking scan stats (`scanned/valid/invalid/lastScan`)
    - stato replay outbox (pending/conflicts)
 
 ## Diagnostica rapida
 - `dependency MISSING/DISABLED`
   - installare/abilitare plugin mancante, riavviare server.
+- `integrazione UNAVAILABLE`
+  - verificare `integration.yml` (scanLimit, command template claim).
+  - per Vault: provider Economy registrato.
+  - per ClassificheEXP: API provider registrato.
 - `PERSISTENCE UNAVAILABLE`
   - verificare config `persistence.yml`, connessione MySQL, permessi file sqlite.
 - `outbox pending` cresce senza decremento
