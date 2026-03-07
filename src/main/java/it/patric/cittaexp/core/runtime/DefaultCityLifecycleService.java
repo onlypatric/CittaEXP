@@ -466,10 +466,14 @@ public final class DefaultCityLifecycleService implements
     @Override
     public void leaveCity(UUID cityId, UUID playerUuid, String reason) {
         CityRecord city = requireCity(cityId);
+        CityMemberRecord member = requireActiveMember(cityId, playerUuid);
+        if (city.memberCount() <= 1) {
+            deleteCity(city.cityId().toString(), playerUuid, "auto-last-member-leave:" + safe(reason));
+            return;
+        }
         if (city.leaderUuid().equals(playerUuid)) {
             throw new IllegalStateException("leader-must-transfer-before-leave");
         }
-        CityMemberRecord member = requireActiveMember(cityId, playerUuid);
 
         long now = System.currentTimeMillis();
         CityRecord updatedCity = updateCityRecord(city, city.name(), city.tag(), city.leaderUuid(), city.status(), city.frozen(), Math.max(0, city.memberCount() - 1), now);

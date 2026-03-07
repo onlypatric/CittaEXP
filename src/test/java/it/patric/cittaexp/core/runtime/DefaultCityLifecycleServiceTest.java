@@ -7,11 +7,13 @@ import it.patric.cittaexp.core.port.HuskClaimsPort;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
+import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
 import it.patric.cittaexp.persistence.port.CityReadPort;
 import it.patric.cittaexp.persistence.port.CityTxPort;
 import it.patric.cittaexp.persistence.port.CityWritePort;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -21,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultCityLifecycleServiceTest {
@@ -133,6 +137,58 @@ class DefaultCityLifecycleServiceTest {
         );
 
         assertDoesNotThrow(() -> service.declineInvite(invitationId, playerUuid, "no"));
+    }
+
+    @Test
+    void leaveCityDeletesAggregateWhenLastMemberLeaves() {
+        CityReadPort readPort = mock(CityReadPort.class);
+        CityWritePort writePort = mock(CityWritePort.class);
+        HuskClaimsPort claimsPort = mock(HuskClaimsPort.class);
+
+        UUID cityId = UUID.randomUUID();
+        UUID leader = UUID.randomUUID();
+        long now = System.currentTimeMillis();
+        CityRecord city = new CityRecord(
+                cityId,
+                "Aurora",
+                "AUR",
+                leader,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
+                false,
+                false,
+                0L,
+                1,
+                10,
+                now,
+                now,
+                0
+        );
+        ClaimBindingRecord claim = new ClaimBindingRecord(cityId, "world", 0, 0, 99, 99, 10000, now, now);
+
+        when(readPort.findCityById(cityId)).thenReturn(Optional.of(city));
+        when(readPort.findMember(cityId, leader)).thenReturn(Optional.of(new CityMemberRecord(
+                cityId,
+                leader,
+                "leader",
+                now,
+                true
+        )));
+        when(readPort.findClaimBinding(cityId)).thenReturn(Optional.of(claim));
+        when(claimsPort.deleteClaimAtAsync(eq("world"), eq(49), eq(49))).thenReturn(CompletableFuture.completedFuture(true));
+        when(writePort.hardDeleteCityAggregate(cityId)).thenReturn(PersistenceWriteOutcome.success("ok"));
+        when(writePort.appendAuditEvent(any())).thenReturn(PersistenceWriteOutcome.success("ok"));
+
+        DefaultCityLifecycleService service = new DefaultCityLifecycleService(
+                readPort,
+                writePort,
+                passthroughTx(),
+                claimsPort,
+                Logger.getLogger("test")
+        );
+
+        assertDoesNotThrow(() -> service.leaveCity(cityId, leader, "leave"));
+        verify(writePort).hardDeleteCityAggregate(cityId);
     }
 
     private static CityTxPort passthroughTx() {

@@ -9,6 +9,7 @@ import net.william278.huskclaims.claim.Claim;
 import net.william278.huskclaims.claim.ClaimWorld;
 import net.william278.huskclaims.claim.Region;
 import net.william278.huskclaims.position.BlockPosition;
+import net.william278.huskclaims.trust.TrustLevel;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class HuskClaimsAdapterTest {
@@ -70,6 +72,8 @@ class HuskClaimsAdapterTest {
         World world = mock(World.class);
         net.william278.huskclaims.position.World huskWorld = mock(net.william278.huskclaims.position.World.class);
         ClaimWorld claimWorld = mock(ClaimWorld.class);
+        Claim createdClaim = mock(Claim.class);
+        TrustLevel leaderTrust = mock(TrustLevel.class);
 
         HuskClaimsAdapter adapter = new HuskClaimsAdapter(
                 plugin,
@@ -85,8 +89,10 @@ class HuskClaimsAdapterTest {
                 blockPosition(invocation.getArgument(0, Integer.class), invocation.getArgument(1, Integer.class))
         );
         when(api.isRegionClaimed(eq(claimWorld), any(Region.class))).thenReturn(false);
+        when(api.getTrustLevels()).thenReturn(java.util.List.of(leaderTrust));
+        when(leaderTrust.getPrivileges()).thenReturn(java.util.List.of(TrustLevel.Privilege.MANAGE_TRUSTEES));
         when(api.createAdminClaim(eq(claimWorld), any(Region.class)))
-                .thenReturn(CompletableFuture.completedFuture(mock(Claim.class)));
+                .thenReturn(CompletableFuture.completedFuture(createdClaim));
 
         try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
             bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
@@ -95,6 +101,7 @@ class HuskClaimsAdapterTest {
             assertTrue(result.minX() < result.maxX());
             assertTrue(result.minZ() < result.maxZ());
         }
+        verify(api).setTrustLevel(eq(createdClaim), eq(claimWorld), any(), eq(leaderTrust));
     }
 
     @Test

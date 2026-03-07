@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import net.william278.huskclaims.trust.TrustLevel;
+import net.william278.huskclaims.user.User;
 import java.util.logging.Logger;
 import net.william278.huskclaims.api.BukkitHuskClaimsAPI;
 import net.william278.huskclaims.api.HuskClaimsAPI;
@@ -182,6 +184,14 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
                                 centerZ
                         );
                     }
+                    if (!grantLeaderTrust(claimWorld, created, playerUuid)) {
+                        safeDeleteClaim(claimWorld, created);
+                        return failureResult(
+                                IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR + ":trust-grant-failed",
+                                centerX,
+                                centerZ
+                        );
+                    }
                     return successResult(centerX, centerZ);
                 });
     }
@@ -297,6 +307,52 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
                             + ex.getClass().getSimpleName()
             );
             return Optional.empty();
+        }
+    }
+
+    private boolean grantLeaderTrust(ClaimWorld claimWorld, Claim claim, UUID leaderUuid) {
+        Optional<TrustLevel> leaderTrust = resolveLeaderTrustLevel();
+        if (leaderTrust.isEmpty()) {
+            logger.warning("[CittaEXP] HuskClaims trust grant failed: no trust level available");
+            return false;
+        }
+        try {
+            api.setTrustLevel(claim, claimWorld, User.of(leaderUuid, leaderUuid.toString()), leaderTrust.get());
+            return true;
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims trust grant failed player="
+                            + leaderUuid
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return false;
+        }
+    }
+
+    private Optional<TrustLevel> resolveLeaderTrustLevel() {
+        var trustLevels = api.getTrustLevels();
+        if (trustLevels == null || trustLevels.isEmpty()) {
+            return Optional.empty();
+        }
+        return trustLevels.stream()
+                .filter(level -> level.getPrivileges().contains(TrustLevel.Privilege.MANAGE_TRUSTEES))
+                .max(TrustLevel::compareTo)
+                .or(() -> trustLevels.stream().max(TrustLevel::compareTo));
+    }
+
+    private void safeDeleteClaim(ClaimWorld claimWorld, Claim claim) {
+        try {
+            if (claim.isChildClaim()) {
+                api.deleteChildClaim(claimWorld, claim);
+            } else {
+                api.deleteClaim(claimWorld, claim);
+            }
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims safe delete after trust failure failed: "
+                            + ex.getClass().getSimpleName()
+            );
         }
     }
 
