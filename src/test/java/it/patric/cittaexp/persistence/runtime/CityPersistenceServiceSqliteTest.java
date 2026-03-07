@@ -7,6 +7,7 @@ import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
 import it.patric.cittaexp.core.model.FreezeReason;
@@ -206,5 +207,44 @@ class CityPersistenceServiceSqliteTest {
         assertTrue(service.upsertFreezeCase(freezeCase).success());
         assertTrue(service.findInvitation(invitation.invitationId()).isPresent());
         assertTrue(service.findActiveFreezeCase(cityId).isPresent());
+    }
+
+    @Test
+    void hardDeleteCityAggregateRemovesCityAndClaimBinding() {
+        long now = System.currentTimeMillis();
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+        service.createCity(new CityRecord(
+                cityId,
+                "TestDelete",
+                "TST",
+                leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
+                false,
+                false,
+                0L,
+                1,
+                10,
+                now,
+                now,
+                0
+        ));
+        service.upsertClaimBinding(new ClaimBindingRecord(
+                cityId,
+                "world",
+                0,
+                0,
+                99,
+                99,
+                10000,
+                now,
+                now
+        ));
+
+        PersistenceWriteOutcome deleted = service.hardDeleteCityAggregate(cityId);
+        assertTrue(deleted.success());
+        assertTrue(service.findCityById(cityId).isEmpty());
+        assertTrue(service.findClaimBinding(cityId).isEmpty());
     }
 }

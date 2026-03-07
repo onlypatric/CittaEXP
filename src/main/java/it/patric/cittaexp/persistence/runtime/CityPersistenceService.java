@@ -41,6 +41,7 @@ public final class CityPersistenceService
         implements CityReadPort, CityWritePort, CityTxPort, DomainEventOutboxPort, PersistenceStatusService {
 
     private static final String EVENT_CITY_UPSERT = "CITY_UPSERT";
+    private static final String EVENT_CITY_HARD_DELETE = "CITY_HARD_DELETE";
     private static final String EVENT_MEMBER_UPSERT = "MEMBER_UPSERT";
     private static final String EVENT_MEMBER_DELETE = "MEMBER_DELETE";
     private static final String EVENT_ROLE_UPSERT = "ROLE_UPSERT";
@@ -889,6 +890,31 @@ public final class CityPersistenceService
     }
 
     @Override
+    public PersistenceWriteOutcome hardDeleteCityAggregate(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        try {
+            runWritable("hardDeleteCityAggregate", connection -> {
+                deleteCityAggregate(connection, cityId.toString());
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY",
+                            cityId.toString(),
+                            EVENT_CITY_HARD_DELETE,
+                            codec.cityHardDeletePayload(cityId),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("city-hard-deleted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] hardDeleteCityAggregate failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
     public <T> T withTransaction(SqlTransaction<T> transaction) {
         Objects.requireNonNull(transaction, "transaction");
         if (txConnection.get() != null) {
@@ -1044,6 +1070,7 @@ public final class CityPersistenceService
         runOnMysql(connection -> {
             switch (event.eventType()) {
                 case EVENT_CITY_UPSERT -> replayCityUpsert(connection, payload);
+                case EVENT_CITY_HARD_DELETE -> replayCityHardDelete(connection, payload);
                 case EVENT_MEMBER_UPSERT -> replayMemberUpsert(connection, payload);
                 case EVENT_MEMBER_DELETE -> replayMemberDelete(connection, payload);
                 case EVENT_ROLE_UPSERT -> replayRoleUpsert(connection, payload);
@@ -1140,6 +1167,14 @@ public final class CityPersistenceService
                 throw new OptimisticConflictException("city-unique-conflict");
             }
             throw new IllegalStateException("city replay failed", ex);
+        }
+    }
+
+    private void replayCityHardDelete(Connection connection, JsonObject payload) {
+        try {
+            deleteCityAggregate(connection, payload.get("cityId").getAsString());
+        } catch (SQLException ex) {
+            throw new IllegalStateException("city hard delete replay failed", ex);
         }
     }
 
@@ -1374,6 +1409,36 @@ public final class CityPersistenceService
             }
         } catch (SQLException ex) {
             throw new IllegalStateException("audit replay failed", ex);
+        }
+    }
+
+    private static void deleteCityAggregate(Connection connection, String cityId) throws SQLException {
+        deleteByCityId(connection, "city_members", cityId);
+        deleteByCityId(connection, "city_roles", cityId);
+        deleteByCityId(connection, "city_invitations", cityId);
+        deleteByCityId(connection, "join_requests", cityId);
+        deleteByCityId(connection, "freeze_cases", cityId);
+        deleteByCityId(connection, "claim_bindings", cityId);
+        deleteByCityId(connection, "city_treasury_ledger", cityId);
+        deleteByCityId(connection, "ranking_snapshot", cityId);
+        deleteByCityId(connection, "staff_approval_tickets", cityId);
+        deleteByCityId(connection, "city_deletion_cases", cityId);
+        deleteByCityId(connection, "capital_state", cityId);
+        deleteByAggregateId(connection, cityId);
+        deleteByCityId(connection, "cities", cityId);
+    }
+
+    private static void deleteByCityId(Connection connection, String table, String cityId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM " + table + " WHERE city_id = ?")) {
+            stmt.setString(1, cityId);
+            stmt.executeUpdate();
+        }
+    }
+
+    private static void deleteByAggregateId(Connection connection, String cityId) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM audit_events WHERE aggregate_id = ?")) {
+            stmt.setString(1, cityId);
+            stmt.executeUpdate();
         }
     }
 

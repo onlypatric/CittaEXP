@@ -610,6 +610,32 @@ public final class DefaultCityLifecycleService implements
     }
 
     @Override
+    public City deleteCity(String cityReference, UUID actorUuid, String reason) {
+        CityRecord city = resolveCity(cityReference);
+        long now = System.currentTimeMillis();
+
+        ClaimBindingRecord claimBinding = readPort.findClaimBinding(city.cityId()).orElse(null);
+        if (claimBinding != null) {
+            int centerX = (claimBinding.minX() + claimBinding.maxX()) / 2;
+            int centerZ = (claimBinding.minZ() + claimBinding.maxZ()) / 2;
+            boolean deletedClaim;
+            try {
+                deletedClaim = huskClaimsPort.deleteClaimAtAsync(claimBinding.worldName(), centerX, centerZ).join();
+            } catch (CompletionException ex) {
+                Throwable cause = unwrapCompletion(ex);
+                throw new IllegalStateException("claim-delete-failed:" + cause.getClass().getSimpleName(), cause);
+            }
+            if (!deletedClaim) {
+                throw new IllegalStateException("claim-delete-failed");
+            }
+        }
+
+        expect(writePort.hardDeleteCityAggregate(city.cityId()), "hard-delete-city");
+        appendAudit(audit(city.cityId(), "CITY", "city_deleted", actorUuid, jsonPayload("reason", safe(reason)), now));
+        return toCity(city);
+    }
+
+    @Override
     public boolean isCityFrozen(UUID cityId) {
         CityRecord city = requireCity(cityId);
         return city.status() == CityStatus.FROZEN || city.frozen();

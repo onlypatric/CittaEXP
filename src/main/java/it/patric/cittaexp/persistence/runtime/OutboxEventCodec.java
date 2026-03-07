@@ -38,6 +38,12 @@ final class OutboxEventCodec {
         return GSON.toJson(root);
     }
 
+    String cityHardDeletePayload(UUID cityId) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", cityId.toString());
+        return GSON.toJson(root);
+    }
+
     String memberUpsertPayload(CityMemberRecord member) {
         JsonObject root = new JsonObject();
         root.addProperty("cityId", member.cityId().toString());

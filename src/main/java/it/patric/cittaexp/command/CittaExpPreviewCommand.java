@@ -306,7 +306,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             return true;
         }
         String action = args[2].toLowerCase(Locale.ROOT);
-        if (!action.equals("freeze") && !action.equals("unfreeze")) {
+        if (!action.equals("freeze") && !action.equals("unfreeze") && !action.equals("delete")) {
             sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
             return true;
         }
@@ -320,16 +320,19 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
 
         UUID actor = sender instanceof Player player ? player.getUniqueId() : UUID.randomUUID();
         try {
-            var city = action.equals("freeze")
-                    ? cityModerationService.freezeCity(cityRef, actor, reason)
-                    : cityModerationService.unfreezeCity(cityRef, actor, reason);
+            var city = switch (action) {
+                case "freeze" -> cityModerationService.freezeCity(cityRef, actor, reason);
+                case "unfreeze" -> cityModerationService.unfreezeCity(cityRef, actor, reason);
+                case "delete" -> cityModerationService.deleteCity(cityRef, actor, reason);
+                default -> throw new IllegalStateException("invalid-staff-action");
+            };
             sender.sendMessage(msg(
                     sender,
                     "cittaexp.command.staff.result",
                     Map.of(
                             "action", action,
                             "city", city.name(),
-                            "status", city.status().name()
+                            "status", action.equals("delete") ? "DELETED" : city.status().name()
                     )
             ));
             return true;
@@ -492,7 +495,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
         }
 
         if (args.length == 3 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("city")) {
-            return complete(List.of("freeze", "unfreeze"), args[2]);
+            return complete(List.of("freeze", "unfreeze", "delete"), args[2]);
         }
 
         return List.of();

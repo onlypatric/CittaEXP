@@ -5,7 +5,7 @@ default:
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questa azione richiede un player in gioco.</red>"
       staff:
         no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso staff mancante:</red> <yellow>cittaexp.staff.freeze</yellow>"
-        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze> <city> <reason></white>"
+        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze|delete> <city> <reason></white>"
         result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Staff <action></aqua> <white><city></white> <gray>-></gray> <yellow><status></yellow>"
         error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione staff fallita:</red> <yellow><reason></yellow>"
       usage:

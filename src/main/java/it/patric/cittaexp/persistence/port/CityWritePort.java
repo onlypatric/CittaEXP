@@ -47,4 +47,6 @@ public interface CityWritePort {
     PersistenceWriteOutcome upsertClaimBinding(ClaimBindingRecord claimBinding);
 
     PersistenceWriteOutcome appendAuditEvent(AuditEventRecord event);
+
+    PersistenceWriteOutcome hardDeleteCityAggregate(UUID cityId);
 }

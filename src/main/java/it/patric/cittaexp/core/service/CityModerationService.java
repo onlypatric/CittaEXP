@@ -9,5 +9,7 @@ public interface CityModerationService {
 
     City unfreezeCity(String cityReference, UUID actorUuid, String reason);
 
+    City deleteCity(String cityReference, UUID actorUuid, String reason);
+
     boolean isCityFrozen(UUID cityId);
 }
