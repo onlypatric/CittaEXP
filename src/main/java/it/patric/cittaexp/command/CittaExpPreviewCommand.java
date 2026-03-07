@@ -11,6 +11,7 @@ import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewScenario;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.preview.ThemeMode;
+import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
 import it.patric.cittaexp.ui.contract.UiPermissionGate;
 import it.patric.cittaexp.ui.contract.UiScreenKey;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
@@ -43,6 +44,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
     private final DialogShowcaseService dialogShowcaseService;
     private final PersistenceStatusService persistenceStatusService;
     private final MessageService messageService;
+    private final RequiredDependencyStatusService requiredDependencyStatusService;
 
     public CittaExpPreviewCommand(
             GuiFlowOrchestrator guiFlowOrchestrator,
@@ -52,7 +54,8 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             ItemsAdderService itemsAdderService,
             DialogShowcaseService dialogShowcaseService,
             PersistenceStatusService persistenceStatusService,
-            MessageService messageService
+            MessageService messageService,
+            RequiredDependencyStatusService requiredDependencyStatusService
     ) {
         this.guiFlowOrchestrator = Objects.requireNonNull(guiFlowOrchestrator, "guiFlowOrchestrator");
         this.previewSettings = Objects.requireNonNull(previewSettings, "previewSettings");
@@ -62,6 +65,10 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
         this.dialogShowcaseService = Objects.requireNonNull(dialogShowcaseService, "dialogShowcaseService");
         this.persistenceStatusService = Objects.requireNonNull(persistenceStatusService, "persistenceStatusService");
         this.messageService = Objects.requireNonNull(messageService, "messageService");
+        this.requiredDependencyStatusService = Objects.requireNonNull(
+                requiredDependencyStatusService,
+                "requiredDependencyStatusService"
+        );
     }
 
     @Override
@@ -218,6 +225,18 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
                         "reason", persistence.lastSwitchReason()
                 )
         ));
+        for (var dependency : requiredDependencyStatusService.snapshot().dependencies()) {
+            sender.sendMessage(msg(
+                    sender,
+                    "cittaexp.probe.dependency.status",
+                    Map.of(
+                            "name", dependency.name(),
+                            "state", dependency.state().name(),
+                            "version", dependency.version(),
+                            "reason", dependency.reason().isBlank() ? "-" : dependency.reason()
+                    )
+            ));
+        }
         return true;
     }
 

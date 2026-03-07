@@ -12,6 +12,11 @@ import it.patric.cittaexp.persistence.runtime.PersistenceRuntimeMode;
 import it.patric.cittaexp.preview.PreviewScenario;
 import it.patric.cittaexp.preview.PreviewSettings;
 import it.patric.cittaexp.preview.ThemeMode;
+import it.patric.cittaexp.runtime.dependency.DependencyState;
+import it.patric.cittaexp.runtime.dependency.ExternalDependencyStatus;
+import it.patric.cittaexp.runtime.dependency.RequiredDependencySnapshot;
+import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
+import java.util.List;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import java.util.Locale;
 import java.util.Map;
@@ -46,7 +51,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -70,7 +76,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -97,7 +104,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -124,7 +132,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -145,7 +154,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -170,7 +180,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -196,7 +207,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -223,7 +235,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 dialogShowcaseService,
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -246,7 +259,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 mock(PersistenceStatusService.class),
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         Player sender = mock(Player.class);
@@ -279,7 +293,8 @@ class CittaExpPreviewCommandTest {
                 mock(ItemsAdderService.class),
                 mock(DialogShowcaseService.class),
                 persistenceStatusService,
-                messageService
+                messageService,
+                dependencyStatusService()
         );
 
         CommandSender sender = mock(CommandSender.class);
@@ -289,6 +304,7 @@ class CittaExpPreviewCommandTest {
 
         verify(messageService).render(eq("cittaexp.probe.persistence.mode"), anyMap(), any(Locale.class));
         verify(messageService).render(eq("cittaexp.probe.persistence.outbox_pending"), anyMap(), any(Locale.class));
+        verify(messageService, atLeastOnce()).render(eq("cittaexp.probe.dependency.status"), anyMap(), any(Locale.class));
     }
 
     private static MessageService messageService() {
@@ -298,6 +314,16 @@ class CittaExpPreviewCommandTest {
         when(service.render(anyString(), any(Locale.class)))
                 .thenAnswer(invocation -> Component.text(invocation.getArgument(0, String.class)));
         when(service.render(any())).thenAnswer(invocation -> Component.text("message"));
+        return service;
+    }
+
+    private static RequiredDependencyStatusService dependencyStatusService() {
+        RequiredDependencyStatusService service = mock(RequiredDependencyStatusService.class);
+        when(service.snapshot()).thenReturn(new RequiredDependencySnapshot(List.of(
+                new ExternalDependencyStatus("Vault", DependencyState.AVAILABLE, "1.7", ""),
+                new ExternalDependencyStatus("HuskClaims", DependencyState.AVAILABLE, "3.0.0", ""),
+                new ExternalDependencyStatus("ClassificheEXP", DependencyState.AVAILABLE, "1.0.0", "")
+        )));
         return service;
     }
 }

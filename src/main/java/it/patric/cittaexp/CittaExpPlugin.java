@@ -21,6 +21,8 @@ import it.patric.cittaexp.permission.StaffUiPermissionGate;
 import it.patric.cittaexp.persistence.runtime.CittaExpPersistenceComponent;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.preview.PreviewSettings;
+import it.patric.cittaexp.runtime.dependency.RequiredDependenciesComponent;
+import it.patric.cittaexp.runtime.dependency.RequiredDependencyStatusService;
 import it.patric.cittaexp.ui.framework.GuiActionRouter;
 import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import it.patric.cittaexp.ui.framework.GuiStateComposer;
@@ -35,7 +37,8 @@ public final class CittaExpPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         OperationResult<CommonRuntime> built = RuntimeBootstrap.build(this, builder ->
-                builder.component(new ItemsAdderAdapterComponent())
+                builder.component(new RequiredDependenciesComponent())
+                        .component(new ItemsAdderAdapterComponent())
                         .component(new CittaExpPersistenceComponent())
         );
         if (built.isFailure()) {
@@ -77,6 +80,7 @@ public final class CittaExpPlugin extends JavaPlugin {
         ItemsAdderService itemsAdderService = runtime.services().require(ItemsAdderService.class);
         PersistenceStatusService persistenceStatusService = runtime.services().require(PersistenceStatusService.class);
         MessageService messageService = runtime.services().require(MessageService.class);
+        RequiredDependencyStatusService requiredDependencyStatusService = runtime.services().require(RequiredDependencyStatusService.class);
 
         PreviewSettings previewSettings = new PreviewSettings();
         RuntimeUiCapabilityGate capabilityGate = new RuntimeUiCapabilityGate(capabilityRegistry);
@@ -108,7 +112,8 @@ public final class CittaExpPlugin extends JavaPlugin {
                 itemsAdderService,
                 dialogShowcaseService,
                 persistenceStatusService,
-                messageService
+                messageService,
+                requiredDependencyStatusService
         );
         if (getCommand("cittaexp") != null) {
             getCommand("cittaexp").setExecutor(previewCommand);

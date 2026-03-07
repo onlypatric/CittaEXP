@@ -124,19 +124,185 @@ final class SchemaInstaller {
                     )
                     """);
 
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS tax_policy (
+                        policy_id VARCHAR(64) PRIMARY KEY,
+                        borgo_monthly_cost BIGINT NOT NULL,
+                        villaggio_monthly_cost BIGINT NOT NULL,
+                        regno_monthly_cost BIGINT NOT NULL,
+                        regno_shop_monthly_extra BIGINT NOT NULL,
+                        capitale_monthly_bonus BIGINT NOT NULL,
+                        due_day_of_month INTEGER NOT NULL,
+                        timezone_id VARCHAR(64) NOT NULL,
+                        updated_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS city_treasury_ledger (
+                        entry_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        entry_type VARCHAR(32) NOT NULL,
+                        amount BIGINT NOT NULL,
+                        resulting_balance BIGINT NOT NULL,
+                        reason VARCHAR(255) NOT NULL,
+                        actor_uuid VARCHAR(36),
+                        occurred_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS capital_state (
+                        capital_slot VARCHAR(32) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        assigned_at BIGINT NOT NULL,
+                        updated_at BIGINT NOT NULL,
+                        source_ranking_version VARCHAR(64) NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS claim_bindings (
+                        city_id VARCHAR(36) PRIMARY KEY,
+                        world_name VARCHAR(64) NOT NULL,
+                        min_x INTEGER NOT NULL,
+                        min_z INTEGER NOT NULL,
+                        max_x INTEGER NOT NULL,
+                        max_z INTEGER NOT NULL,
+                        area INTEGER NOT NULL,
+                        created_at BIGINT NOT NULL,
+                        updated_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS ranking_snapshot (
+                        city_id VARCHAR(36) PRIMARY KEY,
+                        rank_pos INTEGER NOT NULL,
+                        score BIGINT NOT NULL,
+                        source_version VARCHAR(64) NOT NULL,
+                        fetched_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS staff_approval_tickets (
+                        ticket_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        ticket_type VARCHAR(32) NOT NULL,
+                        status VARCHAR(32) NOT NULL,
+                        requester_uuid VARCHAR(36) NOT NULL,
+                        reviewer_uuid VARCHAR(36),
+                        reason VARCHAR(255) NOT NULL,
+                        payload_json TEXT NOT NULL,
+                        requested_at BIGINT NOT NULL,
+                        reviewed_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS freeze_cases (
+                        case_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        reason VARCHAR(32) NOT NULL,
+                        details TEXT NOT NULL,
+                        active INTEGER NOT NULL,
+                        opened_by VARCHAR(36),
+                        closed_by VARCHAR(36),
+                        opened_at BIGINT NOT NULL,
+                        closed_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS city_deletion_cases (
+                        case_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        requires_staff_approval INTEGER NOT NULL,
+                        status VARCHAR(32) NOT NULL,
+                        requester_uuid VARCHAR(36) NOT NULL,
+                        reviewer_uuid VARCHAR(36),
+                        reason VARCHAR(255) NOT NULL,
+                        requested_at BIGINT NOT NULL,
+                        resolved_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS city_invitations (
+                        invitation_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        invited_player_uuid VARCHAR(36) NOT NULL,
+                        invited_by_uuid VARCHAR(36) NOT NULL,
+                        status VARCHAR(32) NOT NULL,
+                        created_at BIGINT NOT NULL,
+                        expires_at BIGINT NOT NULL,
+                        updated_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS join_requests (
+                        request_id VARCHAR(36) PRIMARY KEY,
+                        city_id VARCHAR(36) NOT NULL,
+                        player_uuid VARCHAR(36) NOT NULL,
+                        status VARCHAR(32) NOT NULL,
+                        message TEXT NOT NULL,
+                        reviewed_by_uuid VARCHAR(36),
+                        requested_at BIGINT NOT NULL,
+                        reviewed_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS audit_events (
+                        event_id VARCHAR(36) PRIMARY KEY,
+                        aggregate_type VARCHAR(64) NOT NULL,
+                        aggregate_id VARCHAR(128) NOT NULL,
+                        event_type VARCHAR(64) NOT NULL,
+                        actor_uuid VARCHAR(36),
+                        payload_json TEXT NOT NULL,
+                        occurred_at BIGINT NOT NULL
+                    )
+                    """);
+
             if (sqlite) {
                 statement.executeUpdate(
                         "CREATE INDEX IF NOT EXISTS idx_city_outbox_status_occurred ON city_outbox(replay_status, occurred_at)"
                 );
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_members_city ON city_members(city_id)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_roles_city ON city_roles(city_id)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_ledger_city_time ON city_treasury_ledger(city_id, occurred_at)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_tickets_status_time ON staff_approval_tickets(status, requested_at)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_freeze_city_active ON freeze_cases(city_id, active)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_invite_city_status ON city_invitations(city_id, status)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_join_city_status ON join_requests(city_id, status)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_audit_agg_time ON audit_events(aggregate_type, aggregate_id, occurred_at)");
             } else {
                 try {
                     statement.executeUpdate(
-                            "CREATE INDEX idx_city_outbox_status_occurred ON city_outbox(replay_status, occurred_at)"
+                        "CREATE INDEX idx_city_outbox_status_occurred ON city_outbox(replay_status, occurred_at)"
                     );
                 } catch (SQLException ignored) {
                     // index already exists
                 }
+                createIndexIfMissing(statement, "idx_city_members_city", "city_members(city_id)");
+                createIndexIfMissing(statement, "idx_city_roles_city", "city_roles(city_id)");
+                createIndexIfMissing(statement, "idx_ledger_city_time", "city_treasury_ledger(city_id, occurred_at)");
+                createIndexIfMissing(statement, "idx_tickets_status_time", "staff_approval_tickets(status, requested_at)");
+                createIndexIfMissing(statement, "idx_freeze_city_active", "freeze_cases(city_id, active)");
+                createIndexIfMissing(statement, "idx_invite_city_status", "city_invitations(city_id, status)");
+                createIndexIfMissing(statement, "idx_join_city_status", "join_requests(city_id, status)");
+                createIndexIfMissing(statement, "idx_audit_agg_time", "audit_events(aggregate_type, aggregate_id, occurred_at)");
             }
+        }
+    }
+
+    private static void createIndexIfMissing(Statement statement, String indexName, String expression) {
+        try {
+            statement.executeUpdate("CREATE INDEX " + indexName + " ON " + expression);
+        } catch (SQLException ignored) {
+            // index already exists
         }
     }
 }

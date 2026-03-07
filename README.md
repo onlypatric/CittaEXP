@@ -1,39 +1,40 @@
 # CittaEXP
 
-Plugin Paper 1.21.11 in stato bootstrap per funzionalita' legate all'EXP cittadina.
+Plugin Paper 1.21.11 per gestione completa citta (borghi/villaggi/regni), con GUI-first, persistenza resiliente e workflow staff.
 
 ## Obiettivo
-- Preparare una base tecnica minima e pulita per implementazioni future.
-- Centralizzare utilita' condivise appoggiandosi a `minecraft-common-lib`.
+- Consegnare un plugin citta full-scope (war esclusa) pronto per produzione.
+- Mantenere architettura modulare con `minecraft-common-lib`.
 
 ## Dipendenze
 - Java 21
 - Paper API `1.21.11-R0.1-SNAPSHOT`
 - `minecraft-common-lib` (jar locale, baseline `3.0.0`)
-- `adapter-invui` (jar locale, baseline `3.0.0`)
 - `adapter-itemsadder` (jar locale, baseline `3.0.0`)
+- Runtime dependency obbligatorie: `Vault`, `HuskClaims`, `ClassificheEXP`
 
-Configurazione jar locali:
+Configurazione jar locali build-time:
 - `commonLibJar` default: `../minecraft-common-lib/build/libs/minecraft-common-lib-3.0.0.jar`
-- `invUiAdapterJar` default: `../minecraft-common-lib/adapter-invui/build/libs/adapter-invui-3.0.0.jar`
 - `itemsAdderAdapterJar` default: `../minecraft-common-lib/adapter-itemsadder/build/libs/adapter-itemsadder-3.0.0.jar`
-- override: `./gradlew build -PcommonLibJar=... -PinvUiAdapterJar=... -PitemsAdderAdapterJar=...`
+- override: `./gradlew build -PcommonLibJar=... -PitemsAdderAdapterJar=...`
 
-## Moduli futuri (outline)
-- Core domain `cittaexp.core` per regole EXP.
-- Integration layer `cittaexp.integration` per hook Bukkit/Paper.
-- Infrastructure `cittaexp.infrastructure` per persistenza/config/runtime wiring.
-- API pubblica minima per altri plugin (da definire).
-
-## Prossimi step
-- Definire lo scope funzionale v1.
-- Disegnare config e comando principale.
-- Stabilire test strategy (unit + integration su MockBukkit/Paper locale).
+## Stato corrente
+- GUI preview e Dialog showcase disponibili.
+- Foundation persistence MySQL primario + SQLite fallback + replay outbox.
+- Message layer MiniMessage in italiano via `messages.yml`.
+- Guard runtime dipendenze obbligatorie.
 
 ## Framework planning docs
 - `docs/frameworks/GUI-FIRST-FRAMEWORK-BLUEPRINT.md`
 - `docs/frameworks/GUI-FIRST-ACTION-PLAN.md`
 - `docs/frameworks/GUI-KEYS-CATALOG-DRAFT.md`
+
+## Full-scope docs
+- `docs/architecture/DATA-MODEL.md`
+- `docs/architecture/DOMAIN-SERVICES.md`
+- `docs/architecture/INTEGRATION-CONTRACTS.md`
+- `docs/roadmap/FULL-DELIVERY-PLAN.md`
+- `docs/operations/RUNBOOK.md`
 
 ## Preview commands
 - `/cittaexp <dashboard|members|roles|taxes|wizard>`
