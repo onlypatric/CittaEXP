@@ -36,10 +36,12 @@ import it.patric.cittaexp.persistence.port.CityTxPort;
 import it.patric.cittaexp.persistence.port.CityWritePort;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -639,6 +641,16 @@ public final class DefaultCityLifecycleService implements
     public boolean isCityFrozen(UUID cityId) {
         CityRecord city = requireCity(cityId);
         return city.status() == CityStatus.FROZEN || city.frozen();
+    }
+
+    @Override
+    public List<String> listCityReferences() {
+        Set<String> refs = new LinkedHashSet<>();
+        for (CityRecord city : readPort.listCities()) {
+            refs.add(city.name());
+            refs.add(city.tag());
+        }
+        return List.copyOf(refs);
     }
 
     @Override

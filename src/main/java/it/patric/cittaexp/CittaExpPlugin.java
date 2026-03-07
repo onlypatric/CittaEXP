@@ -3,6 +3,7 @@ package it.patric.cittaexp;
 import dev.patric.commonlib.adapter.huskclaims.HuskClaimsAdapterComponent;
 import dev.patric.commonlib.adapter.itemsadder.ItemsAdderAdapterComponent;
 import dev.patric.commonlib.api.CommonRuntime;
+import dev.patric.commonlib.api.ConfigService;
 import dev.patric.commonlib.api.bootstrap.RuntimeBootstrap;
 import dev.patric.commonlib.api.capability.CapabilityRegistry;
 import dev.patric.commonlib.api.dialog.DialogService;
@@ -40,7 +41,13 @@ import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import it.patric.cittaexp.ui.framework.GuiStateComposer;
 import it.patric.cittaexp.ui.framework.catalog.DefaultGuiCatalog;
 import it.patric.cittaexp.ui.theme.DefaultUiAssetResolver;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public final class CittaExpPlugin extends JavaPlugin {
 
@@ -77,6 +84,11 @@ public final class CittaExpPlugin extends JavaPlugin {
         if (runtime == null) {
             throw new IllegalStateException("Runtime was not initialized in onLoad.");
         }
+
+        mergeBundledYamlDefaults("messages.yml");
+        mergeBundledYamlDefaults("integration.yml");
+        mergeBundledYamlDefaults("persistence.yml");
+        runtime.services().require(ConfigService.class).reloadAll();
 
         OperationResult<Void> enableResult = RuntimeBootstrap.safeEnable(runtime);
         if (enableResult.isFailure()) {
@@ -176,5 +188,32 @@ public final class CittaExpPlugin extends JavaPlugin {
             RuntimeBootstrap.safeDisable(runtime);
         }
         getLogger().info("CittaEXP disabled.");
+    }
+
+    private void mergeBundledYamlDefaults(String resourcePath) {
+        File dataFolder = getDataFolder();
+        if (!dataFolder.exists() && !dataFolder.mkdirs()) {
+            throw new IllegalStateException("Cannot create plugin data folder: " + dataFolder);
+        }
+        File targetFile = new File(dataFolder, resourcePath);
+        File parent = targetFile.getParentFile();
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IllegalStateException("Cannot create parent directory: " + parent);
+        }
+
+        YamlConfiguration current = YamlConfiguration.loadConfiguration(targetFile);
+        try (InputStream input = getResource(resourcePath)) {
+            if (input == null) {
+                return;
+            }
+            YamlConfiguration defaults = YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(input, StandardCharsets.UTF_8)
+            );
+            current.setDefaults(defaults);
+            current.options().copyDefaults(true);
+            current.save(targetFile);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Unable to merge default config for " + resourcePath, ex);
+        }
     }
 }

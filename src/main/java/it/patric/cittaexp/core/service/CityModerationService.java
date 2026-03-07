@@ -1,6 +1,7 @@
 package it.patric.cittaexp.core.service;
 
 import it.patric.cittaexp.core.model.City;
+import java.util.List;
 import java.util.UUID;
 
 public interface CityModerationService {
@@ -12,4 +13,6 @@ public interface CityModerationService {
     City deleteCity(String cityReference, UUID actorUuid, String reason);
 
     boolean isCityFrozen(UUID cityId);
+
+    List<String> listCityReferences();
 }

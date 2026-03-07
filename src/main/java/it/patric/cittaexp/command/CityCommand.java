@@ -6,10 +6,12 @@ import it.patric.cittaexp.core.model.RolePermissionSet;
 import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
@@ -418,14 +420,30 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             return complete(List.of("create", "info", "invite", "request", "kick", "leave", "roles", "freeze"), args[0]);
         }
+        if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
+            return complete(cityReferences(), args[1]);
+        }
         if (args.length == 2 && args[0].equalsIgnoreCase("invite")) {
-            return complete(List.of("accept", "deny"), args[1]);
+            List<String> options = new ArrayList<>();
+            options.add("accept");
+            options.add("deny");
+            options.addAll(onlinePlayerNames());
+            return complete(options, args[1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("request")) {
             return complete(List.of("join", "approve", "reject"), args[1]);
         }
+        if (args.length == 3 && args[0].equalsIgnoreCase("request") && args[1].equalsIgnoreCase("join")) {
+            return complete(cityReferences(), args[2]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("kick")) {
+            return complete(currentCityMemberNames(sender), args[1]);
+        }
         if (args.length == 2 && args[0].equalsIgnoreCase("roles")) {
             return complete(List.of("list", "toggle"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("roles") && args[1].equalsIgnoreCase("toggle")) {
+            return complete(currentCityRoleKeys(sender), args[2]);
         }
         if (args.length == 4 && args[0].equalsIgnoreCase("roles") && args[1].equalsIgnoreCase("toggle")) {
             return complete(List.of("invite", "kick", "manage_members", "manage_roles", "request_upgrade", "expand_claims", "manage_settings"), args[3]);
@@ -437,6 +455,51 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             return complete(List.of("status"), args[1]);
         }
         return List.of();
+    }
+
+    private List<String> cityReferences() {
+        return lifecycleService.listCityReferences();
+    }
+
+    private static List<String> onlinePlayerNames() {
+        return Bukkit.getOnlinePlayers().stream()
+                .map(Player::getName)
+                .filter(Objects::nonNull)
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
+    private List<String> currentCityMemberNames(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            return List.of();
+        }
+        var city = lifecycleService.cityByPlayer(player.getUniqueId());
+        if (city.isEmpty()) {
+            return List.of();
+        }
+        Set<String> names = new LinkedHashSet<>();
+        lifecycleService.listActiveMembers(city.get().cityId()).forEach(member -> {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(member.playerUuid());
+            if (offlinePlayer.getName() != null && !offlinePlayer.getName().isBlank()) {
+                names.add(offlinePlayer.getName());
+            }
+        });
+        return List.copyOf(names);
+    }
+
+    private List<String> currentCityRoleKeys(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            return List.of();
+        }
+        var city = lifecycleService.cityByPlayer(player.getUniqueId());
+        if (city.isEmpty()) {
+            return List.of();
+        }
+        return lifecycleService.listRoles(city.get().cityId()).stream()
+                .map(CityRole::roleKey)
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
     }
 
     private static List<String> complete(List<String> options, String token) {

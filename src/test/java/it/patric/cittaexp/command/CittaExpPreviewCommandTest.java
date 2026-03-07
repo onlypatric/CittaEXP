@@ -5,6 +5,9 @@ import dev.patric.commonlib.api.capability.CapabilityRegistry;
 import dev.patric.commonlib.api.itemsadder.ItemsAdderService;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseKey;
 import it.patric.cittaexp.dialog.showcase.DialogShowcaseService;
+import it.patric.cittaexp.core.model.City;
+import it.patric.cittaexp.core.model.CityStatus;
+import it.patric.cittaexp.core.model.CityTier;
 import it.patric.cittaexp.permission.StaffUiPermissionGate;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusService;
 import it.patric.cittaexp.persistence.runtime.PersistenceStatusSnapshot;
@@ -346,6 +349,42 @@ class CittaExpPreviewCommandTest {
         verify(messageService).render(eq("cittaexp.probe.integration.ranking.scan"), anyMap(), any(Locale.class));
     }
 
+    @Test
+    void staffDeleteWithoutReasonUsesManualDefault() {
+        MessageService messageService = messageService();
+        CityModerationService moderationService = mock(CityModerationService.class);
+        when(moderationService.deleteCity(eq("Aurora"), any(), eq("manual")))
+                .thenReturn(sampleCity("Aurora", "AUR"));
+
+        CittaExpPreviewCommand command = new CittaExpPreviewCommand(
+                mock(GuiFlowOrchestrator.class),
+                new PreviewSettings(),
+                new StaffUiPermissionGate("cittaexp.admin.gui.preview"),
+                mock(CapabilityRegistry.class),
+                mock(ItemsAdderService.class),
+                mock(DialogShowcaseService.class),
+                mock(PersistenceStatusService.class),
+                messageService,
+                dependencyStatusService(),
+                integrationStatusService(),
+                moderationService,
+                lifecycleDiagnosticsService()
+        );
+
+        CommandSender sender = mock(CommandSender.class);
+        when(sender.hasPermission("cittaexp.staff.freeze")).thenReturn(true);
+
+        assertDoesNotThrow(() -> command.onCommand(
+                sender,
+                mock(Command.class),
+                "cittaexp",
+                new String[]{"staff", "city", "delete", "Aurora"}
+        ));
+
+        verify(moderationService).deleteCity(eq("Aurora"), any(), eq("manual"));
+        verify(messageService).render(eq("cittaexp.command.staff.result"), anyMap(), any(Locale.class));
+    }
+
     private static MessageService messageService() {
         MessageService service = mock(MessageService.class);
         when(service.render(anyString(), anyMap(), any(Locale.class)))
@@ -380,12 +419,33 @@ class CittaExpPreviewCommandTest {
     }
 
     private static CityModerationService moderationService() {
-        return mock(CityModerationService.class);
+        CityModerationService service = mock(CityModerationService.class);
+        when(service.listCityReferences()).thenReturn(List.of());
+        return service;
     }
 
     private static CityLifecycleDiagnosticsService lifecycleDiagnosticsService() {
         CityLifecycleDiagnosticsService service = mock(CityLifecycleDiagnosticsService.class);
         when(service.snapshot()).thenReturn(new CityLifecycleDiagnosticsService.Snapshot(true, 1L, 2L, 3L));
         return service;
+    }
+
+    private static City sampleCity(String name, String tag) {
+        long now = System.currentTimeMillis();
+        return new City(
+                java.util.UUID.randomUUID(),
+                name,
+                tag,
+                java.util.UUID.randomUUID(),
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
+                false,
+                0L,
+                1,
+                10,
+                0,
+                now,
+                now
+        );
     }
 }

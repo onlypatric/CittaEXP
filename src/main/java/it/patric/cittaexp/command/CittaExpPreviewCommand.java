@@ -301,7 +301,7 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
             sender.sendMessage(msg(sender, "cittaexp.command.staff.no_permission"));
             return true;
         }
-        if (args.length < 5 || !"city".equalsIgnoreCase(args[1])) {
+        if (args.length < 4 || !"city".equalsIgnoreCase(args[1])) {
             sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
             return true;
         }
@@ -312,10 +312,11 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
         }
 
         String cityRef = args[3];
-        String reason = String.join(" ", Arrays.copyOfRange(args, 4, args.length)).trim();
+        String reason = args.length >= 5
+                ? String.join(" ", Arrays.copyOfRange(args, 4, args.length)).trim()
+                : "manual";
         if (reason.isBlank()) {
-            sender.sendMessage(msg(sender, "cittaexp.command.staff.usage"));
-            return true;
+            reason = "manual";
         }
 
         UUID actor = sender instanceof Player player ? player.getUniqueId() : UUID.randomUUID();
@@ -496,6 +497,12 @@ public final class CittaExpPreviewCommand implements CommandExecutor, TabComplet
 
         if (args.length == 3 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("city")) {
             return complete(List.of("freeze", "unfreeze", "delete"), args[2]);
+        }
+        if (args.length == 4 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("city")) {
+            return complete(cityModerationService.listCityReferences(), args[3]);
+        }
+        if (args.length == 5 && args[0].equalsIgnoreCase("staff") && args[1].equalsIgnoreCase("city")) {
+            return complete(List.of("manual", "test", "cleanup"), args[4]);
         }
 
         return List.of();

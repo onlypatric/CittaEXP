@@ -5,7 +5,7 @@ default:
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questa azione richiede un player in gioco.</red>"
       staff:
         no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso staff mancante:</red> <yellow>cittaexp.staff.freeze</yellow>"
-        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze|delete> <city> <reason></white>"
+        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze|delete> <city> [reason]</white>"
         result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Staff <action></aqua> <white><city></white> <gray>-></gray> <yellow><status></yellow>"
         error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione staff fallita:</red> <yellow><reason></yellow>"
       usage:
@@ -57,6 +57,11 @@ default:
         outbox_pending: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxPending=</white><yellow><value></yellow>"
         outbox_conflicts: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxConflicts=</white><yellow><value></yellow>"
         last_switch: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence lastSwitch=</white><yellow><timestamp></yellow> <gray>(<reason>)</gray>"
+    create:
+      in_progress: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Creazione città in corso.</yellow>"
+    error:
+      generic: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione fallita.</red>"
+      city_name_tag_conflict: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Nome o tag già in uso.</red>"
     city:
       no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.player</yellow>"
       no_permission_moderation: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.moderation</yellow>"

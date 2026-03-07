@@ -5,6 +5,7 @@ import it.patric.cittaexp.core.model.City;
 import it.patric.cittaexp.core.model.CityStatus;
 import it.patric.cittaexp.core.model.CityTier;
 import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.Locale;
 import java.util.Map;
@@ -20,14 +21,15 @@ import org.bukkit.scheduler.BukkitTask;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mockStatic;
 
 class CityCommandTest {
 
@@ -136,6 +138,19 @@ class CityCommandTest {
         }
 
         verify(lifecycleService).createCityAsync(any());
+    }
+
+    @Test
+    void infoTabCompletionSuggestsCityReferences() {
+        DefaultCityLifecycleService lifecycleService = mock(DefaultCityLifecycleService.class);
+        when(lifecycleService.listCityReferences()).thenReturn(List.of("Aurora", "AUR"));
+        CityCommand command = new CityCommand(mock(Plugin.class), lifecycleService, messageService());
+
+        Player sender = mock(Player.class);
+        when(sender.hasPermission("cittaexp.city.player")).thenReturn(true);
+
+        List<String> suggestions = command.onTabComplete(sender, mock(Command.class), "city", new String[]{"info", "au"});
+        assertEquals(List.of("AUR", "Aurora"), suggestions);
     }
 
     private static MessageService messageService() {
