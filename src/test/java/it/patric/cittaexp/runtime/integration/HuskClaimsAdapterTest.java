@@ -1,116 +1,153 @@
 package it.patric.cittaexp.runtime.integration;
 
-import dev.patric.commonlib.api.port.ClaimsPort;
-import it.patric.cittaexp.core.port.HuskClaimsPort;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import net.william278.huskclaims.api.BukkitHuskClaimsAPI;
+import net.william278.huskclaims.claim.Claim;
+import net.william278.huskclaims.claim.ClaimWorld;
+import net.william278.huskclaims.claim.Region;
+import net.william278.huskclaims.position.BlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
+import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 class HuskClaimsAdapterTest {
 
     @Test
-    void hasClaimAtUsesClaimsPortWithPlayerLocation() {
-        ClaimsPort claimsPort = mock(ClaimsPort.class);
-        UUID playerUuid = UUID.randomUUID();
+    void bindReturnsUnavailableWhenPluginMissing() {
+        HuskClaimsAdapter.Binding binding = HuskClaimsAdapter.bind(
+                null,
+                new IntegrationSettings.ClaimSettings(100, 100),
+                Logger.getLogger("test")
+        );
+
+        assertFalse(binding.port().available());
+    }
+
+    @Test
+    void createAutoClaimFailsWhenWorldNotClaimable() {
+        Plugin plugin = enabledPlugin();
+        BukkitHuskClaimsAPI api = mock(BukkitHuskClaimsAPI.class);
         World world = mock(World.class);
-        Location location = new Location(world, 12, 64, 34);
-        when(claimsPort.isInsideClaim(eq(playerUuid), eq(location))).thenReturn(true);
+        net.william278.huskclaims.position.World huskWorld = mock(net.william278.huskclaims.position.World.class);
 
         HuskClaimsAdapter adapter = new HuskClaimsAdapter(
-                claimsPort,
-                () -> true,
-                new IntegrationSettings.ClaimSettings(100, 100, "cmd", "cmd2"),
-                (sender, command) -> true,
-                ignored -> location,
-                () -> mock(CommandSender.class),
+                plugin,
+                api,
+                new IntegrationSettings.ClaimSettings(100, 100),
                 Logger.getLogger("test")
         );
 
-        assertTrue(adapter.hasClaimAt(playerUuid));
+        when(api.getWorld(world)).thenReturn(huskWorld);
+        when(api.isWorldClaimable(huskWorld)).thenReturn(false);
+
+        try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+            bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
+            var result = adapter.createAutoClaim100x100Async(UUID.randomUUID(), "world", 0, 0).join();
+            assertFalse(result.success());
+            assertTrue(result.reason().contains("world-not-claimable"));
+        }
     }
 
     @Test
-    void createAutoClaimReturnsValidationErrorWhenTemplateMissing() {
-        ClaimsPort claimsPort = mock(ClaimsPort.class);
-        UUID playerUuid = UUID.randomUUID();
-
-        HuskClaimsAdapter adapter = new HuskClaimsAdapter(
-                claimsPort,
-                () -> true,
-                new IntegrationSettings.ClaimSettings(100, 100, "", "expand"),
-                (sender, command) -> true,
-                ignored -> null,
-                () -> mock(CommandSender.class),
-                Logger.getLogger("test")
-        );
-
-        HuskClaimsPort.ClaimCreationResult result = adapter.createAutoClaim100x100(playerUuid, "world", 0, 0);
-
-        assertFalse(result.success());
-        assertTrue(result.reason().contains(IntegrationErrorCode.VALIDATION_ERROR.name()));
-    }
-
-    @Test
-    void createAutoClaimDispatchesRenderedCommand() {
-        ClaimsPort claimsPort = mock(ClaimsPort.class);
-        when(claimsPort.isInsideClaim(any(), any())).thenReturn(false);
-        UUID playerUuid = UUID.randomUUID();
+    void createAutoClaimUsesApiAndSucceeds() {
+        Plugin plugin = enabledPlugin();
+        BukkitHuskClaimsAPI api = mock(BukkitHuskClaimsAPI.class);
         World world = mock(World.class);
-        Location location = new Location(world, 0, 64, 0);
-        AtomicReference<String> commandRef = new AtomicReference<>();
+        net.william278.huskclaims.position.World huskWorld = mock(net.william278.huskclaims.position.World.class);
+        ClaimWorld claimWorld = mock(ClaimWorld.class);
 
         HuskClaimsAdapter adapter = new HuskClaimsAdapter(
-                claimsPort,
-                () -> true,
-                new IntegrationSettings.ClaimSettings(
-                        100,
-                        100,
-                        "husk create <player_uuid> <world> <min_x> <min_z> <max_x> <max_z>",
-                        "husk expand <city_id> <chunks>"
-                ),
-                (CommandSender sender, String command) -> {
-                    commandRef.set(command);
-                    return true;
-                },
-                ignored -> location,
-                () -> mock(CommandSender.class),
+                plugin,
+                api,
+                new IntegrationSettings.ClaimSettings(100, 100),
                 Logger.getLogger("test")
         );
 
-        HuskClaimsPort.ClaimCreationResult result = adapter.createAutoClaim100x100(playerUuid, "world", 200, 300);
+        when(api.getWorld(world)).thenReturn(huskWorld);
+        when(api.isWorldClaimable(huskWorld)).thenReturn(true);
+        when(api.getClaimWorld(huskWorld)).thenReturn(Optional.of(claimWorld));
+        when(api.getBlockPosition(anyInt(), anyInt())).thenAnswer(invocation ->
+                blockPosition(invocation.getArgument(0, Integer.class), invocation.getArgument(1, Integer.class))
+        );
+        when(api.isRegionClaimed(eq(claimWorld), any(Region.class))).thenReturn(false);
+        when(api.createAdminClaim(eq(claimWorld), any(Region.class)))
+                .thenReturn(CompletableFuture.completedFuture(mock(Claim.class)));
 
-        assertTrue(result.success());
-        assertTrue(commandRef.get().contains(playerUuid.toString()));
-        assertTrue(commandRef.get().contains("world"));
-        assertTrue(commandRef.get().contains("150"));
-        assertTrue(commandRef.get().contains("349"));
+        try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+            bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
+            var result = adapter.createAutoClaim100x100Async(UUID.randomUUID(), "world", 200, 300).join();
+            assertTrue(result.success());
+            assertTrue(result.minX() < result.maxX());
+            assertTrue(result.minZ() < result.maxZ());
+        }
     }
 
     @Test
-    void expandClaimFailsForInvalidInput() {
+    void expandClaimReturnsFalseWhenNoClaimAtAnchor() {
+        Plugin plugin = enabledPlugin();
+        BukkitHuskClaimsAPI api = mock(BukkitHuskClaimsAPI.class);
+        World world = mock(World.class);
+        net.william278.huskclaims.position.World huskWorld = mock(net.william278.huskclaims.position.World.class);
+        ClaimWorld claimWorld = mock(ClaimWorld.class);
+        net.william278.huskclaims.position.Position position = mock(net.william278.huskclaims.position.Position.class);
+
         HuskClaimsAdapter adapter = new HuskClaimsAdapter(
-                mock(ClaimsPort.class),
-                () -> true,
-                new IntegrationSettings.ClaimSettings(100, 100, "create", "expand <city_id> <chunks>"),
-                (sender, command) -> true,
-                ignored -> null,
-                () -> mock(CommandSender.class),
+                plugin,
+                api,
+                new IntegrationSettings.ClaimSettings(100, 100),
                 Logger.getLogger("test")
         );
 
-        assertFalse(adapter.expandClaim(UUID.randomUUID(), 0, 10L));
-        assertFalse(adapter.expandClaim(UUID.randomUUID(), 1, -1L));
+        when(world.getMinHeight()).thenReturn(0);
+        when(api.getWorld(world)).thenReturn(huskWorld);
+        when(api.isWorldClaimable(huskWorld)).thenReturn(true);
+        when(api.getClaimWorld(huskWorld)).thenReturn(Optional.of(claimWorld));
+        when(api.getPosition(any(Location.class))).thenReturn(position);
+        when(api.getClaimAt(position)).thenReturn(Optional.empty());
+
+        try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+            bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
+            assertFalse(adapter.expandClaimAsync("world", 10, 10, 1).join());
+        }
+    }
+
+    private static BlockPosition blockPosition(int x, int z) {
+        return new BlockPosition() {
+            @Override
+            public int getBlockX() {
+                return x;
+            }
+
+            @Override
+            public int getBlockZ() {
+                return z;
+            }
+
+            @Override
+            public long getLongChunkCoords() {
+                return (((long) (x >> 4)) << 32) | ((z >> 4) & 0xffffffffL);
+            }
+        };
+    }
+
+    private static Plugin enabledPlugin() {
+        Plugin plugin = mock(Plugin.class);
+        when(plugin.isEnabled()).thenReturn(true);
+        return plugin;
     }
 }

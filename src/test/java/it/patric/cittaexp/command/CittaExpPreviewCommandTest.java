@@ -361,7 +361,7 @@ class CittaExpPreviewCommandTest {
         when(service.snapshot()).thenReturn(new RequiredDependencySnapshot(List.of(
                 new ExternalDependencyStatus("Vault", DependencyState.AVAILABLE, "1.7", ""),
                 new ExternalDependencyStatus("HuskClaims", DependencyState.AVAILABLE, "3.0.0", ""),
-                new ExternalDependencyStatus("ClassificheEXP", DependencyState.AVAILABLE, "1.0.0", "")
+                new ExternalDependencyStatus("ClassificheExp", DependencyState.AVAILABLE, "1.0.0", "")
         )));
         return service;
     }
@@ -372,7 +372,7 @@ class CittaExpPreviewCommandTest {
                 List.of(
                         new AdapterStatus("Vault", AdapterState.AVAILABLE, "1.7", "api-registered"),
                         new AdapterStatus("HuskClaims", AdapterState.AVAILABLE, "4.0.0", "api-registered"),
-                        new AdapterStatus("ClassificheEXP", AdapterState.AVAILABLE, "0.2.0", "api-registered")
+                        new AdapterStatus("ClassificheExp", AdapterState.AVAILABLE, "0.2.0", "api-registered")
                 ),
                 new RankingScanStats(100, 95, 5, 123456L)
         ));

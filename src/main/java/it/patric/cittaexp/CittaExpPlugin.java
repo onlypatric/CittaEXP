@@ -154,7 +154,7 @@ public final class CittaExpPlugin extends JavaPlugin {
             getCommand("cittaexp").setExecutor(previewCommand);
             getCommand("cittaexp").setTabCompleter(previewCommand);
         }
-        CityCommand cityCommand = new CityCommand(cityLifecycleService, messageService);
+        CityCommand cityCommand = new CityCommand(this, cityLifecycleService, messageService);
         if (getCommand("city") != null) {
             getCommand("city").setExecutor(cityCommand);
             getCommand("city").setTabCompleter(cityCommand);

@@ -25,6 +25,11 @@ public final class IntegrationConfigLoader {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(configFile);
         String root = "integration";
+        if (cfg.isConfigurationSection(root + ".claim.commands")) {
+            plugin.getLogger().warning(
+                    "[CittaEXP] integration.claim.commands.* e' deprecato e verra' ignorato; usa solo integration.claim.auto.*"
+            );
+        }
         return new IntegrationSettings(
                 cfg.getBoolean(root + ".failFast", true),
                 new IntegrationSettings.RankingSettings(
@@ -32,9 +37,7 @@ public final class IntegrationConfigLoader {
                 ),
                 new IntegrationSettings.ClaimSettings(
                         cfg.getInt(root + ".claim.auto.width", 100),
-                        cfg.getInt(root + ".claim.auto.height", 100),
-                        cfg.getString(root + ".claim.commands.create", ""),
-                        cfg.getString(root + ".claim.commands.expand", "")
+                        cfg.getInt(root + ".claim.auto.height", 100)
                 )
         );
     }

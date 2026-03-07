@@ -16,10 +16,10 @@ class RequiredDependenciesComponentTest {
     void inspectReportsMissingPlugin() {
         PluginManager pluginManager = mock(PluginManager.class);
         Plugin vault = enabledPlugin("Vault");
-        Plugin classificheExp = enabledPlugin("ClassificheEXP");
+        Plugin classificheExp = enabledPlugin("ClassificheExp");
         when(pluginManager.getPlugin("Vault")).thenReturn(vault);
         when(pluginManager.getPlugin("HuskClaims")).thenReturn(null);
-        when(pluginManager.getPlugin("ClassificheEXP")).thenReturn(classificheExp);
+        when(pluginManager.getPlugin("ClassificheExp")).thenReturn(classificheExp);
 
         RequiredDependencySnapshot snapshot = RequiredDependenciesComponent.inspect(pluginManager);
 
@@ -36,10 +36,10 @@ class RequiredDependenciesComponentTest {
         PluginManager pluginManager = mock(PluginManager.class);
         Plugin vault = enabledPlugin("Vault");
         Plugin huskClaims = enabledPlugin("HuskClaims");
-        Plugin classificheExp = enabledPlugin("ClassificheEXP");
+        Plugin classificheExp = enabledPlugin("ClassificheExp");
         when(pluginManager.getPlugin("Vault")).thenReturn(vault);
         when(pluginManager.getPlugin("HuskClaims")).thenReturn(huskClaims);
-        when(pluginManager.getPlugin("ClassificheEXP")).thenReturn(classificheExp);
+        when(pluginManager.getPlugin("ClassificheExp")).thenReturn(classificheExp);
 
         RequiredDependencySnapshot snapshot = RequiredDependenciesComponent.inspect(pluginManager);
 

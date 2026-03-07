@@ -34,6 +34,8 @@ import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
 import it.patric.cittaexp.persistence.port.CityReadPort;
 import it.patric.cittaexp.persistence.port.CityTxPort;
 import it.patric.cittaexp.persistence.port.CityWritePort;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -79,6 +81,18 @@ public final class DefaultCityLifecycleService implements
 
     @Override
     public City createCity(CreateCityCommand command) {
+        try {
+            return createCityAsync(command).join();
+        } catch (CompletionException ex) {
+            Throwable cause = unwrapCompletion(ex);
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+            }
+            throw new IllegalStateException("city-create-failed", cause);
+        }
+    }
+
+    public CompletableFuture<City> createCityAsync(CreateCityCommand command) {
         Objects.requireNonNull(command, "command");
         UUID creator = Objects.requireNonNull(command.creatorUuid(), "creatorUuid");
         String name = normalizeCityName(command.cityName());
@@ -90,45 +104,82 @@ public final class DefaultCityLifecycleService implements
         if (readPort.findCityByName(name).isPresent() || readPort.findCityByTag(tag).isPresent()) {
             throw new IllegalStateException("city-name-tag-conflict");
         }
+        if (!huskClaimsPort.available()) {
+            throw new IllegalStateException("huskclaims-unavailable");
+        }
 
-        ClaimBinding claim = ensureInitialClaim100x100(
-                UUID.randomUUID(),
+        UUID cityId = UUID.randomUUID();
+        return huskClaimsPort.createAutoClaim100x100Async(
                 creator,
                 command.world(),
                 command.centerX(),
                 command.centerZ()
-        );
-        UUID cityId = claim.cityId();
-        long now = System.currentTimeMillis();
-        CityRecord city = new CityRecord(
-                cityId,
-                name,
-                tag,
-                creator,
-                CityTier.BORGO,
-                CityStatus.ACTIVE,
-                false,
-                false,
-                0L,
-                1,
-                maxMembersForTier(CityTier.BORGO),
-                now,
-                now,
-                0
-        );
+        ).thenCompose(result -> {
+            if (!result.success()) {
+                return CompletableFuture.failedFuture(
+                        new IllegalStateException("claim-create-failed:" + safe(result.reason()))
+                );
+            }
+            long now = System.currentTimeMillis();
+            ClaimBinding claim = new ClaimBinding(
+                    cityId,
+                    command.world(),
+                    result.minX(),
+                    result.minZ(),
+                    result.maxX(),
+                    result.maxZ(),
+                    (result.maxX() - result.minX() + 1) * (result.maxZ() - result.minZ() + 1),
+                    now,
+                    now
+            );
+            CityRecord city = new CityRecord(
+                    cityId,
+                    name,
+                    tag,
+                    creator,
+                    CityTier.BORGO,
+                    CityStatus.ACTIVE,
+                    false,
+                    false,
+                    0L,
+                    1,
+                    maxMembersForTier(CityTier.BORGO),
+                    now,
+                    now,
+                    0
+            );
+            try {
+                txPort.withTransaction(connection -> {
+                    expect(writePort.createCity(city), "create-city");
+                    bootstrapDefaultRoles(cityId, now);
+                    expect(writePort.upsertMember(new CityMemberRecord(cityId, creator, ROLE_LEADER, now, true)), "create-leader-member");
+                    expect(writePort.upsertClaimBinding(toClaimBindingRecord(claim)), "create-claim-binding");
 
-        txPort.withTransaction(connection -> {
-            expect(writePort.createCity(city), "create-city");
-            bootstrapDefaultRoles(cityId, now);
-            expect(writePort.upsertMember(new CityMemberRecord(cityId, creator, ROLE_LEADER, now, true)), "create-leader-member");
-            expect(writePort.upsertClaimBinding(toClaimBindingRecord(claim)), "create-claim-binding");
-
-            appendAudit(audit(cityId, "CITY", "city_created", creator, jsonPayload("name", name, "tag", tag), now));
-            appendAudit(audit(cityId, "CITY", "claim_created", creator, jsonPayload("world", command.world()), now));
-            return null;
+                    appendAudit(audit(cityId, "CITY", "city_created", creator, jsonPayload("name", name, "tag", tag), now));
+                    appendAudit(audit(cityId, "CITY", "claim_created", creator, jsonPayload("world", command.world()), now));
+                    return null;
+                });
+                return CompletableFuture.completedFuture(toCity(city));
+            } catch (RuntimeException writeFailure) {
+                return huskClaimsPort.deleteClaimAtAsync(command.world(), command.centerX(), command.centerZ())
+                        .handle((rollbackOk, rollbackError) -> {
+                            boolean rollbackSuccess = rollbackError == null && Boolean.TRUE.equals(rollbackOk);
+                            if (!rollbackSuccess) {
+                                logger.warning(
+                                        "[CittaEXP] claim rollback failed after city write failure cityId="
+                                                + cityId
+                                                + " error="
+                                                + (rollbackError == null ? "unknown" : rollbackError.getClass().getSimpleName())
+                                );
+                            }
+                            String reason = rollbackSuccess
+                                    ? "city-create-db-failed-rollback-ok"
+                                    : "city-create-db-failed-rollback-failed";
+                            return new IllegalStateException(reason, writeFailure);
+                        })
+                        .thenCompose(error -> CompletableFuture.failedFuture(error));
+            }
         });
-
-        return toCity(city);
     }
 
     @Override
@@ -448,7 +499,13 @@ public final class DefaultCityLifecycleService implements
         if (!huskClaimsPort.available()) {
             throw new IllegalStateException("huskclaims-unavailable");
         }
-        HuskClaimsPort.ClaimCreationResult result = huskClaimsPort.createAutoClaim100x100(leaderUuid, world, centerX, centerZ);
+        HuskClaimsPort.ClaimCreationResult result;
+        try {
+            result = huskClaimsPort.createAutoClaim100x100Async(leaderUuid, world, centerX, centerZ).join();
+        } catch (CompletionException ex) {
+            Throwable cause = unwrapCompletion(ex);
+            throw new IllegalStateException("claim-create-failed:" + cause.getClass().getSimpleName(), cause);
+        }
         if (!result.success()) {
             throw new IllegalStateException("claim-create-failed:" + safe(result.reason()));
         }
@@ -473,11 +530,20 @@ public final class DefaultCityLifecycleService implements
         CityRecord city = requireCity(cityId);
         ensureCityNotFrozen(city);
         ensureCanExpandClaims(city, actorUuid);
-        if (!huskClaimsPort.expandClaim(cityId, chunks, 0L)) {
-            throw new IllegalStateException("claim-expand-failed");
-        }
         ClaimBindingRecord current = readPort.findClaimBinding(cityId)
                 .orElseThrow(() -> new IllegalStateException("claim-binding-missing"));
+        int centerX = (current.minX() + current.maxX()) / 2;
+        int centerZ = (current.minZ() + current.maxZ()) / 2;
+        boolean expanded;
+        try {
+            expanded = huskClaimsPort.expandClaimAsync(current.worldName(), centerX, centerZ, chunks).join();
+        } catch (CompletionException ex) {
+            Throwable cause = unwrapCompletion(ex);
+            throw new IllegalStateException("claim-expand-failed:" + cause.getClass().getSimpleName(), cause);
+        }
+        if (!expanded) {
+            throw new IllegalStateException("claim-expand-failed");
+        }
         int expandedArea = current.area() + (Math.max(1, chunks) * 256);
         long now = System.currentTimeMillis();
         ClaimBindingRecord updated = new ClaimBindingRecord(
@@ -836,6 +902,13 @@ public final class DefaultCityLifecycleService implements
 
     private static String safe(String value) {
         return value == null ? "" : value;
+    }
+
+    private static Throwable unwrapCompletion(Throwable throwable) {
+        if (throwable instanceof CompletionException completionException && completionException.getCause() != null) {
+            return completionException.getCause();
+        }
+        return throwable;
     }
 
     private static String jsonPayload(String key, String value) {

@@ -9,7 +9,7 @@ import org.bukkit.plugin.PluginManager;
 
 public final class RequiredDependenciesComponent implements CommonComponent, RequiredDependencyStatusService {
 
-    private static final List<String> REQUIRED = List.of("Vault", "HuskClaims", "ClassificheEXP");
+    private static final List<String> REQUIRED = List.of("Vault", "HuskClaims", "ClassificheExp");
 
     private volatile RequiredDependencySnapshot snapshot = new RequiredDependencySnapshot(List.of());
 

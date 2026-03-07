@@ -24,17 +24,13 @@ public record IntegrationSettings(
 
     public record ClaimSettings(
             int autoWidth,
-            int autoHeight,
-            String createCommandTemplate,
-            String expandCommandTemplate
+            int autoHeight
     ) {
 
         public ClaimSettings {
             if (autoWidth < 1 || autoHeight < 1) {
                 throw new IllegalArgumentException("auto claim size must be >= 1");
             }
-            createCommandTemplate = createCommandTemplate == null ? "" : createCommandTemplate.trim();
-            expandCommandTemplate = expandCommandTemplate == null ? "" : expandCommandTemplate.trim();
         }
     }
 }

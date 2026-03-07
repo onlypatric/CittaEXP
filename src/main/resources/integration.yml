@@ -6,10 +6,8 @@ integration:
     auto:
       width: 100
       height: 100
-    # Template command eseguito da console.
-    # Placeholder supportati:
-    # <player_uuid> <world> <center_x> <center_z> <min_x> <min_z> <max_x> <max_z> <width> <height>
+    # DEPRECATO: da M3 wiring API reale, i comandi non sono piu' usati.
+    # Manteniamo la sezione solo per backward-compat di config esistenti.
     commands:
-      create: "huskclaims admin create-claim <player_uuid> <world> <min_x> <min_z> <max_x> <max_z>"
-      # Placeholder supportati: <city_id> <chunks> <cost>
-      expand: "huskclaims admin expand-claim <city_id> <chunks>"
+      create: ""
+      expand: ""

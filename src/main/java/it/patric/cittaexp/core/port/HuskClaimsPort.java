@@ -1,5 +1,6 @@
 package it.patric.cittaexp.core.port;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.UUID;
 
 public interface HuskClaimsPort {
@@ -8,9 +9,16 @@ public interface HuskClaimsPort {
 
     boolean hasClaimAt(UUID playerUuid);
 
-    ClaimCreationResult createAutoClaim100x100(UUID playerUuid, String world, int centerX, int centerZ);
+    CompletableFuture<ClaimCreationResult> createAutoClaim100x100Async(
+            UUID playerUuid,
+            String world,
+            int centerX,
+            int centerZ
+    );
 
-    boolean expandClaim(UUID cityId, int chunks, long cost);
+    CompletableFuture<Boolean> expandClaimAsync(String world, int centerX, int centerZ, int chunks);
+
+    CompletableFuture<Boolean> deleteClaimAtAsync(String world, int blockX, int blockZ);
 
     record ClaimCreationResult(boolean success, int minX, int minZ, int maxX, int maxZ, String reason) {
     }

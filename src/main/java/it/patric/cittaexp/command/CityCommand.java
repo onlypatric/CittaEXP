@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -20,16 +21,19 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class CityCommand implements CommandExecutor, TabCompleter {
 
     private static final String PLAYER_PERMISSION = "cittaexp.city.player";
     private static final String MODERATION_PERMISSION = "cittaexp.city.moderation";
 
+    private final Plugin plugin;
     private final DefaultCityLifecycleService lifecycleService;
     private final MessageService messageService;
 
-    public CityCommand(DefaultCityLifecycleService lifecycleService, MessageService messageService) {
+    public CityCommand(Plugin plugin, DefaultCityLifecycleService lifecycleService, MessageService messageService) {
+        this.plugin = Objects.requireNonNull(plugin, "plugin");
         this.lifecycleService = Objects.requireNonNull(lifecycleService, "lifecycleService");
         this.messageService = Objects.requireNonNull(messageService, "messageService");
     }
@@ -78,7 +82,7 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         }
 
         var location = player.getLocation();
-        var created = lifecycleService.createCity(new it.patric.cittaexp.core.service.CityLifecycleService.CreateCityCommand(
+        var createCommand = new it.patric.cittaexp.core.service.CityLifecycleService.CreateCityCommand(
                 player.getUniqueId(),
                 args[1],
                 args[2],
@@ -87,13 +91,30 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                 location.getBlockZ(),
                 "",
                 ""
-        ));
+        );
 
-        player.sendMessage(msg(player, "cittaexp.city.create.success", Map.of(
-                "city", created.name(),
-                "tag", created.tag(),
-                "tier", created.tier().name()
+        player.sendMessage(msg(player, "cittaexp.city.create.in_progress", Map.of(
+                "city", args[1],
+                "tag", args[2].toUpperCase(Locale.ROOT)
         )));
+
+        lifecycleService.createCityAsync(createCommand).whenComplete((created, throwable) ->
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    if (!player.isOnline()) {
+                        return;
+                    }
+                    if (throwable == null) {
+                        player.sendMessage(msg(player, "cittaexp.city.create.success", Map.of(
+                                "city", created.name(),
+                                "tag", created.tag(),
+                                "tier", created.tier().name()
+                        )));
+                        return;
+                    }
+                    RuntimeException runtime = unwrapRuntime(throwable);
+                    player.sendMessage(msg(player, mapErrorKey(runtime), Map.of("reason", safe(runtime.getMessage()))));
+                })
+        );
         return true;
     }
 
@@ -345,10 +366,20 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         if (reason.isBlank()) {
             return "cittaexp.city.error.generic";
         }
+        if (reason.startsWith("claim-create-failed")) {
+            return "cittaexp.city.create.failed.claim";
+        }
+        if (reason.startsWith("city-create-db-failed-rollback-failed")) {
+            return "cittaexp.city.create.failed.persistence_rollback_failed";
+        }
+        if (reason.startsWith("city-create-db-failed-rollback-ok")) {
+            return "cittaexp.city.create.failed.persistence";
+        }
         return switch (reason) {
             case "player-already-in-city" -> "cittaexp.city.error.player_already_in_city";
             case "city-name-tag-conflict" -> "cittaexp.city.error.city_name_tag_conflict";
             case "city-not-found" -> "cittaexp.city.error.city_not_found";
+            case "huskclaims-unavailable" -> "cittaexp.city.create.failed.claims_unavailable";
             case "city-freeze-restricted" -> "cittaexp.city.error.freeze_restricted";
             case "permission-denied-invite", "permission-denied-kick", "permission-denied-manage-members", "permission-denied-manage-roles", "permission-denied-expand-claim", "permission-denied-request-upgrade" -> "cittaexp.city.error.permission_denied";
             case "leader-must-transfer-before-leave", "cannot-kick-leader", "leader-role-is-immutable" -> "cittaexp.city.error.leader_restricted";
@@ -366,6 +397,17 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         }
         player.sendMessage(msg(player, "cittaexp.city.no_permission_moderation"));
         return false;
+    }
+
+    private static RuntimeException unwrapRuntime(Throwable throwable) {
+        Throwable current = throwable;
+        if (current instanceof CompletionException completionException && completionException.getCause() != null) {
+            current = completionException.getCause();
+        }
+        if (current instanceof RuntimeException runtimeException) {
+            return runtimeException;
+        }
+        return new IllegalStateException(current.getMessage() == null ? "create-city-failed" : current.getMessage(), current);
     }
 
     @Override

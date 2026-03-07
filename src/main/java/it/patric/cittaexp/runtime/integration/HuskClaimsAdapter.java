@@ -1,80 +1,100 @@
 package it.patric.cittaexp.runtime.integration;
 
-import dev.patric.commonlib.api.port.ClaimsPort;
 import it.patric.cittaexp.core.port.HuskClaimsPort;
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BooleanSupplier;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
+import net.william278.huskclaims.api.BukkitHuskClaimsAPI;
+import net.william278.huskclaims.api.HuskClaimsAPI;
+import net.william278.huskclaims.claim.Claim;
+import net.william278.huskclaims.claim.ClaimWorld;
+import net.william278.huskclaims.claim.Region;
+import net.william278.huskclaims.position.BlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public final class HuskClaimsAdapter implements HuskClaimsPort {
 
-    private final ClaimsPort claimsPort;
-    private final BooleanSupplier availableSupplier;
+    private final Plugin huskClaimsPlugin;
+    private final BukkitHuskClaimsAPI api;
     private final IntegrationSettings.ClaimSettings claimSettings;
-    private final CommandDispatcher commandDispatcher;
-    private final PlayerLocationProvider playerLocationProvider;
-    private final ConsoleSenderProvider consoleSenderProvider;
     private final Logger logger;
 
-    public HuskClaimsAdapter(
-            ClaimsPort claimsPort,
-            BooleanSupplier availableSupplier,
+    HuskClaimsAdapter(
+            Plugin huskClaimsPlugin,
+            BukkitHuskClaimsAPI api,
             IntegrationSettings.ClaimSettings claimSettings,
-            CommandDispatcher commandDispatcher,
-            PlayerLocationProvider playerLocationProvider,
-            ConsoleSenderProvider consoleSenderProvider,
             Logger logger
     ) {
-        this.claimsPort = Objects.requireNonNull(claimsPort, "claimsPort");
-        this.availableSupplier = Objects.requireNonNull(availableSupplier, "availableSupplier");
+        this.huskClaimsPlugin = Objects.requireNonNull(huskClaimsPlugin, "huskClaimsPlugin");
+        this.api = Objects.requireNonNull(api, "api");
         this.claimSettings = Objects.requireNonNull(claimSettings, "claimSettings");
-        this.commandDispatcher = Objects.requireNonNull(commandDispatcher, "commandDispatcher");
-        this.playerLocationProvider = Objects.requireNonNull(playerLocationProvider, "playerLocationProvider");
-        this.consoleSenderProvider = Objects.requireNonNull(consoleSenderProvider, "consoleSenderProvider");
         this.logger = Objects.requireNonNull(logger, "logger");
     }
 
     public static Binding bind(
-            ClaimsPort claimsPort,
-            BooleanSupplier availableSupplier,
+            Plugin huskClaimsPlugin,
             IntegrationSettings.ClaimSettings claimSettings,
             Logger logger
     ) {
-        HuskClaimsAdapter adapter = new HuskClaimsAdapter(
-                claimsPort,
-                availableSupplier,
-                claimSettings,
-                (sender, command) -> Bukkit.dispatchCommand(sender, command),
-                playerUuid -> {
-                    var player = Bukkit.getPlayer(playerUuid);
-                    if (player == null) {
-                        return null;
-                    }
-                    return player.getLocation();
-                },
-                Bukkit::getConsoleSender,
-                logger
-        );
-        boolean available = adapter.available();
-        AdapterStatus status = new AdapterStatus(
-                "HuskClaims",
-                available ? AdapterState.AVAILABLE : AdapterState.UNAVAILABLE,
-                available ? "detected" : "n/a",
-                available
-                        ? "api-registered"
-                        : IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims"
-        );
-        return new Binding(adapter, status);
+        if (huskClaimsPlugin == null || !huskClaimsPlugin.isEnabled()) {
+            return new Binding(
+                    new UnavailableHuskClaimsPort(),
+                    new AdapterStatus(
+                            "HuskClaims",
+                            AdapterState.UNAVAILABLE,
+                            safeVersion(huskClaimsPlugin),
+                            IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims"
+                    )
+            );
+        }
+
+        try {
+            BukkitHuskClaimsAPI api = BukkitHuskClaimsAPI.getInstance();
+            HuskClaimsAdapter adapter = new HuskClaimsAdapter(huskClaimsPlugin, api, claimSettings, logger);
+            return new Binding(
+                    adapter,
+                    new AdapterStatus(
+                            "HuskClaims",
+                            AdapterState.AVAILABLE,
+                            safeVersion(huskClaimsPlugin),
+                            "api-registered"
+                    )
+            );
+        } catch (HuskClaimsAPI.NotRegisteredException ex) {
+            logger.warning("[CittaEXP] HuskClaims API non registrata: " + ex.getClass().getSimpleName());
+            return new Binding(
+                    new UnavailableHuskClaimsPort(),
+                    new AdapterStatus(
+                            "HuskClaims",
+                            AdapterState.UNAVAILABLE,
+                            safeVersion(huskClaimsPlugin),
+                            IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":api-not-registered:HuskClaimsAPI"
+                    )
+            );
+        } catch (RuntimeException ex) {
+            logger.warning("[CittaEXP] HuskClaims binding failed: " + ex.getClass().getSimpleName());
+            return new Binding(
+                    new UnavailableHuskClaimsPort(),
+                    new AdapterStatus(
+                            "HuskClaims",
+                            AdapterState.UNAVAILABLE,
+                            safeVersion(huskClaimsPlugin),
+                            IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR + ":binding-failed:" + ex.getClass().getSimpleName()
+                    )
+            );
+        }
     }
 
     @Override
     public boolean available() {
-        return availableSupplier.getAsBoolean();
+        return huskClaimsPlugin.isEnabled();
     }
 
     @Override
@@ -82,12 +102,12 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
         if (!available() || playerUuid == null) {
             return false;
         }
-        Location location = playerLocationProvider.location(playerUuid);
-        if (location == null) {
+        Player player = Bukkit.getPlayer(playerUuid);
+        if (player == null) {
             return false;
         }
         try {
-            return claimsPort.isInsideClaim(playerUuid, location);
+            return api.getClaimAt(api.getPosition(player.getLocation())).isPresent();
         } catch (RuntimeException ex) {
             logger.warning(
                     "[CittaEXP] HuskClaims hasClaimAt failed player="
@@ -102,26 +122,208 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
     }
 
     @Override
-    public ClaimCreationResult createAutoClaim100x100(UUID playerUuid, String world, int centerX, int centerZ) {
+    public CompletableFuture<ClaimCreationResult> createAutoClaim100x100Async(
+            UUID playerUuid,
+            String world,
+            int centerX,
+            int centerZ
+    ) {
         if (!available()) {
-            return failureResult(
+            return CompletableFuture.completedFuture(failureResult(
                     IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims",
                     centerX,
-                    centerZ,
-                    claimSettings.autoWidth(),
-                    claimSettings.autoHeight()
-            );
+                    centerZ
+            ));
         }
         if (playerUuid == null || world == null || world.isBlank()) {
-            return failureResult(
+            return CompletableFuture.completedFuture(failureResult(
                     IntegrationErrorCode.VALIDATION_ERROR + ":invalid-input",
                     centerX,
-                    centerZ,
-                    claimSettings.autoWidth(),
-                    claimSettings.autoHeight()
-            );
+                    centerZ
+            ));
         }
 
+        Optional<ClaimWorld> maybeClaimWorld = claimWorld(world);
+        if (maybeClaimWorld.isEmpty()) {
+            return CompletableFuture.completedFuture(failureResult(
+                    IntegrationErrorCode.VALIDATION_ERROR + ":world-not-claimable",
+                    centerX,
+                    centerZ
+            ));
+        }
+        ClaimWorld claimWorld = maybeClaimWorld.get();
+
+        Region region = targetRegion(centerX, centerZ);
+        try {
+            if (api.isRegionClaimed(claimWorld, region)) {
+                return CompletableFuture.completedFuture(failureResult(
+                        IntegrationErrorCode.VALIDATION_ERROR + ":region-already-claimed",
+                        centerX,
+                        centerZ
+                ));
+            }
+        } catch (RuntimeException ex) {
+            return CompletableFuture.completedFuture(failureResult(
+                    IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR + ":claim-check-failed:" + ex.getClass().getSimpleName(),
+                    centerX,
+                    centerZ
+            ));
+        }
+
+        return api.createAdminClaim(claimWorld, region)
+                .handle((created, throwable) -> {
+                    if (throwable != null) {
+                        Throwable cause = unwrap(throwable);
+                        return failureResult(
+                                IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR
+                                        + ":create-claim-failed:"
+                                        + cause.getClass().getSimpleName(),
+                                centerX,
+                                centerZ
+                        );
+                    }
+                    return successResult(centerX, centerZ);
+                });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> expandClaimAsync(String world, int centerX, int centerZ, int chunks) {
+        if (!available()) {
+            logger.warning("[CittaEXP] HuskClaims expand rejected: " + IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims");
+            return CompletableFuture.completedFuture(false);
+        }
+        if (world == null || world.isBlank() || chunks < 1) {
+            logger.warning("[CittaEXP] HuskClaims expand rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":invalid-input");
+            return CompletableFuture.completedFuture(false);
+        }
+
+        Optional<ClaimWorld> maybeClaimWorld = claimWorld(world);
+        if (maybeClaimWorld.isEmpty()) {
+            logger.warning("[CittaEXP] HuskClaims expand rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":world-not-claimable");
+            return CompletableFuture.completedFuture(false);
+        }
+
+        ClaimWorld claimWorld = maybeClaimWorld.get();
+        Optional<Claim> maybeClaim = claimAt(world, centerX, centerZ);
+        if (maybeClaim.isEmpty()) {
+            logger.warning("[CittaEXP] HuskClaims expand rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":claim-not-found");
+            return CompletableFuture.completedFuture(false);
+        }
+
+        Claim claim = maybeClaim.get();
+        int deltaBlocks = chunks * 16;
+        Region expanded;
+        try {
+            expanded = claim.getRegion().getResized(deltaBlocks, deltaBlocks, deltaBlocks, deltaBlocks);
+        } catch (IllegalArgumentException ex) {
+            logger.warning("[CittaEXP] HuskClaims expand rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":invalid-resize");
+            return CompletableFuture.completedFuture(false);
+        }
+
+        return api.resizeClaim(claimWorld, claim, expanded)
+                .handle((updated, throwable) -> {
+                    if (throwable != null) {
+                        Throwable cause = unwrap(throwable);
+                        logger.warning(
+                                "[CittaEXP] HuskClaims expand failed: "
+                                        + IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR
+                                        + ":"
+                                        + cause.getClass().getSimpleName()
+                        );
+                        return false;
+                    }
+                    return true;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> deleteClaimAtAsync(String world, int blockX, int blockZ) {
+        if (!available()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        if (world == null || world.isBlank()) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        Optional<ClaimWorld> maybeClaimWorld = claimWorld(world);
+        if (maybeClaimWorld.isEmpty()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        Optional<Claim> maybeClaim = claimAt(world, blockX, blockZ);
+        if (maybeClaim.isEmpty()) {
+            return CompletableFuture.completedFuture(true);
+        }
+
+        ClaimWorld claimWorld = maybeClaimWorld.get();
+        Claim claim = maybeClaim.get();
+        try {
+            if (claim.isChildClaim()) {
+                api.deleteChildClaim(claimWorld, claim);
+            } else {
+                api.deleteClaim(claimWorld, claim);
+            }
+            return CompletableFuture.completedFuture(true);
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims delete claim failed world="
+                            + world
+                            + " x="
+                            + blockX
+                            + " z="
+                            + blockZ
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
+    private Optional<ClaimWorld> claimWorld(String worldName) {
+        World bukkitWorld = Bukkit.getWorld(worldName);
+        if (bukkitWorld == null) {
+            return Optional.empty();
+        }
+        try {
+            var world = api.getWorld(bukkitWorld);
+            if (!api.isWorldClaimable(world)) {
+                return Optional.empty();
+            }
+            return api.getClaimWorld(world);
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims claimWorld resolve failed world="
+                            + worldName
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return Optional.empty();
+        }
+    }
+
+    private Optional<Claim> claimAt(String worldName, int blockX, int blockZ) {
+        World world = Bukkit.getWorld(worldName);
+        if (world == null) {
+            return Optional.empty();
+        }
+        try {
+            Location location = new Location(world, blockX, world.getMinHeight(), blockZ);
+            return api.getClaimAt(api.getPosition(location));
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims claim lookup failed world="
+                            + worldName
+                            + " x="
+                            + blockX
+                            + " z="
+                            + blockZ
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return Optional.empty();
+        }
+    }
+
+    private Region targetRegion(int centerX, int centerZ) {
         int width = claimSettings.autoWidth();
         int height = claimSettings.autoHeight();
         int minX = centerX - (width / 2);
@@ -129,89 +331,24 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
         int maxX = minX + width - 1;
         int maxZ = minZ + height - 1;
 
-        if (hasClaimAt(playerUuid)) {
-            return new ClaimCreationResult(
-                    false,
-                    minX,
-                    minZ,
-                    maxX,
-                    maxZ,
-                    IntegrationErrorCode.VALIDATION_ERROR + ":claim-already-present"
-            );
-        }
+        BlockPosition near = api.getBlockPosition(minX, minZ);
+        BlockPosition far = api.getBlockPosition(maxX, maxZ);
+        return Region.from(near, far);
+    }
 
-        String template = claimSettings.createCommandTemplate();
-        if (template.isBlank()) {
-            return new ClaimCreationResult(
-                    false,
-                    minX,
-                    minZ,
-                    maxX,
-                    maxZ,
-                    IntegrationErrorCode.VALIDATION_ERROR + ":create-command-template-missing"
-            );
-        }
-
-        String command = render(
-                template,
-                Map.of(
-                        "player_uuid", playerUuid.toString(),
-                        "world", world,
-                        "center_x", String.valueOf(centerX),
-                        "center_z", String.valueOf(centerZ),
-                        "min_x", String.valueOf(minX),
-                        "min_z", String.valueOf(minZ),
-                        "max_x", String.valueOf(maxX),
-                        "max_z", String.valueOf(maxZ),
-                        "width", String.valueOf(width),
-                        "height", String.valueOf(height)
-                )
-        );
-        boolean executed = execute(command);
-        if (!executed) {
-            return new ClaimCreationResult(
-                    false,
-                    minX,
-                    minZ,
-                    maxX,
-                    maxZ,
-                    IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR + ":create-command-failed"
-            );
-        }
+    private ClaimCreationResult successResult(int centerX, int centerZ) {
+        int width = claimSettings.autoWidth();
+        int height = claimSettings.autoHeight();
+        int minX = centerX - (width / 2);
+        int minZ = centerZ - (height / 2);
+        int maxX = minX + width - 1;
+        int maxZ = minZ + height - 1;
         return new ClaimCreationResult(true, minX, minZ, maxX, maxZ, "ok");
     }
 
-    @Override
-    public boolean expandClaim(UUID cityId, int chunks, long cost) {
-        if (!available()) {
-            logger.warning("[CittaEXP] HuskClaims expandClaim rejected: " + IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims");
-            return false;
-        }
-        if (cityId == null || chunks < 1 || cost < 0L) {
-            logger.warning("[CittaEXP] HuskClaims expandClaim rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":invalid-input");
-            return false;
-        }
-        String template = claimSettings.expandCommandTemplate();
-        if (template.isBlank()) {
-            logger.warning("[CittaEXP] HuskClaims expandClaim rejected: " + IntegrationErrorCode.VALIDATION_ERROR + ":expand-command-template-missing");
-            return false;
-        }
-        String command = render(
-                template,
-                Map.of(
-                        "city_id", cityId.toString(),
-                        "chunks", String.valueOf(chunks),
-                        "cost", String.valueOf(cost)
-                )
-        );
-        boolean ok = execute(command);
-        if (!ok) {
-            logger.warning("[CittaEXP] HuskClaims expandClaim failed: " + IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR + ":expand-command-failed");
-        }
-        return ok;
-    }
-
-    private ClaimCreationResult failureResult(String reason, int centerX, int centerZ, int width, int height) {
+    private ClaimCreationResult failureResult(String reason, int centerX, int centerZ) {
+        int width = claimSettings.autoWidth();
+        int height = claimSettings.autoHeight();
         int minX = centerX - (width / 2);
         int minZ = centerZ - (height / 2);
         int maxX = minX + width - 1;
@@ -219,53 +356,60 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
         return new ClaimCreationResult(false, minX, minZ, maxX, maxZ, reason);
     }
 
-    private boolean execute(String command) {
-        String raw = command == null ? "" : command.trim();
-        if (raw.isEmpty()) {
-            return false;
+    private static String safeVersion(Plugin plugin) {
+        if (plugin == null || plugin.getDescription() == null || plugin.getDescription().getVersion() == null) {
+            return "n/a";
         }
-        String normalized = raw.startsWith("/") ? raw.substring(1) : raw;
-        try {
-            CommandSender sender = consoleSenderProvider.sender();
-            if (sender == null) {
-                logger.warning("[CittaEXP] HuskClaims command dispatch failed command=" + normalized + " error=missing-console-sender");
-                return false;
-            }
-            return commandDispatcher.dispatch(sender, normalized);
-        } catch (RuntimeException ex) {
-            logger.warning(
-                    "[CittaEXP] HuskClaims command dispatch failed command="
-                            + normalized
-                            + " error="
-                            + ex.getClass().getSimpleName()
-            );
-            return false;
-        }
+        return plugin.getDescription().getVersion();
     }
 
-    private static String render(String template, Map<String, String> placeholders) {
-        String rendered = template;
-        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
-            rendered = rendered.replace("<" + entry.getKey() + ">", entry.getValue());
+    private static Throwable unwrap(Throwable throwable) {
+        if (throwable instanceof CompletionException completionException && completionException.getCause() != null) {
+            return completionException.getCause();
         }
-        return rendered;
+        return throwable;
     }
 
     public record Binding(HuskClaimsPort port, AdapterStatus status) {
     }
 
-    @FunctionalInterface
-    public interface CommandDispatcher {
-        boolean dispatch(CommandSender sender, String command);
-    }
+    private static final class UnavailableHuskClaimsPort implements HuskClaimsPort {
 
-    @FunctionalInterface
-    public interface PlayerLocationProvider {
-        Location location(UUID playerUuid);
-    }
+        @Override
+        public boolean available() {
+            return false;
+        }
 
-    @FunctionalInterface
-    public interface ConsoleSenderProvider {
-        CommandSender sender();
+        @Override
+        public boolean hasClaimAt(UUID playerUuid) {
+            return false;
+        }
+
+        @Override
+        public CompletableFuture<ClaimCreationResult> createAutoClaim100x100Async(
+                UUID playerUuid,
+                String world,
+                int centerX,
+                int centerZ
+        ) {
+            return CompletableFuture.completedFuture(new ClaimCreationResult(
+                    false,
+                    centerX,
+                    centerZ,
+                    centerX,
+                    centerZ,
+                    IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":plugin-unavailable:HuskClaims"
+            ));
+        }
+
+        @Override
+        public CompletableFuture<Boolean> expandClaimAsync(String world, int centerX, int centerZ, int chunks) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        @Override
+        public CompletableFuture<Boolean> deleteClaimAtAsync(String world, int blockX, int blockZ) {
+            return CompletableFuture.completedFuture(false);
+        }
     }
 }

@@ -2,7 +2,6 @@ package it.patric.cittaexp.runtime.integration;
 
 import dev.patric.commonlib.api.CommonComponent;
 import dev.patric.commonlib.api.CommonContext;
-import dev.patric.commonlib.api.port.ClaimsPort;
 import it.patric.cittaexp.core.port.HuskClaimsPort;
 import it.patric.cittaexp.core.port.RankingPort;
 import it.patric.cittaexp.core.port.VaultEconomyPort;
@@ -32,7 +31,7 @@ public final class RequiredIntegrationsComponent implements CommonComponent, Req
                 List.of(
                         new AdapterStatus("Vault", AdapterState.UNAVAILABLE, "n/a", "bootstrap-pending"),
                         new AdapterStatus("HuskClaims", AdapterState.UNAVAILABLE, "n/a", "bootstrap-pending"),
-                        new AdapterStatus("ClassificheEXP", AdapterState.UNAVAILABLE, "n/a", "bootstrap-pending")
+                        new AdapterStatus("ClassificheExp", AdapterState.UNAVAILABLE, "n/a", "bootstrap-pending")
                 ),
                 RankingScanStats.empty()
         );
@@ -40,23 +39,18 @@ public final class RequiredIntegrationsComponent implements CommonComponent, Req
 
     @Override
     public void onEnable(CommonContext context) {
-        ClaimsPort claimsPort = context.services().require(ClaimsPort.class);
-
         VaultEconomyAdapter.Binding vaultBinding = VaultEconomyAdapter.bind(
                 () -> context.plugin().getServer().getServicesManager().getRegistration(Economy.class),
                 context.logger()
         );
+        Plugin huskClaimsPlugin = context.plugin().getServer().getPluginManager().getPlugin("HuskClaims");
         HuskClaimsAdapter.Binding huskBinding = HuskClaimsAdapter.bind(
-                claimsPort,
-                () -> {
-                    Plugin plugin = context.plugin().getServer().getPluginManager().getPlugin("HuskClaims");
-                    return plugin != null && plugin.isEnabled();
-                },
+                huskClaimsPlugin,
                 settings.claim(),
                 context.logger()
         );
 
-        Plugin classifichePlugin = context.plugin().getServer().getPluginManager().getPlugin("ClassificheEXP");
+        Plugin classifichePlugin = context.plugin().getServer().getPluginManager().getPlugin("ClassificheExp");
         ClassificheExpRankingAdapter.Binding rankingBinding = ClassificheExpRankingAdapter.bind(
                 classifichePlugin,
                 settings.ranking().scanLimit(),

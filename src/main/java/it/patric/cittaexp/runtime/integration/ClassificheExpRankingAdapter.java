@@ -47,7 +47,7 @@ public final class ClassificheExpRankingAdapter implements RankingPort {
             return new Binding(
                     unavailable,
                     new AdapterStatus(
-                            "ClassificheEXP",
+                            "ClassificheExp",
                             AdapterState.UNAVAILABLE,
                             safeVersion(plugin),
                             IntegrationErrorCode.DEPENDENCY_UNAVAILABLE + ":api-missing:LeaderboardApiProvider"
@@ -67,7 +67,7 @@ public final class ClassificheExpRankingAdapter implements RankingPort {
         return new Binding(
                 adapter,
                 new AdapterStatus(
-                        "ClassificheEXP",
+                        "ClassificheExp",
                         AdapterState.AVAILABLE,
                         safeVersion(plugin),
                         "api-registered"
@@ -123,7 +123,7 @@ public final class ClassificheExpRankingAdapter implements RankingPort {
             top = api.getTop(scanLimit);
         } catch (RuntimeException ex) {
             logger.warning(
-                    "[CittaEXP] ClassificheEXP scan failed error="
+                    "[CittaEXP] ClassificheExp scan failed error="
                             + IntegrationErrorCode.EXTERNAL_INTEGRATION_ERROR
                             + ":"
                             + ex.getClass().getSimpleName()
