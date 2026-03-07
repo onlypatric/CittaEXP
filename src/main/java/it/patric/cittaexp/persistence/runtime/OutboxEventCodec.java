@@ -9,9 +9,11 @@ import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import java.util.UUID;
 import java.util.Locale;
 
@@ -154,6 +156,40 @@ final class OutboxEventCodec {
         root.addProperty("area", claimBinding.area());
         root.addProperty("createdAt", claimBinding.createdAtEpochMilli());
         root.addProperty("updatedAt", claimBinding.updatedAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String cityViceUpsertPayload(CityViceRecord viceRecord) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", viceRecord.cityId().toString());
+        root.addProperty("viceUuid", viceRecord.viceUuid() == null ? "" : viceRecord.viceUuid().toString());
+        root.addProperty("updatedAt", viceRecord.updatedAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String cityViceClearPayload(UUID cityId, long updatedAtEpochMilli) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", cityId.toString());
+        root.addProperty("updatedAt", updatedAtEpochMilli);
+        return GSON.toJson(root);
+    }
+
+    String memberClaimPermissionsUpsertPayload(MemberClaimPermissionRecord record) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", record.cityId().toString());
+        root.addProperty("playerUuid", record.playerUuid().toString());
+        root.addProperty("permAccess", record.access());
+        root.addProperty("permContainer", record.container());
+        root.addProperty("permBuild", record.build());
+        root.addProperty("updatedBy", record.updatedBy() == null ? "" : record.updatedBy().toString());
+        root.addProperty("updatedAt", record.updatedAtEpochMilli());
+        return GSON.toJson(root);
+    }
+
+    String memberClaimPermissionsDeletePayload(UUID cityId, UUID playerUuid) {
+        JsonObject root = new JsonObject();
+        root.addProperty("cityId", cityId.toString());
+        root.addProperty("playerUuid", playerUuid.toString());
         return GSON.toJson(root);
     }
 

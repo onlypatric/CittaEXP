@@ -77,6 +77,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core:5.18.0")
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.106.1")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.3")
+    testImplementation("org.testcontainers:mysql:1.21.3")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -101,7 +103,30 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.test {
+    useJUnitPlatform {
+        excludeTags("full")
+    }
+}
+
+tasks.register<Test>("testFast") {
+    description = "Esegue la suite bot fast (core + command + sqlite)"
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    dependsOn(tasks.testClasses)
+    useJUnitPlatform {
+        excludeTags("full")
+    }
+}
+
+tasks.register<Test>("testFull") {
+    description = "Esegue la suite bot full (include MySQL Testcontainers)"
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+    dependsOn(tasks.testClasses)
     useJUnitPlatform()
+    shouldRunAfter(tasks.test)
 }
 
 tasks.jar {

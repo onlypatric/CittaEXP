@@ -4,9 +4,11 @@ import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +44,12 @@ public interface CityReadPort {
     Optional<FreezeCaseRecord> findActiveFreezeCase(UUID cityId);
 
     Optional<ClaimBindingRecord> findClaimBinding(UUID cityId);
+
+    Optional<CityViceRecord> findCityVice(UUID cityId);
+
+    Optional<MemberClaimPermissionRecord> findClaimPermissions(UUID cityId, UUID playerUuid);
+
+    List<MemberClaimPermissionRecord> listClaimPermissions(UUID cityId);
 
     long countActiveFreezeCases();
 

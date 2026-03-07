@@ -14,23 +14,29 @@ import it.patric.cittaexp.core.model.FreezeReason;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import it.patric.cittaexp.core.model.JoinRequest;
 import it.patric.cittaexp.core.model.JoinRequestStatus;
+import it.patric.cittaexp.core.model.MemberClaimPermissions;
 import it.patric.cittaexp.core.model.MemberStatus;
 import it.patric.cittaexp.core.model.RolePermissionSet;
 import it.patric.cittaexp.core.port.HuskClaimsPort;
 import it.patric.cittaexp.core.service.CityLifecycleDiagnosticsService;
 import it.patric.cittaexp.core.service.CityLifecycleService;
 import it.patric.cittaexp.core.service.CityModerationService;
+import it.patric.cittaexp.core.service.CityGovernanceService;
 import it.patric.cittaexp.core.service.ClaimService;
 import it.patric.cittaexp.core.service.MembershipService;
 import it.patric.cittaexp.core.service.RoleService;
+import it.patric.cittaexp.core.view.MemberClaimPermissionsView;
+import it.patric.cittaexp.core.view.ViceView;
 import it.patric.cittaexp.persistence.domain.AuditEventRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import it.patric.cittaexp.persistence.port.CityReadPort;
 import it.patric.cittaexp.persistence.port.CityTxPort;
 import it.patric.cittaexp.persistence.port.CityWritePort;
@@ -51,6 +57,7 @@ public final class DefaultCityLifecycleService implements
         MembershipService,
         RoleService,
         ClaimService,
+        CityGovernanceService,
         CityModerationService,
         CityLifecycleDiagnosticsService {
 
@@ -58,6 +65,7 @@ public final class DefaultCityLifecycleService implements
     private static final long INVITE_EXPIRY_MILLIS = 72L * 60L * 60L * 1000L;
 
     private static final String ROLE_LEADER = "leader";
+    private static final String ROLE_VICE = "vice";
     private static final String ROLE_UFFICIALE = "ufficiale";
     private static final String ROLE_RECRUITER = "recruiter";
     private static final String ROLE_MEMBER = "membro";
@@ -186,6 +194,15 @@ public final class DefaultCityLifecycleService implements
                     bootstrapDefaultRoles(cityId, now);
                     expect(writePort.upsertMember(new CityMemberRecord(cityId, creator, ROLE_LEADER, now, true)), "create-leader-member");
                     expect(writePort.upsertClaimBinding(toClaimBindingRecord(claim)), "create-claim-binding");
+                    expect(writePort.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                            cityId,
+                            creator,
+                            true,
+                            true,
+                            true,
+                            creator,
+                            now
+                    )), "create-leader-claim-permissions");
 
                     appendAudit(audit(cityId, "CITY", "city_created", creator, jsonPayload("name", name, "tag", tag), now));
                     appendAudit(audit(cityId, "CITY", "claim_created", creator, jsonPayload("world", command.world()), now));
@@ -244,12 +261,17 @@ public final class DefaultCityLifecycleService implements
         }
         CityMemberRecord next = requireActiveMember(cityId, nextLeader);
         long now = System.currentTimeMillis();
+        CityViceRecord viceRecord = findCityViceSafe(cityId).orElse(null);
+        boolean nextWasVice = viceRecord != null && nextLeader.equals(viceRecord.viceUuid());
 
         CityRecord updated = updateCityRecord(city, city.name(), city.tag(), next.playerUuid(), city.status(), city.frozen(), city.memberCount(), now);
         txPort.withTransaction(connection -> {
             expect(writePort.updateCity(updated, city.revision()), "transfer-leadership");
             expect(writePort.upsertMember(new CityMemberRecord(cityId, currentLeader, ROLE_UFFICIALE, now, true)), "demote-old-leader");
             expect(writePort.upsertMember(new CityMemberRecord(cityId, next.playerUuid(), ROLE_LEADER, next.joinedAtEpochMilli(), true)), "promote-new-leader");
+            if (nextWasVice) {
+                expect(writePort.clearCityVice(cityId, now), "clear-vice-on-transfer");
+            }
             appendAudit(audit(cityId, "CITY", "leader_transferred", currentLeader, jsonPayload("nextLeader", nextLeader.toString(), "reason", safe(reason)), now));
             return null;
         });
@@ -331,14 +353,27 @@ public final class DefaultCityLifecycleService implements
         if (city.memberCount() >= city.maxMembers()) {
             throw new IllegalStateException("city-member-limit-reached");
         }
+        ClaimBindingRecord claimBinding = requireClaimBinding(city.cityId());
 
         long now = System.currentTimeMillis();
         CityRecord updatedCity = updateCityRecord(city, city.name(), city.tag(), city.leaderUuid(), city.status(), city.frozen(), city.memberCount() + 1, now);
         CityMemberRecord member = new CityMemberRecord(city.cityId(), playerUuid, ROLE_MEMBER, now, true);
+        MemberClaimPermissionRecord claimPermissions = new MemberClaimPermissionRecord(
+                city.cityId(),
+                playerUuid,
+                true,
+                false,
+                false,
+                invitation.invitedByUuid(),
+                now
+        );
+
+        syncClaimPermissionsOrThrow(claimBinding, playerUuid, MemberClaimPermissions.memberDefault(), false, "member-claim-sync-failed");
 
         txPort.withTransaction(connection -> {
             expect(writePort.updateInvitationStatus(invitationId, InvitationStatus.ACCEPTED, now), "accept-invitation");
             expect(writePort.upsertMember(member), "add-member-from-invitation");
+            expect(writePort.upsertClaimPermissions(claimPermissions), "member-claim-permissions-default");
             expect(writePort.updateCity(updatedCity, city.revision()), "bump-member-count");
             appendAudit(audit(city.cityId(), "CITY", "member_joined", playerUuid,
                     jsonPayload("source", "invite", "invitationId", invitationId.toString()), now));
@@ -409,14 +444,27 @@ public final class DefaultCityLifecycleService implements
         if (city.memberCount() >= city.maxMembers()) {
             throw new IllegalStateException("city-member-limit-reached");
         }
+        ClaimBindingRecord claimBinding = requireClaimBinding(city.cityId());
 
         long now = System.currentTimeMillis();
         CityRecord updatedCity = updateCityRecord(city, city.name(), city.tag(), city.leaderUuid(), city.status(), city.frozen(), city.memberCount() + 1, now);
         CityMemberRecord member = new CityMemberRecord(city.cityId(), request.playerUuid(), ROLE_MEMBER, now, true);
+        MemberClaimPermissionRecord claimPermissions = new MemberClaimPermissionRecord(
+                city.cityId(),
+                request.playerUuid(),
+                true,
+                false,
+                false,
+                reviewerUuid,
+                now
+        );
+
+        syncClaimPermissionsOrThrow(claimBinding, request.playerUuid(), MemberClaimPermissions.memberDefault(), false, "member-claim-sync-failed");
 
         txPort.withTransaction(connection -> {
             expect(writePort.updateJoinRequestStatus(request.requestId(), JoinRequestStatus.APPROVED, reviewerUuid, now), "join-request-approve");
             expect(writePort.upsertMember(member), "join-request-add-member");
+            expect(writePort.upsertClaimPermissions(claimPermissions), "join-request-claim-permissions-default");
             expect(writePort.updateCity(updatedCity, city.revision()), "join-request-bump-city");
             appendAudit(audit(city.cityId(), "CITY", "member_joined", request.playerUuid(),
                     jsonPayload("source", "join_request", "requestId", requestId.toString(), "note", safe(note)), now));
@@ -447,15 +495,27 @@ public final class DefaultCityLifecycleService implements
         CityRecord city = requireCity(cityId);
         ensureCityNotFrozen(city);
         ensureCanKick(city, actorUuid);
+        CityMemberRecord actor = requireActiveMember(cityId, actorUuid);
+        CityMemberRecord target = requireActiveMember(cityId, targetUuid);
         if (city.leaderUuid().equals(targetUuid)) {
             throw new IllegalStateException("cannot-kick-leader");
         }
-        CityMemberRecord target = requireActiveMember(cityId, targetUuid);
+        if (!canModerateTarget(city, actor, target)) {
+            throw new IllegalStateException("cannot-kick-higher-role");
+        }
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
+        syncClaimPermissionsClearOrThrow(claimBinding, targetUuid, "member-claim-sync-clear-failed");
+
         long now = System.currentTimeMillis();
+        boolean targetWasVice = isVice(cityId, targetUuid);
         CityRecord updatedCity = updateCityRecord(city, city.name(), city.tag(), city.leaderUuid(), city.status(), city.frozen(), Math.max(0, city.memberCount() - 1), now);
 
         txPort.withTransaction(connection -> {
             expect(writePort.deleteMember(cityId, target.playerUuid()), "kick-delete-member");
+            expect(writePort.deleteClaimPermissions(cityId, target.playerUuid()), "kick-delete-claim-permissions");
+            if (targetWasVice) {
+                expect(writePort.clearCityVice(cityId, now), "kick-clear-vice");
+            }
             expect(writePort.updateCity(updatedCity, city.revision()), "kick-update-city");
             appendAudit(audit(cityId, "CITY", "member_kicked", actorUuid,
                     jsonPayload("target", targetUuid.toString(), "reason", safe(reason)), now));
@@ -471,14 +531,68 @@ public final class DefaultCityLifecycleService implements
             deleteCity(city.cityId().toString(), playerUuid, "auto-last-member-leave:" + safe(reason));
             return;
         }
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
         if (city.leaderUuid().equals(playerUuid)) {
-            throw new IllegalStateException("leader-must-transfer-before-leave");
+            CityMemberRecord viceMember = activeViceMember(cityId)
+                    .orElseThrow(() -> new IllegalStateException("leader-must-assign-vice-before-leave"));
+            syncClaimPermissionsOrThrow(
+                    claimBinding,
+                    viceMember.playerUuid(),
+                    MemberClaimPermissions.viceOrLeader(),
+                    true,
+                    "leader-succession-sync-failed"
+            );
+            syncClaimPermissionsClearOrThrow(claimBinding, playerUuid, "member-claim-sync-clear-failed");
+            long now = System.currentTimeMillis();
+            CityRecord updatedCity = updateCityRecord(
+                    city,
+                    city.name(),
+                    city.tag(),
+                    viceMember.playerUuid(),
+                    city.status(),
+                    city.frozen(),
+                    Math.max(0, city.memberCount() - 1),
+                    now
+            );
+            txPort.withTransaction(connection -> {
+                expect(writePort.deleteMember(cityId, member.playerUuid()), "leader-leave-delete-member");
+                expect(writePort.deleteClaimPermissions(cityId, member.playerUuid()), "leader-leave-delete-claim-permissions");
+                expect(writePort.upsertMember(new CityMemberRecord(
+                        cityId,
+                        viceMember.playerUuid(),
+                        ROLE_LEADER,
+                        viceMember.joinedAtEpochMilli(),
+                        true
+                )), "leader-leave-promote-vice");
+                expect(writePort.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                        cityId,
+                        viceMember.playerUuid(),
+                        true,
+                        true,
+                        true,
+                        playerUuid,
+                        now
+                )), "leader-leave-promote-vice-claim-permissions");
+                expect(writePort.clearCityVice(cityId, now), "leader-leave-clear-vice");
+                expect(writePort.updateCity(updatedCity, city.revision()), "leader-leave-update-city");
+                appendAudit(audit(cityId, "CITY", "leader_transferred", playerUuid,
+                        jsonPayload("nextLeader", viceMember.playerUuid().toString(), "reason", "auto-on-leave"), now));
+                appendAudit(audit(cityId, "CITY", "member_left", playerUuid, jsonPayload("reason", safe(reason)), now));
+                return null;
+            });
+            return;
         }
 
+        syncClaimPermissionsClearOrThrow(claimBinding, playerUuid, "member-claim-sync-clear-failed");
         long now = System.currentTimeMillis();
+        boolean wasVice = isVice(cityId, playerUuid);
         CityRecord updatedCity = updateCityRecord(city, city.name(), city.tag(), city.leaderUuid(), city.status(), city.frozen(), Math.max(0, city.memberCount() - 1), now);
         txPort.withTransaction(connection -> {
             expect(writePort.deleteMember(cityId, member.playerUuid()), "leave-delete-member");
+            expect(writePort.deleteClaimPermissions(cityId, member.playerUuid()), "leave-delete-claim-permissions");
+            if (wasVice) {
+                expect(writePort.clearCityVice(cityId, now), "leave-clear-vice");
+            }
             expect(writePort.updateCity(updatedCity, city.revision()), "leave-update-city");
             appendAudit(audit(cityId, "CITY", "member_left", playerUuid, jsonPayload("reason", safe(reason)), now));
             return null;
@@ -499,8 +613,8 @@ public final class DefaultCityLifecycleService implements
         ensureCityNotFrozen(city);
         ensureCanManageRoles(city, actorUuid);
         String normalizedRoleKey = normalizeRoleKey(roleKey);
-        if (ROLE_LEADER.equals(normalizedRoleKey)) {
-            throw new IllegalStateException("leader-role-is-immutable");
+        if (isSystemRoleImmutable(normalizedRoleKey)) {
+            throw new IllegalStateException("system-role-is-immutable");
         }
 
         long now = System.currentTimeMillis();
@@ -516,8 +630,8 @@ public final class DefaultCityLifecycleService implements
         ensureCityNotFrozen(city);
         ensureCanManageRoles(city, actorUuid);
         String normalizedRoleKey = normalizeRoleKey(roleKey);
-        if (ROLE_LEADER.equals(normalizedRoleKey)) {
-            throw new IllegalStateException("leader-role-is-immutable");
+        if (isSystemRoleImmutable(normalizedRoleKey)) {
+            throw new IllegalStateException("system-role-is-immutable");
         }
 
         long now = System.currentTimeMillis();
@@ -533,8 +647,8 @@ public final class DefaultCityLifecycleService implements
         ensureCityNotFrozen(city);
         ensureCanManageRoles(city, actorUuid);
         String normalizedRoleKey = normalizeRoleKey(roleKey);
-        if (ROLE_LEADER.equals(normalizedRoleKey)) {
-            throw new IllegalStateException("leader-role-is-immutable");
+        if (isSystemRoleImmutable(normalizedRoleKey)) {
+            throw new IllegalStateException("system-role-is-immutable");
         }
         boolean roleInUse = readPort.listMembers(cityId).stream()
                 .anyMatch(member -> member.active() && normalizeRoleKey(member.roleKey()).equals(normalizedRoleKey));
@@ -550,6 +664,215 @@ public final class DefaultCityLifecycleService implements
     public List<CityRole> listRoles(UUID cityId) {
         long now = System.currentTimeMillis();
         return readPort.listRoles(cityId).stream().map(role -> toCityRole(role, now)).toList();
+    }
+
+    @Override
+    public ViceView setVice(UUID cityId, UUID actorUuid, UUID targetUuid, String reason) {
+        CityRecord city = requireCity(cityId);
+        ensureCityNotFrozen(city);
+        ensureLeader(city, actorUuid);
+        CityMemberRecord targetMember = requireActiveMember(cityId, targetUuid);
+        if (city.leaderUuid().equals(targetMember.playerUuid())) {
+            throw new IllegalStateException("vice-cannot-be-leader");
+        }
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
+        CityViceRecord currentVice = findCityViceSafe(cityId).orElse(null);
+        UUID previousVice = currentVice == null ? null : currentVice.viceUuid();
+
+        syncClaimPermissionsOrThrow(
+                claimBinding,
+                targetMember.playerUuid(),
+                MemberClaimPermissions.viceOrLeader(),
+                true,
+                "vice-claim-sync-failed"
+        );
+        if (previousVice != null && !previousVice.equals(targetMember.playerUuid())) {
+            syncClaimPermissionsOrThrow(
+                    claimBinding,
+                    previousVice,
+                    MemberClaimPermissions.memberDefault(),
+                    false,
+                    "vice-claim-sync-failed"
+            );
+        }
+
+        long now = System.currentTimeMillis();
+        CityViceRecord updated = new CityViceRecord(cityId, targetMember.playerUuid(), now);
+        txPort.withTransaction(connection -> {
+            expect(writePort.upsertCityVice(updated), "set-vice");
+            if (previousVice != null && !previousVice.equals(targetMember.playerUuid())) {
+                expect(writePort.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                        cityId,
+                        previousVice,
+                        true,
+                        false,
+                        false,
+                        actorUuid,
+                        now
+                )), "set-vice-demote-previous-claim-permissions");
+            }
+            expect(writePort.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                    cityId,
+                    targetMember.playerUuid(),
+                    true,
+                    true,
+                    true,
+                    actorUuid,
+                    now
+            )), "set-vice-claim-permissions");
+            appendAudit(audit(cityId, "CITY", "vice_assigned", actorUuid,
+                    jsonPayload("vice", targetMember.playerUuid().toString(), "reason", safe(reason)), now));
+            return null;
+        });
+        return toViceView(updated);
+    }
+
+    @Override
+    public void clearVice(UUID cityId, UUID actorUuid, String reason) {
+        CityRecord city = requireCity(cityId);
+        ensureCityNotFrozen(city);
+        ensureLeader(city, actorUuid);
+        CityViceRecord current = findCityViceSafe(cityId).orElse(null);
+        if (current == null || current.viceUuid() == null) {
+            return;
+        }
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
+        syncClaimPermissionsOrThrow(
+                claimBinding,
+                current.viceUuid(),
+                MemberClaimPermissions.memberDefault(),
+                false,
+                "vice-claim-sync-failed"
+        );
+        long now = System.currentTimeMillis();
+        txPort.withTransaction(connection -> {
+            expect(writePort.clearCityVice(cityId, now), "clear-vice");
+            expect(writePort.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                    cityId,
+                    current.viceUuid(),
+                    true,
+                    false,
+                    false,
+                    actorUuid,
+                    now
+            )), "clear-vice-claim-permissions");
+            appendAudit(audit(cityId, "CITY", "vice_cleared", actorUuid,
+                    jsonPayload("vice", current.viceUuid().toString(), "reason", safe(reason)), now));
+            return null;
+        });
+    }
+
+    @Override
+    public Optional<ViceView> vice(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        return findCityViceSafe(cityId)
+                .filter(record -> record.viceUuid() != null)
+                .map(this::toViceView);
+    }
+
+    @Override
+    public MemberClaimPermissionsView setMemberClaimPermission(
+            UUID cityId,
+            UUID actorUuid,
+            UUID targetUuid,
+            MemberClaimPermissions permissions,
+            String reason
+    ) {
+        CityRecord city = requireCity(cityId);
+        ensureCityNotFrozen(city);
+        ensureCanManageMembers(city, actorUuid);
+        CityMemberRecord target = requireActiveMember(cityId, targetUuid);
+        if (city.leaderUuid().equals(target.playerUuid()) || isVice(cityId, target.playerUuid())) {
+            throw new IllegalStateException("cannot-modify-system-role-claim-permissions");
+        }
+        MemberClaimPermissions normalized = normalizeClaimPermissions(permissions);
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
+        syncClaimPermissionsOrThrow(
+                claimBinding,
+                target.playerUuid(),
+                normalized,
+                false,
+                "member-claim-sync-failed"
+        );
+
+        long now = System.currentTimeMillis();
+        MemberClaimPermissionRecord record = new MemberClaimPermissionRecord(
+                cityId,
+                target.playerUuid(),
+                normalized.access(),
+                normalized.container(),
+                normalized.build(),
+                actorUuid,
+                now
+        );
+        txPort.withTransaction(connection -> {
+            expect(writePort.upsertClaimPermissions(record), "upsert-member-claim-permissions");
+            appendAudit(audit(cityId, "CITY", "member_claim_permissions_updated", actorUuid,
+                    jsonPayload("target", target.playerUuid().toString(), "reason", safe(reason)), now));
+            return null;
+        });
+        return toClaimPermissionsView(record);
+    }
+
+    @Override
+    public void clearMemberClaimPermission(UUID cityId, UUID actorUuid, UUID targetUuid, String reason) {
+        CityRecord city = requireCity(cityId);
+        ensureCityNotFrozen(city);
+        ensureCanManageMembers(city, actorUuid);
+        CityMemberRecord target = requireActiveMember(cityId, targetUuid);
+        if (city.leaderUuid().equals(target.playerUuid()) || isVice(cityId, target.playerUuid())) {
+            throw new IllegalStateException("cannot-modify-system-role-claim-permissions");
+        }
+        ClaimBindingRecord claimBinding = requireClaimBinding(cityId);
+        syncClaimPermissionsOrThrow(
+                claimBinding,
+                target.playerUuid(),
+                MemberClaimPermissions.memberDefault(),
+                false,
+                "member-claim-sync-failed"
+        );
+        long now = System.currentTimeMillis();
+        txPort.withTransaction(connection -> {
+            expect(writePort.deleteClaimPermissions(cityId, target.playerUuid()), "delete-member-claim-permissions");
+            appendAudit(audit(cityId, "CITY", "member_claim_permissions_cleared", actorUuid,
+                    jsonPayload("target", target.playerUuid().toString(), "reason", safe(reason)), now));
+            return null;
+        });
+    }
+
+    @Override
+    public Optional<MemberClaimPermissionsView> claimPermissions(UUID cityId, UUID targetUuid) {
+        Objects.requireNonNull(cityId, "cityId");
+        Objects.requireNonNull(targetUuid, "targetUuid");
+        CityMemberRecord member = requireActiveMember(cityId, targetUuid);
+        if (isLeaderOrVice(cityId, member.playerUuid())) {
+            return Optional.of(new MemberClaimPermissionsView(
+                    cityId,
+                    targetUuid,
+                    MemberClaimPermissions.viceOrLeader(),
+                    member.playerUuid(),
+                    System.currentTimeMillis()
+            ));
+        }
+        return findClaimPermissionsSafe(cityId, targetUuid)
+                .map(this::toClaimPermissionsView)
+                .or(() -> Optional.of(new MemberClaimPermissionsView(
+                        cityId,
+                        targetUuid,
+                        MemberClaimPermissions.memberDefault(),
+                        null,
+                        member.joinedAtEpochMilli()
+                )));
+    }
+
+    @Override
+    public List<MemberClaimPermissionsView> listClaimPermissions(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        return readPort.listMembers(cityId).stream()
+                .filter(CityMemberRecord::active)
+                .map(member -> claimPermissions(cityId, member.playerUuid()).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Override
@@ -735,10 +1058,140 @@ public final class DefaultCityLifecycleService implements
 
     private void bootstrapDefaultRoles(UUID cityId, long now) {
         expect(writePort.upsertRole(new CityRoleRecord(cityId, ROLE_LEADER, "Capo", 100, toPermissionsJson(allPermissions()))), "role-leader");
+        expect(writePort.upsertRole(new CityRoleRecord(cityId, ROLE_VICE, "Vice", 95, toPermissionsJson(allPermissions()))), "role-vice");
         expect(writePort.upsertRole(new CityRoleRecord(cityId, ROLE_UFFICIALE, "Ufficiale", 80, toPermissionsJson(new RolePermissionSet(true, true, true, true, true, true, true)))), "role-ufficiale");
         expect(writePort.upsertRole(new CityRoleRecord(cityId, ROLE_RECRUITER, "Recruiter", 40, toPermissionsJson(new RolePermissionSet(true, false, false, false, false, false, false)))), "role-recruiter");
         expect(writePort.upsertRole(new CityRoleRecord(cityId, ROLE_MEMBER, "Membro", 10, toPermissionsJson(noPermissions()))), "role-member");
         appendAudit(audit(cityId, "CITY", "role_updated", null, jsonPayload("action", "bootstrap_default"), now));
+    }
+
+    private ClaimBindingRecord requireClaimBinding(UUID cityId) {
+        return readPort.findClaimBinding(cityId)
+                .orElseThrow(() -> new IllegalStateException("claim-binding-missing"));
+    }
+
+    private Optional<CityViceRecord> findCityViceSafe(UUID cityId) {
+        return Optional.ofNullable(readPort.findCityVice(cityId)).orElse(Optional.empty());
+    }
+
+    private Optional<MemberClaimPermissionRecord> findClaimPermissionsSafe(UUID cityId, UUID playerUuid) {
+        return Optional.ofNullable(readPort.findClaimPermissions(cityId, playerUuid)).orElse(Optional.empty());
+    }
+
+    private Optional<CityMemberRecord> activeViceMember(UUID cityId) {
+        UUID viceUuid = findCityViceSafe(cityId)
+                .map(CityViceRecord::viceUuid)
+                .orElse(null);
+        if (viceUuid == null) {
+            return Optional.empty();
+        }
+        return readPort.findMember(cityId, viceUuid).filter(CityMemberRecord::active);
+    }
+
+    private boolean isVice(UUID cityId, UUID playerUuid) {
+        return findCityViceSafe(cityId)
+                .map(CityViceRecord::viceUuid)
+                .filter(playerUuid::equals)
+                .isPresent();
+    }
+
+    private boolean isLeaderOrVice(UUID cityId, UUID playerUuid) {
+        CityRecord city = requireCity(cityId);
+        return city.leaderUuid().equals(playerUuid) || isVice(cityId, playerUuid);
+    }
+
+    private boolean canModerateTarget(CityRecord city, CityMemberRecord actor, CityMemberRecord target) {
+        if (city.leaderUuid().equals(actor.playerUuid())) {
+            return true;
+        }
+        if (city.leaderUuid().equals(target.playerUuid())) {
+            return false;
+        }
+        int actorRank = hierarchyRank(city.cityId(), actor.playerUuid(), actor.roleKey());
+        int targetRank = hierarchyRank(city.cityId(), target.playerUuid(), target.roleKey());
+        return actorRank > targetRank;
+    }
+
+    private int hierarchyRank(UUID cityId, UUID playerUuid, String roleKey) {
+        if (isVice(cityId, playerUuid)) {
+            return 200;
+        }
+        String normalizedRole = normalizeRoleKey(roleKey);
+        if (ROLE_LEADER.equals(normalizedRole)) {
+            return 300;
+        }
+        if (ROLE_VICE.equals(normalizedRole)) {
+            return 200;
+        }
+        return readPort.listRoles(cityId).stream()
+                .filter(role -> normalizeRoleKey(role.roleKey()).equals(normalizedRole))
+                .findFirst()
+                .map(CityRoleRecord::priority)
+                .orElse(0);
+    }
+
+    private void syncClaimPermissionsOrThrow(
+            ClaimBindingRecord claimBinding,
+            UUID playerUuid,
+            MemberClaimPermissions permissions,
+            boolean managementTrusted,
+            String errorCode
+    ) {
+        int centerX = (claimBinding.minX() + claimBinding.maxX()) / 2;
+        int centerZ = (claimBinding.minZ() + claimBinding.maxZ()) / 2;
+        boolean synced;
+        try {
+            synced = huskClaimsPort.syncClaimPermissionsAsync(
+                    claimBinding.worldName(),
+                    centerX,
+                    centerZ,
+                    playerUuid,
+                    normalizeClaimPermissions(permissions),
+                    managementTrusted
+            ).join();
+        } catch (CompletionException ex) {
+            Throwable cause = unwrapCompletion(ex);
+            throw new IllegalStateException(errorCode + ":" + cause.getClass().getSimpleName(), cause);
+        }
+        if (!synced) {
+            throw new IllegalStateException(errorCode);
+        }
+    }
+
+    private void syncClaimPermissionsClearOrThrow(
+            ClaimBindingRecord claimBinding,
+            UUID playerUuid,
+            String errorCode
+    ) {
+        int centerX = (claimBinding.minX() + claimBinding.maxX()) / 2;
+        int centerZ = (claimBinding.minZ() + claimBinding.maxZ()) / 2;
+        boolean cleared;
+        try {
+            cleared = huskClaimsPort.clearClaimPermissionsAsync(
+                    claimBinding.worldName(),
+                    centerX,
+                    centerZ,
+                    playerUuid
+            ).join();
+        } catch (CompletionException ex) {
+            Throwable cause = unwrapCompletion(ex);
+            throw new IllegalStateException(errorCode + ":" + cause.getClass().getSimpleName(), cause);
+        }
+        if (!cleared) {
+            throw new IllegalStateException(errorCode);
+        }
+    }
+
+    private static boolean isSystemRoleImmutable(String roleKey) {
+        return ROLE_LEADER.equals(roleKey) || ROLE_VICE.equals(roleKey);
+    }
+
+    private static MemberClaimPermissions normalizeClaimPermissions(MemberClaimPermissions permissions) {
+        MemberClaimPermissions raw = Objects.requireNonNullElse(permissions, MemberClaimPermissions.none());
+        boolean access = raw.access() || raw.container() || raw.build();
+        boolean container = raw.container() || raw.build();
+        boolean build = raw.build();
+        return new MemberClaimPermissions(access, container, build);
     }
 
     private void ensureCityNotFrozen(CityRecord city) {
@@ -748,7 +1201,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanInvite(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canInvite()) {
@@ -757,7 +1210,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanKick(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canKick()) {
@@ -766,7 +1219,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanManageMembers(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canManageMembers()) {
@@ -775,7 +1228,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanManageRoles(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canManageRoles()) {
@@ -784,7 +1237,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanExpandClaims(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canExpandClaims()) {
@@ -793,7 +1246,7 @@ public final class DefaultCityLifecycleService implements
     }
 
     private void ensureCanRequestUpgrade(CityRecord city, UUID actorUuid) {
-        if (city.leaderUuid().equals(actorUuid)) {
+        if (city.leaderUuid().equals(actorUuid) || isVice(city.cityId(), actorUuid)) {
             return;
         }
         if (!permissionsFor(city.cityId(), actorUuid).canRequestUpgrade()) {
@@ -810,7 +1263,7 @@ public final class DefaultCityLifecycleService implements
     private RolePermissionSet permissionsFor(UUID cityId, UUID actorUuid) {
         CityMemberRecord member = requireActiveMember(cityId, actorUuid);
         String roleKey = normalizeRoleKey(member.roleKey());
-        if (ROLE_LEADER.equals(roleKey)) {
+        if (ROLE_LEADER.equals(roleKey) || isVice(cityId, actorUuid)) {
             return allPermissions();
         }
         return readPort.listRoles(cityId).stream()
@@ -1136,6 +1589,24 @@ public final class DefaultCityLifecycleService implements
                 claim.area(),
                 claim.createdAtEpochMilli(),
                 claim.updatedAtEpochMilli()
+        );
+    }
+
+    private ViceView toViceView(CityViceRecord record) {
+        return new ViceView(
+                record.cityId(),
+                record.viceUuid(),
+                record.updatedAtEpochMilli()
+        );
+    }
+
+    private MemberClaimPermissionsView toClaimPermissionsView(MemberClaimPermissionRecord record) {
+        return new MemberClaimPermissionsView(
+                record.cityId(),
+                record.playerUuid(),
+                new MemberClaimPermissions(record.access(), record.container(), record.build()),
+                record.updatedBy(),
+                record.updatedAtEpochMilli()
         );
     }
 }

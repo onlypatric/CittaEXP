@@ -67,7 +67,7 @@ default:
       no_permission_moderation: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.moderation</yellow>"
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questo comando è solo per player.</red>"
       usage:
-        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <create|info|invite|request|kick|leave|roles|freeze></white>"
+        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <create|info|invite|request|kick|leave|roles|vice|perms|freeze></white>"
         create: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city create <name> <tag></white>"
         invite: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite <player></white>"
         invite_accept: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite accept <invitationId></white>"
@@ -79,6 +79,10 @@ default:
         kick: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city kick <player></white>"
         roles: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles <list|toggle></white>"
         roles_toggle: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles toggle <roleKey> <invite|kick|manage_members|manage_roles|request_upgrade|expand_claims|manage_settings> <on|off></white>"
+        vice: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city vice <set|clear|info> [player]</white>"
+        vice_set: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city vice set <player></white>"
+        perms: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city perms <player|set></white>"
+        perms_set: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city perms set <player> <access|container|build> <on|off></white>"
         freeze: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city freeze status</white>"
       create:
         in_progress: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Creazione città in corso:</yellow> <aqua><city> [<tag>]</aqua>"
@@ -111,6 +115,18 @@ default:
           entry: "<gray>[<gold>CittaEXP</gold>]</gray> <white><role></white> <gray>invite=<invite> kick=<kick> manage=<manage></gray>"
         toggle:
           success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Ruolo</green> <aqua><role></aqua> <green>flag</green> <yellow><flag></yellow> <green>-></green> <white><value></white>"
+      vice:
+        info:
+          none: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Vice non assegnato.</yellow>"
+          value: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Vice città:</aqua> <white><player></white>"
+        set:
+          success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Vice assegnato a</green> <aqua><player></aqua>"
+        clear:
+          success: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Vice rimosso.</yellow>"
+      perms:
+        view: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Permessi claim</aqua> <white><player></white> <gray>-></gray> <yellow>access=<access> container=<container> build=<build></yellow>"
+        set:
+          success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Permesso aggiornato:</green> <white><player></white> <gray><flag>=<value></gray>"
       freeze:
         status: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Freeze status <city></white> <gray>-></gray> <yellow><value></yellow>"
       error:
@@ -125,3 +141,5 @@ default:
         expired: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Richiesta o invito scaduto.</red>"
         member_limit: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Limite membri raggiunto.</red>"
         role_invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ruolo o flag non valido.</red>"
+        claim_sync_failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Sincronizzazione permessi claim fallita.</red>"
+        claim_system_role_immutable: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permessi claim non modificabili per Capo/Vice.</red>"

@@ -1,11 +1,14 @@
 package it.patric.cittaexp.runtime.integration;
 
 import it.patric.cittaexp.core.port.HuskClaimsPort;
+import it.patric.cittaexp.core.model.MemberClaimPermissions;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.Comparator;
+import java.util.Locale;
 import net.william278.huskclaims.trust.TrustLevel;
 import net.william278.huskclaims.user.User;
 import java.util.logging.Logger;
@@ -288,6 +291,105 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
         }
     }
 
+    @Override
+    public CompletableFuture<Boolean> syncClaimPermissionsAsync(
+            String world,
+            int anchorX,
+            int anchorZ,
+            UUID playerUuid,
+            MemberClaimPermissions permissions,
+            boolean managementTrusted
+    ) {
+        if (!available()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        if (world == null || world.isBlank() || playerUuid == null) {
+            return CompletableFuture.completedFuture(false);
+        }
+        Optional<ClaimWorld> maybeClaimWorld = claimWorld(world);
+        Optional<Claim> maybeClaim = claimAt(world, anchorX, anchorZ);
+        if (maybeClaimWorld.isEmpty() || maybeClaim.isEmpty()) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        ClaimWorld claimWorld = maybeClaimWorld.get();
+        Claim claim = maybeClaim.get();
+        MemberClaimPermissions normalized = normalizePermissions(permissions);
+        Optional<TrustLevel> targetLevel = resolveTrustLevel(normalized, managementTrusted);
+        if (targetLevel.isEmpty()) {
+            logger.warning("[CittaEXP] HuskClaims trust sync failed: no matching trust level");
+            return CompletableFuture.completedFuture(false);
+        }
+
+        User trustable = User.of(playerUuid, playerUuid.toString());
+        try {
+            Optional<TrustLevel> current = api.getTrustLevel(claim, claimWorld, trustable);
+            if (current.isPresent() && current.get().getId().equalsIgnoreCase(targetLevel.get().getId())) {
+                return CompletableFuture.completedFuture(true);
+            }
+            api.setTrustLevel(claim, claimWorld, trustable, targetLevel.get());
+            return CompletableFuture.completedFuture(true);
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims trust sync failed world="
+                            + world
+                            + " x="
+                            + anchorX
+                            + " z="
+                            + anchorZ
+                            + " player="
+                            + playerUuid
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
+    @Override
+    public CompletableFuture<Boolean> clearClaimPermissionsAsync(String world, int anchorX, int anchorZ, UUID playerUuid) {
+        if (!available()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        if (world == null || world.isBlank() || playerUuid == null) {
+            return CompletableFuture.completedFuture(false);
+        }
+        Optional<ClaimWorld> maybeClaimWorld = claimWorld(world);
+        Optional<Claim> maybeClaim = claimAt(world, anchorX, anchorZ);
+        if (maybeClaimWorld.isEmpty() || maybeClaim.isEmpty()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        ClaimWorld claimWorld = maybeClaimWorld.get();
+        Claim claim = maybeClaim.get();
+        User trustable = User.of(playerUuid, playerUuid.toString());
+        try {
+            if (api.getTrustLevel(claim, claimWorld, trustable).isEmpty()) {
+                return CompletableFuture.completedFuture(true);
+            }
+            Optional<TrustLevel> removalLevel = resolveClearLevel();
+            if (removalLevel.isPresent()) {
+                api.setTrustLevel(claim, claimWorld, trustable, removalLevel.get());
+            } else {
+                api.setTrustLevel(claim, claimWorld, trustable, null);
+            }
+            return CompletableFuture.completedFuture(true);
+        } catch (RuntimeException ex) {
+            logger.warning(
+                    "[CittaEXP] HuskClaims trust clear failed world="
+                            + world
+                            + " x="
+                            + anchorX
+                            + " z="
+                            + anchorZ
+                            + " player="
+                            + playerUuid
+                            + " error="
+                            + ex.getClass().getSimpleName()
+            );
+            return CompletableFuture.completedFuture(false);
+        }
+    }
+
     private Optional<ClaimWorld> claimWorld(String worldName) {
         World bukkitWorld = Bukkit.getWorld(worldName);
         if (bukkitWorld == null) {
@@ -339,6 +441,74 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
                 .filter(level -> level.getPrivileges().contains(TrustLevel.Privilege.MANAGE_TRUSTEES))
                 .max(TrustLevel::compareTo)
                 .or(() -> trustLevels.stream().max(TrustLevel::compareTo));
+    }
+
+    private Optional<TrustLevel> resolveTrustLevel(MemberClaimPermissions permissions, boolean managementTrusted) {
+        var trustLevels = api.getTrustLevels();
+        if (trustLevels == null || trustLevels.isEmpty()) {
+            return Optional.empty();
+        }
+        if (managementTrusted) {
+            return resolveLeaderTrustLevel();
+        }
+        if (permissions.build()) {
+            return matchByHint(trustLevels, "build", "builder", "trusted")
+                    .or(() -> trustLevels.stream().max(Comparator.comparingInt(TrustLevel::getWeight)));
+        }
+        if (permissions.container()) {
+            return matchByHint(trustLevels, "container", "chest", "storage")
+                    .or(() -> trustLevels.stream()
+                            .sorted(Comparator.comparingInt(TrustLevel::getWeight))
+                            .skip(Math.max(0, trustLevels.size() / 2))
+                            .findFirst());
+        }
+        if (permissions.access()) {
+            return matchByHint(trustLevels, "access", "visitor", "entry")
+                    .or(() -> trustLevels.stream().min(Comparator.comparingInt(TrustLevel::getWeight)));
+        }
+        return resolveClearLevel();
+    }
+
+    private Optional<TrustLevel> resolveClearLevel() {
+        var trustLevels = api.getTrustLevels();
+        if (trustLevels == null || trustLevels.isEmpty()) {
+            return Optional.empty();
+        }
+        return matchByHint(trustLevels, "none", "default", "untrusted", "remove")
+                .or(() -> trustLevels.stream().min(Comparator.comparingInt(TrustLevel::getWeight)));
+    }
+
+    private static Optional<TrustLevel> matchByHint(
+            java.util.List<TrustLevel> trustLevels,
+            String... hints
+    ) {
+        return trustLevels.stream()
+                .filter(level -> {
+                    String id = safeText(level.getId());
+                    String aliases = level.getCommandAliases() == null
+                            ? ""
+                            : safeText(String.join(" ", level.getCommandAliases()));
+                    String haystack = (id + " " + aliases).toLowerCase(Locale.ROOT);
+                    for (String hint : hints) {
+                        if (haystack.contains(hint.toLowerCase(Locale.ROOT))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .max(Comparator.comparingInt(TrustLevel::getWeight));
+    }
+
+    private static MemberClaimPermissions normalizePermissions(MemberClaimPermissions permissions) {
+        MemberClaimPermissions raw = permissions == null ? MemberClaimPermissions.none() : permissions;
+        boolean access = raw.access() || raw.container() || raw.build();
+        boolean container = raw.container() || raw.build();
+        boolean build = raw.build();
+        return new MemberClaimPermissions(access, container, build);
+    }
+
+    private static String safeText(String value) {
+        return value == null ? "" : value;
     }
 
     private void safeDeleteClaim(ClaimWorld claimWorld, Claim claim) {
@@ -465,6 +635,23 @@ public final class HuskClaimsAdapter implements HuskClaimsPort {
 
         @Override
         public CompletableFuture<Boolean> deleteClaimAtAsync(String world, int blockX, int blockZ) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        @Override
+        public CompletableFuture<Boolean> syncClaimPermissionsAsync(
+                String world,
+                int anchorX,
+                int anchorZ,
+                UUID playerUuid,
+                MemberClaimPermissions permissions,
+                boolean managementTrusted
+        ) {
+            return CompletableFuture.completedFuture(false);
+        }
+
+        @Override
+        public CompletableFuture<Boolean> clearClaimPermissionsAsync(String world, int anchorX, int anchorZ, UUID playerUuid) {
             return CompletableFuture.completedFuture(false);
         }
     }

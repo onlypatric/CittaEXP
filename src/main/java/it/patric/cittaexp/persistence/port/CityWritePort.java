@@ -4,9 +4,11 @@ import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
 import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import it.patric.cittaexp.persistence.domain.AuditEventRecord;
 import it.patric.cittaexp.core.model.InvitationStatus;
 import it.patric.cittaexp.core.model.JoinRequestStatus;
@@ -45,6 +47,14 @@ public interface CityWritePort {
     PersistenceWriteOutcome closeFreezeCase(UUID caseId, UUID closedBy, long closedAtEpochMilli);
 
     PersistenceWriteOutcome upsertClaimBinding(ClaimBindingRecord claimBinding);
+
+    PersistenceWriteOutcome upsertCityVice(CityViceRecord viceRecord);
+
+    PersistenceWriteOutcome clearCityVice(UUID cityId, long updatedAtEpochMilli);
+
+    PersistenceWriteOutcome upsertClaimPermissions(MemberClaimPermissionRecord permissions);
+
+    PersistenceWriteOutcome deleteClaimPermissions(UUID cityId, UUID playerUuid);
 
     PersistenceWriteOutcome appendAuditEvent(AuditEventRecord event);
 

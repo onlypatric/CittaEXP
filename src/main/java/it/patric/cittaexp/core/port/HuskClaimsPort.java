@@ -3,7 +3,7 @@ package it.patric.cittaexp.core.port;
 import java.util.concurrent.CompletableFuture;
 import java.util.UUID;
 
-public interface HuskClaimsPort {
+public interface HuskClaimsPort extends CityClaimPermissionPort {
 
     boolean available();
 

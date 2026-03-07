@@ -19,13 +19,20 @@ Stato: `COMPLETATO` (7 marzo 2026)
   - test smoke su server locale con dipendenze reali
 
 ## Milestone 3 - City Lifecycle completo
-Stato: `COMPLETATO` (7 marzo 2026)
+Stato: `COMPLETATO` (7 marzo 2026, aggiornato governance wave)
 - Creazione citta (wizard + dialog), auto-claim 100x100, membership flow completo.
 - Ruoli custom completi con matrix permission.
 - Freeze engine operativo con gate azioni.
+- Governance aggiuntiva:
+  - `Vice` unico per citta con successione automatica su uscita leader.
+  - Gerarchia moderazione `CAPO > VICE > ruoli custom`.
+  - Comandi player estesi: `/city vice ...` e `/city perms ...`.
+  - Permessi claim per-membro (`access/container/build`) con sync HuskClaims API.
 - DoD:
   - create/invite/join/kick/leave role-based funzionanti
   - freeze gates verificati da test
+  - successione vice->leader verificata
+  - sync permessi claim verificato su lifecycle membership
 
 ## Milestone 4 - Economia, Tasse, Capitale
 - Tax policy config + scheduler mensile.
@@ -60,6 +67,15 @@ Stato: `COMPLETATO` (7 marzo 2026)
   - zero critical test failures
   - startup/disable clean con scheduler safe
   - release candidate firmata e validata su server test
+
+## Bot Harness Automation
+- Suite fast: `./gradlew testFast`
+  - include domain/command/persistence sqlite/adapters senza dipendenze docker.
+- Suite full: `./gradlew testFull`
+  - include test MySQL con Testcontainers (`@Tag(\"full\")`, skip automatico se Docker assente).
+- Output:
+  - machine-readable: XML JUnit in `build/test-results/`.
+  - human-readable: report HTML in `build/reports/tests/`.
 
 ## Sequenza dipendenze
 - M2 dipende da M1

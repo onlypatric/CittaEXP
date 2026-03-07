@@ -23,6 +23,10 @@ Configurazione jar locali build-time:
 - Foundation persistence MySQL primario + SQLite fallback + replay outbox.
 - Message layer MiniMessage in italiano via `messages.yml`.
 - Guard runtime dipendenze obbligatorie.
+- Lifecycle M3 esteso con governance:
+  - `Vice` unico per citta + successione automatica leader.
+  - Permessi claim membro `access/container/build` sincronizzati via HuskClaims API.
+  - Comandi player `/city vice ...` e `/city perms ...`.
 
 ## Framework planning docs
 - `docs/frameworks/GUI-FIRST-FRAMEWORK-BLUEPRINT.md`
@@ -45,3 +49,20 @@ Configurazione jar locali build-time:
 
 Permission:
 - `cittaexp.admin.gui.preview` (default `op`)
+
+## City commands (M3 governance)
+- `/city create <name> <tag>`
+- `/city info [city]`
+- `/city invite <player|accept|deny ...>`
+- `/city request <join|approve|reject ...>`
+- `/city kick <player>`
+- `/city leave`
+- `/city roles <list|toggle ...>`
+- `/city vice <set|clear|info> [player]`
+- `/city perms <player>`
+- `/city perms set <player> <access|container|build> <on|off>`
+- `/city freeze status`
+
+## Bot suites
+- `./gradlew testFast` (domain/command/persistence sqlite/adapters)
+- `./gradlew testFull` (include MySQL Testcontainers; skip automatico se Docker non disponibile)

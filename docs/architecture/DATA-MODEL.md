@@ -13,6 +13,12 @@ Definire il modello dati definitivo del plugin CittaEXP per coprire il ciclo vit
 - `CityRole`
   - Identita: `(city_id, role_key)`
   - Campi: `display_name`, `priority`, `permissions` (`RolePermissionSet`), `updated_at`.
+- `CityGovernance`
+  - Identita: `city_id`
+  - Campi: `vice_uuid`, `updated_at`.
+- `MemberClaimPermission`
+  - Identita: `(city_id, player_uuid)`
+  - Campi: `perm_access`, `perm_container`, `perm_build`, `updated_by`, `updated_at`.
 - `TaxPolicy`
   - Config globale tasse in valuta Vault.
 - `CapitalState`
@@ -48,8 +54,19 @@ Definire il modello dati definitivo del plugin CittaEXP per coprire il ciclo vit
 - Un player puo appartenere a una sola citta attiva.
 - `name` e `tag` citta unici case-insensitive.
 - Ogni citta ha un solo leader attivo.
+- Ogni citta puo avere al massimo un solo vice attivo.
 - I ruoli sono per-citta (no global roles), `role_key` unico dentro la citta.
+- Ruoli di sistema immutabili: `CAPO` e `VICE`.
+- Gerarchia moderazione: `CAPO > VICE > ruoli custom`.
 - Freeze blocca solo azioni vietate: invite, kick, claim expand, upgrade, shop regno.
+- Uscita/rimozione leader:
+  - con vice attivo -> successione automatica vice->capo.
+  - senza vice e citta non vuota -> operazione bloccata.
+- Se esce l'ultimo membro: hard-delete citta + claim + dati correlati.
+- Claim permissions membri:
+  - capo/vice sempre trust massimo operativo,
+  - membri default `access`,
+  - override granulari `access/container/build` per utente.
 - La capitale e sempre un `REGNO` e coincide con top rank corrente.
 - Eliminazione `BORGO` autonoma; `VILLAGGIO/REGNO` richiede ticket staff approvato.
 
@@ -58,6 +75,8 @@ Tabelle principali:
 - `cities`
 - `city_members`
 - `city_roles`
+- `city_governance`
+- `city_member_claim_permissions`
 - `tax_policy`
 - `city_treasury_ledger`
 - `capital_state`

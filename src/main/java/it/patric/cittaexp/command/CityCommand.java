@@ -2,8 +2,10 @@ package it.patric.cittaexp.command;
 
 import dev.patric.commonlib.api.MessageService;
 import it.patric.cittaexp.core.model.CityRole;
+import it.patric.cittaexp.core.model.MemberClaimPermissions;
 import it.patric.cittaexp.core.model.RolePermissionSet;
 import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
+import it.patric.cittaexp.core.view.MemberClaimPermissionsView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -66,6 +68,8 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                 case "kick" -> handleKick(player, args);
                 case "leave" -> handleLeave(player, args);
                 case "roles" -> handleRoles(player, args);
+                case "vice" -> handleVice(player, args);
+                case "perms" -> handlePerms(player, args);
                 case "freeze" -> handleFreezeStatus(player, args);
                 default -> {
                     sender.sendMessage(msg(sender, "cittaexp.city.usage.root", Map.of("label", label)));
@@ -338,6 +342,131 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean handleVice(Player player, String[] args) {
+        if (args.length < 2) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.vice"));
+            return true;
+        }
+        var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+        String sub = args[1].toLowerCase(Locale.ROOT);
+        if ("info".equals(sub)) {
+            var vice = lifecycleService.vice(city.cityId());
+            if (vice.isEmpty()) {
+                player.sendMessage(msg(player, "cittaexp.city.vice.info.none"));
+                return true;
+            }
+            OfflinePlayer vicePlayer = Bukkit.getOfflinePlayer(vice.get().viceUuid());
+            String name = vicePlayer.getName() == null ? vice.get().viceUuid().toString() : vicePlayer.getName();
+            player.sendMessage(msg(player, "cittaexp.city.vice.info.value", Map.of("player", name)));
+            return true;
+        }
+        if (!requireModerationPermission(player)) {
+            return true;
+        }
+        if ("clear".equals(sub)) {
+            lifecycleService.clearVice(city.cityId(), player.getUniqueId(), "city-vice-clear-command");
+            player.sendMessage(msg(player, "cittaexp.city.vice.clear.success"));
+            return true;
+        }
+        if ("set".equals(sub)) {
+            if (args.length < 3) {
+                player.sendMessage(msg(player, "cittaexp.city.usage.vice_set"));
+                return true;
+            }
+            OfflinePlayer target = Bukkit.getPlayerExact(args[2]);
+            if (target == null) {
+                target = Bukkit.getOfflinePlayer(args[2]);
+            }
+            lifecycleService.setVice(
+                    city.cityId(),
+                    player.getUniqueId(),
+                    target.getUniqueId(),
+                    "city-vice-set-command"
+            );
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.vice.set.success",
+                    Map.of("player", target.getName() == null ? args[2] : target.getName())
+            ));
+            return true;
+        }
+
+        player.sendMessage(msg(player, "cittaexp.city.usage.vice"));
+        return true;
+    }
+
+    private boolean handlePerms(Player player, String[] args) {
+        var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+        if (args.length < 2) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.perms"));
+            return true;
+        }
+
+        if ("set".equalsIgnoreCase(args[1])) {
+            if (!requireModerationPermission(player)) {
+                return true;
+            }
+            if (args.length < 5) {
+                player.sendMessage(msg(player, "cittaexp.city.usage.perms_set"));
+                return true;
+            }
+            OfflinePlayer target = Bukkit.getPlayerExact(args[2]);
+            if (target == null) {
+                target = Bukkit.getOfflinePlayer(args[2]);
+            }
+            String flag = args[3].toLowerCase(Locale.ROOT);
+            if (!isBooleanToken(args[4])) {
+                throw new IllegalStateException("roles-toggle-flag-invalid");
+            }
+            boolean enabled = parseBoolean(args[4]);
+            MemberClaimPermissionsView current = lifecycleService.claimPermissions(city.cityId(), target.getUniqueId())
+                    .orElseThrow(() -> new IllegalStateException("member-not-found"));
+            MemberClaimPermissions updated = switch (flag) {
+                case "access" -> new MemberClaimPermissions(enabled, current.permissions().container(), current.permissions().build());
+                case "container" -> new MemberClaimPermissions(current.permissions().access(), enabled, current.permissions().build());
+                case "build" -> new MemberClaimPermissions(current.permissions().access(), current.permissions().container(), enabled);
+                default -> throw new IllegalStateException("claim-permission-invalid");
+            };
+            lifecycleService.setMemberClaimPermission(
+                    city.cityId(),
+                    player.getUniqueId(),
+                    target.getUniqueId(),
+                    updated,
+                    "city-perms-set-command"
+            );
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.perms.set.success",
+                    Map.of(
+                            "player", target.getName() == null ? args[2] : target.getName(),
+                            "flag", flag,
+                            "value", String.valueOf(enabled)
+                    )
+            ));
+            return true;
+        }
+
+        OfflinePlayer target = Bukkit.getPlayerExact(args[1]);
+        if (target == null) {
+            target = Bukkit.getOfflinePlayer(args[1]);
+        }
+        MemberClaimPermissionsView view = lifecycleService.claimPermissions(city.cityId(), target.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("member-not-found"));
+        player.sendMessage(msg(
+                player,
+                "cittaexp.city.perms.view",
+                Map.of(
+                        "player", target.getName() == null ? args[1] : target.getName(),
+                        "access", String.valueOf(view.permissions().access()),
+                        "container", String.valueOf(view.permissions().container()),
+                        "build", String.valueOf(view.permissions().build())
+                )
+        ));
+        return true;
+    }
+
     private boolean handleFreezeStatus(Player player, String[] args) {
         if (args.length < 2 || !"status".equalsIgnoreCase(args[1])) {
             player.sendMessage(msg(player, "cittaexp.city.usage.freeze"));
@@ -376,6 +505,18 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         return normalized.equals("on") || normalized.equals("true") || normalized.equals("yes") || normalized.equals("1");
     }
 
+    private static boolean isBooleanToken(String value) {
+        String normalized = value.toLowerCase(Locale.ROOT);
+        return normalized.equals("on")
+                || normalized.equals("off")
+                || normalized.equals("true")
+                || normalized.equals("false")
+                || normalized.equals("yes")
+                || normalized.equals("no")
+                || normalized.equals("1")
+                || normalized.equals("0");
+    }
+
     private static String safe(String value) {
         return value == null ? "" : value;
     }
@@ -404,10 +545,12 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             case "huskclaims-unavailable" -> "cittaexp.city.create.failed.claims_unavailable";
             case "city-freeze-restricted" -> "cittaexp.city.error.freeze_restricted";
             case "permission-denied-invite", "permission-denied-kick", "permission-denied-manage-members", "permission-denied-manage-roles", "permission-denied-expand-claim", "permission-denied-request-upgrade" -> "cittaexp.city.error.permission_denied";
-            case "leader-must-transfer-before-leave", "cannot-kick-leader", "leader-role-is-immutable" -> "cittaexp.city.error.leader_restricted";
+            case "leader-must-transfer-before-leave", "leader-must-assign-vice-before-leave", "cannot-kick-leader", "cannot-kick-higher-role", "system-role-is-immutable", "vice-cannot-be-leader" -> "cittaexp.city.error.leader_restricted";
             case "invitation-expired", "join-request-expired" -> "cittaexp.city.error.expired";
             case "city-member-limit-reached" -> "cittaexp.city.error.member_limit";
-            case "role-not-found", "roles-toggle-flag-invalid" -> "cittaexp.city.error.role_invalid";
+            case "role-not-found", "roles-toggle-flag-invalid", "claim-permission-invalid" -> "cittaexp.city.error.role_invalid";
+            case "claim-binding-missing", "member-claim-sync-failed", "member-claim-sync-clear-failed", "vice-claim-sync-failed", "leader-succession-sync-failed" -> "cittaexp.city.error.claim_sync_failed";
+            case "cannot-modify-system-role-claim-permissions" -> "cittaexp.city.error.claim_system_role_immutable";
             case "player-not-in-city", "member-not-found" -> "cittaexp.city.error.player_not_in_city";
             default -> "cittaexp.city.error.generic";
         };
@@ -438,7 +581,7 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             return List.of();
         }
         if (args.length == 1) {
-            return complete(List.of("create", "info", "invite", "request", "kick", "leave", "roles", "freeze"), args[0]);
+            return complete(List.of("create", "info", "invite", "request", "kick", "leave", "roles", "vice", "perms", "freeze"), args[0]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
             return complete(cityReferences(), args[1]);
@@ -461,6 +604,27 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("roles")) {
             return complete(List.of("list", "toggle"), args[1]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("vice")) {
+            return complete(List.of("set", "clear", "info"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("vice") && args[1].equalsIgnoreCase("set")) {
+            return complete(currentCityMemberNames(sender), args[2]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("perms")) {
+            List<String> options = new ArrayList<>();
+            options.add("set");
+            options.addAll(currentCityMemberNames(sender));
+            return complete(options, args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("set")) {
+            return complete(currentCityMemberNames(sender), args[2]);
+        }
+        if (args.length == 4 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("set")) {
+            return complete(List.of("access", "container", "build"), args[3]);
+        }
+        if (args.length == 5 && args[0].equalsIgnoreCase("perms") && args[1].equalsIgnoreCase("set")) {
+            return complete(List.of("on", "off"), args[4]);
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("roles") && args[1].equalsIgnoreCase("toggle")) {
             return complete(currentCityRoleKeys(sender), args[2]);

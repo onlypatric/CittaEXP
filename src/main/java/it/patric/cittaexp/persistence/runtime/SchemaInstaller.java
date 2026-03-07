@@ -116,6 +116,27 @@ final class SchemaInstaller {
                     """);
 
             statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS city_governance (
+                        city_id VARCHAR(36) PRIMARY KEY,
+                        vice_uuid VARCHAR(36),
+                        updated_at BIGINT NOT NULL
+                    )
+                    """);
+
+            statement.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS city_member_claim_permissions (
+                        city_id VARCHAR(36) NOT NULL,
+                        player_uuid VARCHAR(36) NOT NULL,
+                        perm_access INTEGER NOT NULL,
+                        perm_container INTEGER NOT NULL,
+                        perm_build INTEGER NOT NULL,
+                        updated_by VARCHAR(36),
+                        updated_at BIGINT NOT NULL,
+                        PRIMARY KEY (city_id, player_uuid)
+                    )
+                    """);
+
+            statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS city_outbox (
                         event_id VARCHAR(36) PRIMARY KEY,
                         aggregate_type VARCHAR(64) NOT NULL,
@@ -277,6 +298,9 @@ final class SchemaInstaller {
                 );
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_members_city ON city_members(city_id)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_roles_city ON city_roles(city_id)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_governance_vice ON city_governance(vice_uuid)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_claim_perms_city ON city_member_claim_permissions(city_id)");
+                statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_city_claim_perms_player ON city_member_claim_permissions(player_uuid)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_ledger_city_time ON city_treasury_ledger(city_id, occurred_at)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_tickets_status_time ON staff_approval_tickets(status, requested_at)");
                 statement.executeUpdate("CREATE INDEX IF NOT EXISTS idx_freeze_city_active ON freeze_cases(city_id, active)");
@@ -293,6 +317,9 @@ final class SchemaInstaller {
                 }
                 createIndexIfMissing(statement, "idx_city_members_city", "city_members(city_id)");
                 createIndexIfMissing(statement, "idx_city_roles_city", "city_roles(city_id)");
+                createIndexIfMissing(statement, "idx_city_governance_vice", "city_governance(vice_uuid)");
+                createIndexIfMissing(statement, "idx_city_claim_perms_city", "city_member_claim_permissions(city_id)");
+                createIndexIfMissing(statement, "idx_city_claim_perms_player", "city_member_claim_permissions(player_uuid)");
                 createIndexIfMissing(statement, "idx_ledger_city_time", "city_treasury_ledger(city_id, occurred_at)");
                 createIndexIfMissing(statement, "idx_tickets_status_time", "staff_approval_tickets(status, requested_at)");
                 createIndexIfMissing(statement, "idx_freeze_city_active", "freeze_cases(city_id, active)");

@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 CITTAEXP_DIR="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 ROOT_DIR="$(cd -- "${CITTAEXP_DIR}/.." && pwd)"
 COMMON_LIB_DIR="${ROOT_DIR}/minecraft-common-lib"
+CLASSIFICHE_DIR="${ROOT_DIR}/ClassificheExp"
 SERVER_TEST_DIR="${ROOT_DIR}/SERVER-TEST"
 EXTERNAL_LIBS_DIR="${ROOT_DIR}/EXTERNAL-LIBS"
 RUNTIME_DIR="${SERVER_TEST_DIR}/runtime/current"
@@ -279,15 +280,27 @@ prepare_runtime_offline() {
 
 install_plugins() {
   local cittaexp_jar
+  local classifiche_jar
   cittaexp_jar="$(pick_latest_jar "${CITTAEXP_DIR}/build/libs" "CittaEXP-*.jar")"
   [[ -n "${cittaexp_jar:-}" ]] || fail "CittaEXP jar non trovato in ${CITTAEXP_DIR}/build/libs"
 
   cp -f "$cittaexp_jar" "${PLUGINS_DIR}/CittaEXP.jar"
   log "installed plugin: ${PLUGINS_DIR}/CittaEXP.jar"
 
+  classifiche_jar="$(pick_latest_jar "${CLASSIFICHE_DIR}/build/libs" "ClassificheExp-*.jar" || true)"
+  if [[ -n "${classifiche_jar:-}" ]]; then
+    cp -f "$classifiche_jar" "${PLUGINS_DIR}/ClassificheEXP.jar"
+    log "installed dependency plugin: ${PLUGINS_DIR}/ClassificheEXP.jar"
+  fi
+
   copy_jars_if_any "$EXTERNAL_LIBS_DIR" "EXTERNAL-LIBS"
   if [[ "$COPY_CACHED_EXTERNAL" == "1" ]]; then
     copy_jars_if_any "${SERVER_TEST_DIR}/cache/external" "SERVER-TEST/cache/external"
+  fi
+
+  if [[ -f "${PLUGINS_DIR}/ClassificheEXP.jar" && -f "${PLUGINS_DIR}/ClassificheExp.jar" ]]; then
+    rm -f "${PLUGINS_DIR}/ClassificheExp.jar"
+    log "removed duplicate plugin jar: ${PLUGINS_DIR}/ClassificheExp.jar"
   fi
 
   ensure_protocol_lib_for_itemsadder
@@ -323,7 +336,11 @@ main() {
   log "starting Paper server"
   (
     cd "$RUNTIME_DIR"
-    exec "$JAVA_BIN" $JAVA_OPTS -jar paper.jar --nogui
+    local -a java_args=()
+    if [[ -n "${JAVA_OPTS}" ]]; then
+      read -r -a java_args <<< "$JAVA_OPTS"
+    fi
+    exec "$JAVA_BIN" "${java_args[@]}" -jar paper.jar --nogui
   )
 }
 

@@ -7,8 +7,10 @@ import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
 import it.patric.cittaexp.core.model.FreezeReason;
 import it.patric.cittaexp.core.model.InvitationStatus;
@@ -314,5 +316,53 @@ class CityPersistenceServiceSqliteTest {
         assertTrue(deleted.success());
         assertTrue(service.findCityById(cityId).isEmpty());
         assertTrue(service.findClaimBinding(cityId).isEmpty());
+    }
+
+    @Test
+    void governanceViceAndClaimPermissionsReadWriteWorks() {
+        long now = System.currentTimeMillis();
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+        UUID viceId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+
+        service.createCity(new CityRecord(
+                cityId,
+                "GovernanceVille",
+                "GOV",
+                leaderId,
+                CityTier.BORGO,
+                CityStatus.ACTIVE,
+                false,
+                false,
+                0L,
+                2,
+                10,
+                now,
+                now,
+                0
+        ));
+
+        assertTrue(service.upsertCityVice(new CityViceRecord(cityId, viceId, now)).success());
+        assertTrue(service.upsertClaimPermissions(new MemberClaimPermissionRecord(
+                cityId,
+                memberId,
+                true,
+                true,
+                false,
+                leaderId,
+                now
+        )).success());
+
+        assertTrue(service.findCityVice(cityId).isPresent());
+        assertEquals(viceId, service.findCityVice(cityId).orElseThrow().viceUuid());
+        assertTrue(service.findClaimPermissions(cityId, memberId).isPresent());
+        assertTrue(service.findClaimPermissions(cityId, memberId).orElseThrow().container());
+
+        assertTrue(service.clearCityVice(cityId, now + 1000L).success());
+        assertTrue(service.deleteClaimPermissions(cityId, memberId).success());
+        assertTrue(service.findCityVice(cityId).isPresent());
+        assertTrue(service.findCityVice(cityId).orElseThrow().viceUuid() == null);
+        assertTrue(service.findClaimPermissions(cityId, memberId).isEmpty());
     }
 }

@@ -1,5 +1,6 @@
 package it.patric.cittaexp.runtime.integration;
 
+import it.patric.cittaexp.core.model.MemberClaimPermissions;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -130,6 +131,42 @@ class HuskClaimsAdapterTest {
         try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
             bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
             assertFalse(adapter.expandClaimAsync("world", 10, 10, 1).join());
+        }
+    }
+
+    @Test
+    void syncClaimPermissionsReturnsFalseWhenClaimMissing() {
+        Plugin plugin = enabledPlugin();
+        BukkitHuskClaimsAPI api = mock(BukkitHuskClaimsAPI.class);
+        World world = mock(World.class);
+        net.william278.huskclaims.position.World huskWorld = mock(net.william278.huskclaims.position.World.class);
+        ClaimWorld claimWorld = mock(ClaimWorld.class);
+        net.william278.huskclaims.position.Position position = mock(net.william278.huskclaims.position.Position.class);
+
+        HuskClaimsAdapter adapter = new HuskClaimsAdapter(
+                plugin,
+                api,
+                new IntegrationSettings.ClaimSettings(100, 100),
+                Logger.getLogger("test")
+        );
+
+        when(world.getMinHeight()).thenReturn(0);
+        when(api.getWorld(world)).thenReturn(huskWorld);
+        when(api.isWorldClaimable(huskWorld)).thenReturn(true);
+        when(api.getClaimWorld(huskWorld)).thenReturn(Optional.of(claimWorld));
+        when(api.getPosition(any(Location.class))).thenReturn(position);
+        when(api.getClaimAt(position)).thenReturn(Optional.empty());
+
+        try (MockedStatic<Bukkit> bukkit = mockStatic(Bukkit.class)) {
+            bukkit.when(() -> Bukkit.getWorld("world")).thenReturn(world);
+            assertFalse(adapter.syncClaimPermissionsAsync(
+                    "world",
+                    0,
+                    0,
+                    UUID.randomUUID(),
+                    MemberClaimPermissions.memberDefault(),
+                    false
+            ).join());
         }
     }
 

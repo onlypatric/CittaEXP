@@ -12,9 +12,11 @@ import it.patric.cittaexp.persistence.domain.CityInvitationRecord;
 import it.patric.cittaexp.persistence.domain.CityMemberRecord;
 import it.patric.cittaexp.persistence.domain.CityRecord;
 import it.patric.cittaexp.persistence.domain.CityRoleRecord;
+import it.patric.cittaexp.persistence.domain.CityViceRecord;
 import it.patric.cittaexp.persistence.domain.ClaimBindingRecord;
 import it.patric.cittaexp.persistence.domain.FreezeCaseRecord;
 import it.patric.cittaexp.persistence.domain.JoinRequestRecord;
+import it.patric.cittaexp.persistence.domain.MemberClaimPermissionRecord;
 import it.patric.cittaexp.persistence.domain.OutboxEvent;
 import it.patric.cittaexp.persistence.domain.PersistenceWriteOutcome;
 import it.patric.cittaexp.persistence.domain.ReplayStatus;
@@ -54,6 +56,10 @@ public final class CityPersistenceService
     private static final String EVENT_FREEZE_UPSERT = "FREEZE_UPSERT";
     private static final String EVENT_FREEZE_CLOSE = "FREEZE_CLOSE";
     private static final String EVENT_CLAIM_BINDING_UPSERT = "CLAIM_BINDING_UPSERT";
+    private static final String EVENT_CITY_VICE_UPSERT = "CITY_VICE_UPSERT";
+    private static final String EVENT_CITY_VICE_CLEAR = "CITY_VICE_CLEAR";
+    private static final String EVENT_MEMBER_CLAIM_PERMISSIONS_UPSERT = "MEMBER_CLAIM_PERMISSIONS_UPSERT";
+    private static final String EVENT_MEMBER_CLAIM_PERMISSIONS_DELETE = "MEMBER_CLAIM_PERMISSIONS_DELETE";
     private static final String EVENT_AUDIT_APPEND = "AUDIT_APPEND";
 
     private final JavaPlugin plugin;
@@ -290,6 +296,51 @@ public final class CityPersistenceService
     }
 
     @Override
+    public Optional<CityViceRecord> findCityVice(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        return withReadConnection("SELECT * FROM city_governance WHERE city_id = ? LIMIT 1", stmt -> {
+            stmt.setString(1, cityId.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? Optional.of(mapCityVice(rs)) : Optional.empty();
+            }
+        });
+    }
+
+    @Override
+    public Optional<MemberClaimPermissionRecord> findClaimPermissions(UUID cityId, UUID playerUuid) {
+        Objects.requireNonNull(cityId, "cityId");
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        return withReadConnection(
+                "SELECT * FROM city_member_claim_permissions WHERE city_id = ? AND player_uuid = ? LIMIT 1",
+                stmt -> {
+                    stmt.setString(1, cityId.toString());
+                    stmt.setString(2, playerUuid.toString());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        return rs.next() ? Optional.of(mapClaimPermissions(rs)) : Optional.empty();
+                    }
+                }
+        );
+    }
+
+    @Override
+    public List<MemberClaimPermissionRecord> listClaimPermissions(UUID cityId) {
+        Objects.requireNonNull(cityId, "cityId");
+        return withReadConnection(
+                "SELECT * FROM city_member_claim_permissions WHERE city_id = ? ORDER BY player_uuid ASC",
+                stmt -> {
+                    stmt.setString(1, cityId.toString());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        List<MemberClaimPermissionRecord> rows = new ArrayList<>();
+                        while (rs.next()) {
+                            rows.add(mapClaimPermissions(rs));
+                        }
+                        return List.copyOf(rows);
+                    }
+                }
+        );
+    }
+
+    @Override
     public long countActiveFreezeCases() {
         return countByQuery("SELECT COUNT(*) AS c FROM freeze_cases WHERE active = 1");
     }
@@ -336,6 +387,20 @@ public final class CityPersistenceService
                     stmt.setInt(16, Math.max(city.revision(), 0));
                     stmt.executeUpdate();
                 }
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        upsertSql(
+                                connection,
+                                "city_governance",
+                                "city_id, vice_uuid, updated_at",
+                                "vice_uuid = excluded.vice_uuid, updated_at = excluded.updated_at",
+                                "vice_uuid = VALUES(vice_uuid), updated_at = VALUES(updated_at)"
+                        )
+                )) {
+                    stmt.setString(1, city.cityId().toString());
+                    stmt.setString(2, null);
+                    stmt.setLong(3, city.updatedAtEpochMilli());
+                    stmt.executeUpdate();
+                }
 
                 if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
                     enqueue(
@@ -345,6 +410,16 @@ public final class CityPersistenceService
                                     city.cityId().toString(),
                                     EVENT_CITY_UPSERT,
                                     codec.cityUpsertPayload(city, -1),
+                                    System.currentTimeMillis()
+                            )
+                    );
+                    enqueue(
+                            OutboxEvent.pending(
+                                    UUID.randomUUID(),
+                                    "CITY_GOVERNANCE",
+                                    city.cityId().toString(),
+                                    EVENT_CITY_VICE_CLEAR,
+                                    codec.cityViceClearPayload(city.cityId(), city.updatedAtEpochMilli()),
                                     System.currentTimeMillis()
                             )
                     );
@@ -855,6 +930,156 @@ public final class CityPersistenceService
     }
 
     @Override
+    public PersistenceWriteOutcome upsertCityVice(CityViceRecord viceRecord) {
+        Objects.requireNonNull(viceRecord, "viceRecord");
+        try {
+            runWritable("upsertCityVice", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "city_governance",
+                        "city_id, vice_uuid, updated_at",
+                        "vice_uuid = excluded.vice_uuid, updated_at = excluded.updated_at",
+                        "vice_uuid = VALUES(vice_uuid), updated_at = VALUES(updated_at)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, viceRecord.cityId().toString());
+                    stmt.setString(2, viceRecord.viceUuid() == null ? null : viceRecord.viceUuid().toString());
+                    stmt.setLong(3, viceRecord.updatedAtEpochMilli());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY_GOVERNANCE",
+                            viceRecord.cityId().toString(),
+                            EVENT_CITY_VICE_UPSERT,
+                            codec.cityViceUpsertPayload(viceRecord),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("city-vice-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertCityVice failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome clearCityVice(UUID cityId, long updatedAtEpochMilli) {
+        Objects.requireNonNull(cityId, "cityId");
+        try {
+            runWritable("clearCityVice", connection -> {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "UPDATE city_governance SET vice_uuid = NULL, updated_at = ? WHERE city_id = ?"
+                )) {
+                    stmt.setLong(1, updatedAtEpochMilli);
+                    stmt.setString(2, cityId.toString());
+                    int updated = stmt.executeUpdate();
+                    if (updated == 0) {
+                        try (PreparedStatement insert = connection.prepareStatement(
+                                "INSERT INTO city_governance (city_id, vice_uuid, updated_at) VALUES (?, NULL, ?)"
+                        )) {
+                            insert.setString(1, cityId.toString());
+                            insert.setLong(2, updatedAtEpochMilli);
+                            insert.executeUpdate();
+                        }
+                    }
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY_GOVERNANCE",
+                            cityId.toString(),
+                            EVENT_CITY_VICE_CLEAR,
+                            codec.cityViceClearPayload(cityId, updatedAtEpochMilli),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("city-vice-cleared");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] clearCityVice failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome upsertClaimPermissions(MemberClaimPermissionRecord permissions) {
+        Objects.requireNonNull(permissions, "permissions");
+        try {
+            runWritable("upsertClaimPermissions", connection -> {
+                String sql = upsertSql(
+                        connection,
+                        "city_member_claim_permissions",
+                        "city_id, player_uuid, perm_access, perm_container, perm_build, updated_by, updated_at",
+                        "perm_access = excluded.perm_access, perm_container = excluded.perm_container, perm_build = excluded.perm_build, updated_by = excluded.updated_by, updated_at = excluded.updated_at",
+                        "perm_access = VALUES(perm_access), perm_container = VALUES(perm_container), perm_build = VALUES(perm_build), updated_by = VALUES(updated_by), updated_at = VALUES(updated_at)"
+                );
+                try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                    stmt.setString(1, permissions.cityId().toString());
+                    stmt.setString(2, permissions.playerUuid().toString());
+                    stmt.setInt(3, permissions.access() ? 1 : 0);
+                    stmt.setInt(4, permissions.container() ? 1 : 0);
+                    stmt.setInt(5, permissions.build() ? 1 : 0);
+                    stmt.setString(6, permissions.updatedBy() == null ? null : permissions.updatedBy().toString());
+                    stmt.setLong(7, permissions.updatedAtEpochMilli());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY_CLAIM_PERMISSIONS",
+                            permissions.cityId() + ":" + permissions.playerUuid(),
+                            EVENT_MEMBER_CLAIM_PERMISSIONS_UPSERT,
+                            codec.memberClaimPermissionsUpsertPayload(permissions),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("claim-permissions-upserted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] upsertClaimPermissions failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
+    public PersistenceWriteOutcome deleteClaimPermissions(UUID cityId, UUID playerUuid) {
+        Objects.requireNonNull(cityId, "cityId");
+        Objects.requireNonNull(playerUuid, "playerUuid");
+        try {
+            runWritable("deleteClaimPermissions", connection -> {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "DELETE FROM city_member_claim_permissions WHERE city_id = ? AND player_uuid = ?"
+                )) {
+                    stmt.setString(1, cityId.toString());
+                    stmt.setString(2, playerUuid.toString());
+                    stmt.executeUpdate();
+                }
+                if (modeManager.currentMode() == PersistenceRuntimeMode.SQLITE_FALLBACK) {
+                    enqueue(OutboxEvent.pending(
+                            UUID.randomUUID(),
+                            "CITY_CLAIM_PERMISSIONS",
+                            cityId + ":" + playerUuid,
+                            EVENT_MEMBER_CLAIM_PERMISSIONS_DELETE,
+                            codec.memberClaimPermissionsDeletePayload(cityId, playerUuid),
+                            System.currentTimeMillis()
+                    ));
+                }
+                return null;
+            });
+            return PersistenceWriteOutcome.success("claim-permissions-deleted");
+        } catch (SQLException ex) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] deleteClaimPermissions failed", ex);
+            return PersistenceWriteOutcome.failure("sql-error");
+        }
+    }
+
+    @Override
     public PersistenceWriteOutcome appendAuditEvent(AuditEventRecord event) {
         Objects.requireNonNull(event, "event");
         try {
@@ -1140,6 +1365,10 @@ public final class CityPersistenceService
                 case EVENT_FREEZE_UPSERT -> replayFreezeUpsert(connection, payload);
                 case EVENT_FREEZE_CLOSE -> replayFreezeClose(connection, payload);
                 case EVENT_CLAIM_BINDING_UPSERT -> replayClaimBindingUpsert(connection, payload);
+                case EVENT_CITY_VICE_UPSERT -> replayCityViceUpsert(connection, payload);
+                case EVENT_CITY_VICE_CLEAR -> replayCityViceClear(connection, payload);
+                case EVENT_MEMBER_CLAIM_PERMISSIONS_UPSERT -> replayMemberClaimPermissionsUpsert(connection, payload);
+                case EVENT_MEMBER_CLAIM_PERMISSIONS_DELETE -> replayMemberClaimPermissionsDelete(connection, payload);
                 case EVENT_AUDIT_APPEND -> replayAuditAppend(connection, payload);
                 default -> throw new IllegalStateException("Unknown outbox eventType: " + event.eventType());
             }
@@ -1446,6 +1675,83 @@ public final class CityPersistenceService
         }
     }
 
+    private void replayCityViceUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "city_governance",
+                    "city_id, vice_uuid, updated_at",
+                    "vice_uuid = excluded.vice_uuid, updated_at = excluded.updated_at",
+                    "vice_uuid = VALUES(vice_uuid), updated_at = VALUES(updated_at)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("cityId").getAsString());
+                stmt.setString(2, toNullableValue(payload.get("viceUuid").getAsString()));
+                stmt.setLong(3, payload.get("updatedAt").getAsLong());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("city vice replay failed", ex);
+        }
+    }
+
+    private void replayCityViceClear(Connection connection, JsonObject payload) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE city_governance SET vice_uuid = NULL, updated_at = ? WHERE city_id = ?"
+        )) {
+            stmt.setLong(1, payload.get("updatedAt").getAsLong());
+            stmt.setString(2, payload.get("cityId").getAsString());
+            int updated = stmt.executeUpdate();
+            if (updated == 0) {
+                try (PreparedStatement insert = connection.prepareStatement(
+                        "INSERT INTO city_governance (city_id, vice_uuid, updated_at) VALUES (?, NULL, ?)"
+                )) {
+                    insert.setString(1, payload.get("cityId").getAsString());
+                    insert.setLong(2, payload.get("updatedAt").getAsLong());
+                    insert.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("city vice clear replay failed", ex);
+        }
+    }
+
+    private void replayMemberClaimPermissionsUpsert(Connection connection, JsonObject payload) {
+        try {
+            String sql = upsertSql(
+                    connection,
+                    "city_member_claim_permissions",
+                    "city_id, player_uuid, perm_access, perm_container, perm_build, updated_by, updated_at",
+                    "perm_access = excluded.perm_access, perm_container = excluded.perm_container, perm_build = excluded.perm_build, updated_by = excluded.updated_by, updated_at = excluded.updated_at",
+                    "perm_access = VALUES(perm_access), perm_container = VALUES(perm_container), perm_build = VALUES(perm_build), updated_by = VALUES(updated_by), updated_at = VALUES(updated_at)"
+            );
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, payload.get("cityId").getAsString());
+                stmt.setString(2, payload.get("playerUuid").getAsString());
+                stmt.setInt(3, payload.get("permAccess").getAsBoolean() ? 1 : 0);
+                stmt.setInt(4, payload.get("permContainer").getAsBoolean() ? 1 : 0);
+                stmt.setInt(5, payload.get("permBuild").getAsBoolean() ? 1 : 0);
+                stmt.setString(6, toNullableValue(payload.get("updatedBy").getAsString()));
+                stmt.setLong(7, payload.get("updatedAt").getAsLong());
+                stmt.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new IllegalStateException("claim permissions replay failed", ex);
+        }
+    }
+
+    private void replayMemberClaimPermissionsDelete(Connection connection, JsonObject payload) {
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "DELETE FROM city_member_claim_permissions WHERE city_id = ? AND player_uuid = ?"
+        )) {
+            stmt.setString(1, payload.get("cityId").getAsString());
+            stmt.setString(2, payload.get("playerUuid").getAsString());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new IllegalStateException("claim permissions delete replay failed", ex);
+        }
+    }
+
     private void replayAuditAppend(Connection connection, JsonObject payload) {
         try {
             String sql = upsertSql(
@@ -1473,6 +1779,8 @@ public final class CityPersistenceService
     private static void deleteCityAggregate(Connection connection, String cityId) throws SQLException {
         deleteByCityId(connection, "city_members", cityId);
         deleteByCityId(connection, "city_roles", cityId);
+        deleteByCityId(connection, "city_member_claim_permissions", cityId);
+        deleteByCityId(connection, "city_governance", cityId);
         deleteByCityId(connection, "city_invitations", cityId);
         deleteByCityId(connection, "join_requests", cityId);
         deleteByCityId(connection, "freeze_cases", cityId);
@@ -1730,6 +2038,26 @@ public final class CityPersistenceService
                 rs.getInt("max_z"),
                 rs.getInt("area"),
                 rs.getLong("created_at"),
+                rs.getLong("updated_at")
+        );
+    }
+
+    private static CityViceRecord mapCityVice(ResultSet rs) throws SQLException {
+        return new CityViceRecord(
+                UUID.fromString(rs.getString("city_id")),
+                nullableUuid(rs.getString("vice_uuid")),
+                rs.getLong("updated_at")
+        );
+    }
+
+    private static MemberClaimPermissionRecord mapClaimPermissions(ResultSet rs) throws SQLException {
+        return new MemberClaimPermissionRecord(
+                UUID.fromString(rs.getString("city_id")),
+                UUID.fromString(rs.getString("player_uuid")),
+                rs.getInt("perm_access") == 1,
+                rs.getInt("perm_container") == 1,
+                rs.getInt("perm_build") == 1,
+                nullableUuid(rs.getString("updated_by")),
                 rs.getLong("updated_at")
         );
     }
