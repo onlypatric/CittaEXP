@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -932,17 +933,14 @@ public final class CityPersistenceService
                 T result = transaction.execute(connection);
                 connection.commit();
                 return result;
-            } catch (SQLException ex) {
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackError) {
-                    logger.log(Level.SEVERE, "[CittaEXP][persistence] transaction rollback failed", rollbackError);
+            } catch (Throwable ex) {
+                rollbackAfterTransactionFailure(connection, ex);
+                if (ex instanceof RuntimeException runtimeException) {
+                    throw runtimeException;
                 }
-                logger.log(
-                        Level.SEVERE,
-                        "[CittaEXP][persistence] transaction failed mode=" + modeManager.currentMode(),
-                        ex
-                );
+                if (ex instanceof Error error) {
+                    throw error;
+                }
                 throw new IllegalStateException("transaction failed", ex);
             } finally {
                 txConnection.remove();
@@ -956,6 +954,22 @@ public final class CityPersistenceService
             logger.log(Level.SEVERE, "[CittaEXP][persistence] cannot open transaction", ex);
             throw new IllegalStateException("cannot open transaction", ex);
         }
+    }
+
+    private void rollbackAfterTransactionFailure(Connection connection, Throwable failure) {
+        try {
+            connection.rollback();
+        } catch (SQLException rollbackError) {
+            logger.log(Level.SEVERE, "[CittaEXP][persistence] transaction rollback failed", rollbackError);
+        }
+        logger.log(
+                Level.SEVERE,
+                "[CittaEXP][persistence] transaction failed mode="
+                        + modeManager.currentMode()
+                        + " errorType="
+                        + failure.getClass().getSimpleName(),
+                failure
+        );
     }
 
     @Override
@@ -1582,7 +1596,19 @@ public final class CityPersistenceService
     }
 
     private Connection openSqliteConnection() throws SQLException {
-        return DriverManager.getConnection(schemaInstaller.sqliteUrl());
+        Connection connection = DriverManager.getConnection(schemaInstaller.sqliteUrl());
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("PRAGMA foreign_keys=ON");
+            statement.execute("PRAGMA busy_timeout=5000");
+        } catch (SQLException ex) {
+            try {
+                connection.close();
+            } catch (SQLException ignored) {
+                // keep primary exception
+            }
+            throw ex;
+        }
+        return connection;
     }
 
     private <T> T runWritable(String operation, SqlFunction<Connection, T> body) throws SQLException {

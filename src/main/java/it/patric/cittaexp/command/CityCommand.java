@@ -394,6 +394,9 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         if (reason.startsWith("city-create-db-failed-rollback-ok")) {
             return "cittaexp.city.create.failed.persistence";
         }
+        if (reason.contains("city-name-or-tag-already-exists")) {
+            return "cittaexp.city.error.city_name_tag_conflict";
+        }
         return switch (reason) {
             case "player-already-in-city" -> "cittaexp.city.error.player_already_in_city";
             case "city-name-tag-conflict" -> "cittaexp.city.error.city_name_tag_conflict";

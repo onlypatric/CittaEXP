@@ -24,6 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -191,6 +192,39 @@ class CityPersistenceServiceSqliteTest {
 
         assertTrue(service.findCityById(cityId).isPresent());
         assertTrue(service.pendingCount() >= 1L);
+    }
+
+    @Test
+    void runtimeFailureInsideTransactionRollsBackCityAndOutbox() {
+        UUID cityId = UUID.randomUUID();
+        UUID leaderId = UUID.randomUUID();
+        long now = System.currentTimeMillis();
+
+        assertThrows(IllegalStateException.class, () ->
+                service.withTransaction(connection -> {
+                    PersistenceWriteOutcome created = service.createCity(new CityRecord(
+                            cityId,
+                            "RollbackCity",
+                            "RBC",
+                            leaderId,
+                            CityTier.BORGO,
+                            CityStatus.ACTIVE,
+                            false,
+                            false,
+                            0L,
+                            1,
+                            10,
+                            now,
+                            now,
+                            0
+                    ));
+                    assertTrue(created.success());
+                    throw new IllegalStateException("forced-runtime-failure");
+                })
+        );
+
+        assertTrue(service.findCityById(cityId).isEmpty());
+        assertEquals(0L, service.pendingCount());
     }
 
     @Test

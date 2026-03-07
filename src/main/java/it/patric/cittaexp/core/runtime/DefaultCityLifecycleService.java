@@ -221,9 +221,14 @@ public final class DefaultCityLifecycleService implements
                                         rollbackError
                                 );
                             }
-                            String reason = rollbackSuccess
-                                    ? "city-create-db-failed-rollback-ok"
-                                    : "city-create-db-failed-rollback-failed";
+                            String reason;
+                            if (isCityNameTagConflictFailure(writeFailure)) {
+                                reason = "city-name-tag-conflict";
+                            } else {
+                                reason = rollbackSuccess
+                                        ? "city-create-db-failed-rollback-ok"
+                                        : "city-create-db-failed-rollback-failed";
+                            }
                             return new IllegalStateException(reason, writeFailure);
                         })
                         .thenCompose(error -> CompletableFuture.failedFuture(error));
@@ -993,6 +998,19 @@ public final class DefaultCityLifecycleService implements
 
     private static String safe(String value) {
         return value == null ? "" : value;
+    }
+
+    private static boolean isCityNameTagConflictFailure(Throwable throwable) {
+        Throwable cursor = throwable;
+        while (cursor != null) {
+            String message = safe(cursor.getMessage());
+            if (message.equals("city-name-tag-conflict")
+                    || message.contains("city-name-or-tag-already-exists")) {
+                return true;
+            }
+            cursor = cursor.getCause();
+        }
+        return false;
     }
 
     private static Throwable unwrapCompletion(Throwable throwable) {
