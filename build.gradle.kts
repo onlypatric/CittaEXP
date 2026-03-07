@@ -12,6 +12,25 @@ java {
     }
 }
 
+fun pickLatestJar(baseDir: String, prefix: String): String? {
+    val dir = file(baseDir)
+    if (!dir.exists() || !dir.isDirectory) {
+        return null
+    }
+    val matches = dir.listFiles()
+        ?.filter { file ->
+            file.isFile &&
+                file.extension.equals("jar", ignoreCase = true) &&
+                file.name.startsWith(prefix) &&
+                !file.name.endsWith("-sources.jar") &&
+                !file.name.endsWith("-javadoc.jar") &&
+                !file.name.endsWith("-plain.jar")
+        }
+        ?.sortedByDescending { it.lastModified() }
+        .orEmpty()
+    return matches.firstOrNull()?.path
+}
+
 val defaultCommonLibJar = "../minecraft-common-lib/build/libs/minecraft-common-lib-3.0.0.jar"
 val commonLibJarPath = providers.gradleProperty("commonLibJar").orElse(defaultCommonLibJar)
 val commonLibJar = file(commonLibJarPath.get())
@@ -21,7 +40,8 @@ val itemsAdderAdapterJar = file(itemsAdderAdapterJarPath.get())
 val defaultVaultApiJar = "../ShopperEXP/.bench/downloads/Vault.jar"
 val vaultApiJarPath = providers.gradleProperty("vaultApiJar").orElse(defaultVaultApiJar)
 val vaultApiJar = file(vaultApiJarPath.get())
-val defaultHuskClaimsApiJar = "../minecraft-common-lib/adapter-huskclaims/build/libs/adapter-huskclaims-3.0.0.jar"
+val defaultHuskClaimsApiJar = pickLatestJar("../EXTERNAL-LIBS", "HuskClaims")
+    ?: "../EXTERNAL-LIBS/HuskClaims.jar"
 val huskClaimsApiJarPath = providers.gradleProperty("huskClaimsApiJar").orElse(defaultHuskClaimsApiJar)
 val huskClaimsApiJar = file(huskClaimsApiJarPath.get())
 val defaultHuskClaimsAdapterJar = "../minecraft-common-lib/adapter-huskclaims/build/libs/adapter-huskclaims-3.0.0.jar"
@@ -136,7 +156,7 @@ tasks.register("verifyHuskClaimsApiJar") {
         if (!huskClaimsApiJar.exists()) {
             throw GradleException(
                 "HuskClaims API jar non trovato: ${huskClaimsApiJar.absolutePath}. " +
-                    "Passa -PhuskClaimsApiJar=/path/HuskClaims.jar"
+                    "Copia il jar in ../EXTERNAL-LIBS oppure passa -PhuskClaimsApiJar=/path/HuskClaims.jar"
             )
         }
     }
