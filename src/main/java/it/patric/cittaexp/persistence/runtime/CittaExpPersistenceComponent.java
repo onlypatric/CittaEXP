@@ -10,6 +10,7 @@ import dev.patric.commonlib.api.persistence.SchemaMigrationContext;
 import dev.patric.commonlib.api.persistence.SchemaMigrationService;
 import it.patric.cittaexp.core.port.CityTreasuryLedgerPort;
 import it.patric.cittaexp.core.port.EconomyStatePort;
+import it.patric.cittaexp.core.port.StaffApprovalPort;
 import it.patric.cittaexp.core.port.TaxPolicyPort;
 import it.patric.cittaexp.persistence.config.PersistenceConfigLoader;
 import it.patric.cittaexp.persistence.config.PersistenceSettings;
@@ -55,6 +56,11 @@ public final class CittaExpPersistenceComponent implements CommonComponent {
         context.services().register(TaxPolicyPort.class, persistenceService);
         context.services().register(CityTreasuryLedgerPort.class, persistenceService);
         context.services().register(EconomyStatePort.class, persistenceService);
+        context.services().register(StaffApprovalPort.class, persistenceService);
+
+        // Always enforce baseline schema on boot so backend switches (SQLite <-> MySQL)
+        // do not depend on migration-version deltas.
+        persistenceService.ensureSchema();
 
         SchemaMigrationService migrationService = context.services().require(SchemaMigrationService.class);
         migrationService.register(MIGRATION_NAMESPACE, new SchemaMigration() {
@@ -82,6 +88,22 @@ public final class CittaExpPersistenceComponent implements CommonComponent {
             @Override
             public int toVersion() {
                 return 2;
+            }
+
+            @Override
+            public void migrate(SchemaMigrationContext migrationContext) {
+                persistenceService.ensureSchema();
+            }
+        });
+        migrationService.register(MIGRATION_NAMESPACE, new SchemaMigration() {
+            @Override
+            public int fromVersion() {
+                return 2;
+            }
+
+            @Override
+            public int toVersion() {
+                return 3;
             }
 
             @Override

@@ -5,9 +5,25 @@ default:
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questa azione richiede un player in gioco.</red>"
       staff:
         no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso staff mancante:</red> <yellow>cittaexp.staff.freeze</yellow>"
-        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff city <freeze|unfreeze|delete> <city> [reason]</white>"
+        usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff <city|ticket> ...</white>"
         result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Staff <action></aqua> <white><city></white> <gray>-></gray> <yellow><status></yellow>"
         error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione staff fallita:</red> <yellow><reason></yellow>"
+        ticket:
+          usage: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff ticket <list|view|approve|reject> ...</white>"
+          usage_view: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff ticket view <ticketId></white>"
+          usage_approve: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff ticket approve <ticketId> [nota]</white>"
+          usage_reject: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp staff ticket reject <ticketId> <motivo></white>"
+          gui_opened: "<gray>[<gold>CittaEXP</gold>]</gray> <green>GUI ticket:</green> <yellow><result></yellow>"
+          not_found: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ticket non trovato.</red>"
+          error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Azione ticket fallita:</red> <yellow><reason></yellow>"
+          result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Ticket <ticket_id></aqua> <gray>-></gray> <yellow><status></yellow> <gray>(<type>)</gray>"
+          list:
+            title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Ticket trovati:</aqua> <white><count></white>"
+            entry: "<gray>[<gold>CittaEXP</gold>]</gray> <white><ticket_id></white> <gray>city=<city_id> type=<type> status=<status> requester=<requester></gray>"
+          view:
+            header: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Ticket <ticket_id></aqua> <gray>city=<city_id> type=<type> status=<status></gray>"
+            reason: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Motivo:</white> <yellow><reason></yellow>"
+            history_line: "<gray>[<gold>CittaEXP</gold>]</gray> <gray><line></gray>"
       usage:
         root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog|staff></white>"
         scenario: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/cittaexp scenario <default|freeze|capital|lowfunds|kingdom></white>"
@@ -24,7 +40,7 @@ default:
         invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Tema non valido.</red>"
         set: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Tema impostato su:</green> <aqua><theme></aqua>"
       hud:
-        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>HUD <action>(<hudId>)</aqua> <gray>-></gray> <yellow><result></yellow>"
+        result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>HUD <action>(<hud_id>)</aqua> <gray>-></gray> <yellow><result></yellow>"
     dialog:
       list:
         title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Dialog showcase disponibili:</aqua>"
@@ -34,6 +50,65 @@ default:
       open:
         result: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Dialog <alias></aqua> <gray>-></gray> <green><result></green>"
         internal_error: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Dialog <alias> fallito:</red> <yellow>OPEN_FAILED_INTERNAL</yellow>"
+      creation:
+        common:
+          confirm: "<green>Conferma</green>"
+        city_name:
+          title: "<gold>CittaEXP</gold> <gray>- Nome Città</gray>"
+          body: "<gray>Inserisci il nome città usato nel wizard.</gray>"
+          input: "<yellow>Nome città</yellow>"
+        city_tag:
+          title: "<gold>CittaEXP</gold> <gray>- Tag Città</gray>"
+          body: "<gray>Inserisci un tag città di 3 caratteri.</gray>"
+          input: "<yellow>Tag città</yellow>"
+      showcase:
+        submit:
+          feedback: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Dialog submit <alias></aqua> <gray>session=<session> action=<action> payload=<payload></gray>"
+        common:
+          confirm: "<green>Conferma</green>"
+          cancel: "<red>Annulla</red>"
+          close: "<yellow>Chiudi</yellow>"
+          exit: "<yellow>Esci</yellow>"
+        notice:
+          title: "<gold>CittaEXP</gold> <gray>- Showcase Notice</gray>"
+          body: "<gray>Notice informativo: questo dialog serve solo per review UX.</gray>"
+        confirm:
+          title: "<gold>CittaEXP</gold> <gray>- Showcase Confirm</gray>"
+          body: "<gray>Conferma sensibile preview: nessuna azione reale verrà eseguita.</gray>"
+        multi:
+          title: "<gold>CittaEXP</gold> <gray>- Showcase Multi</gray>"
+          body: "<gray>Multi-action: scegli una CTA di anteprima per validare il layout.</gray>"
+          open_dashboard: "<aqua>Apri Dashboard</aqua>"
+          open_members: "<aqua>Apri Members</aqua>"
+          open_taxes: "<aqua>Apri Taxes</aqua>"
+        form:
+          title: "<gold>CittaEXP</gold> <gray>- Showcase Form</gray>"
+          body: "<gray>Form composito preview: i valori vengono mostrati solo in chat staff.</gray>"
+          submit: "<green>Invia preview</green>"
+          input:
+            city_name: "<yellow>Nome città</yellow>"
+            freeze_mode: "<yellow>Freeze mode</yellow>"
+            taxes_percent: "<yellow>Tasse %</yellow>"
+            taxes_format: "Tasse: %s%%"
+            tier: "<yellow>Tier città</yellow>"
+          option:
+            borgo: "<white>Borgo</white>"
+            villaggio: "<white>Villaggio</white>"
+            regno: "<white>Regno</white>"
+        list:
+          root:
+            title: "<gold>CittaEXP</gold> <gray>- Showcase List</gray>"
+            body: "<gray>DialogList root: naviga i template figlio in sequenza.</gray>"
+          step1:
+            title: "<gold>CittaEXP</gold> <gray>- List Step 1</gray>"
+            body: "<gray>Step 1: schermata introduttiva del flusso DialogList.</gray>"
+            continue: "<green>Continua</green>"
+          step2:
+            title: "<gold>CittaEXP</gold> <gray>- List Step 2</gray>"
+            body: "<gray>Step 2: validazione finale del dialog list.</gray>"
+        links:
+          title: "<gold>CittaEXP</gold> <gray>- Showcase Links</gray>"
+          body: "<gray>ServerLinks: visualizzazione link server con uscita preview-safe.</gray>"
     probe:
       title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Capability probe</aqua>"
       dependency:
@@ -41,12 +116,14 @@ default:
       integration:
         status: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Integrazione <name></white> <gray>-></gray> <yellow><state></yellow> <gray>(v:<version>, reason:<reason>)</gray>"
         ranking:
-          scan: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Ranking scan</white> <gray>-></gray> <yellow>scanned=<scanned> valid=<valid> invalid=<invalid> lastScan=<lastScan></yellow>"
+          scan: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Ranking scan</white> <gray>-></gray> <yellow>scanned=<scanned> valid=<valid> invalid=<invalid> last_scan=<last_scan></yellow>"
       lifecycle:
         summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Lifecycle</white> <gray>-></gray> <yellow>enabled=<enabled> freeze=<freeze> invites=<invites> requests=<requests></yellow>"
       economy:
-        summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Economy</white> <gray>-></gray> <yellow>enabled=<enabled> lastMonth=<lastMonth> backlog=<backlog> taxFreeze=<taxFreeze></yellow>"
-        capital: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Capitale</white> <gray>-></gray> <yellow>cityId=<cityId> bonusEntries=<bonusEntries> lastRun=<lastRun> status=<status> error=<error></yellow>"
+        summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Economy</white> <gray>-></gray> <yellow>enabled=<enabled> last_month=<last_month> backlog=<backlog> tax_freeze=<tax_freeze></yellow>"
+        capital: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Capitale</white> <gray>-></gray> <yellow>city_id=<city_id> bonus_entries=<bonus_entries> last_run=<last_run> status=<status> error=<error></yellow>"
+      staff:
+        summary: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Staff tickets</white> <gray>-></gray> <yellow>upgrade=<pending_upgrade> unfreeze=<pending_unfreeze> delete=<pending_delete> last_reviewed=<last_reviewed></yellow>"
       capability:
         available: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <green>available</green> <gray>(<metadata>)</gray>"
         unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <white><name></white> <gray>-></gray> <red>unavailable</red> <gray>(<reason>)</gray>"
@@ -60,38 +137,239 @@ default:
         outbox_pending: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxPending=</white><yellow><value></yellow>"
         outbox_conflicts: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence outboxConflicts=</white><yellow><value></yellow>"
         last_switch: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Persistence lastSwitch=</white><yellow><timestamp></yellow> <gray>(<reason>)</gray>"
+    gui:
+      asset:
+        icon_city:
+          title: "<gold>Dashboard città</gold>"
+          lore1: "<gray>Panoramica stato città</gray>"
+        icon_members:
+          title: "<aqua>Membri</aqua>"
+          lore1: "<gray>Apri roster membri</gray>"
+        icon_roles:
+          title: "<yellow>Ruoli</yellow>"
+          lore1: "<gray>Gestisci flag ruolo</gray>"
+        icon_taxes:
+          title: "<gold>Tasse</gold>"
+          lore1: "<gray>Costi mensili e scadenze</gray>"
+        icon_wizard:
+          title: "<light_purple>Wizard creazione</light_purple>"
+          lore1: "<gray>Flusso nome, tag e setup</gray>"
+        state_freeze_on:
+          title: "<red>FREEZE ATTIVO</red>"
+          lore1: "<gray>Le azioni bloccate non sono disponibili</gray>"
+        state_freeze_off:
+          title: "<green>Freeze: OFF</green>"
+          lore1: "<gray>Azioni città disponibili</gray>"
+        state_capital_on:
+          title: "<gold>Capitale: ON</gold>"
+          lore1: "<gray>Bonus capitale attivo</gray>"
+        state_capital_off:
+          title: "<gray>Capitale: OFF</gray>"
+          lore1: "<gray>Nessun privilegio capitale</gray>"
+        cta_confirm:
+          title: "<green>Conferma</green>"
+        cta_cancel:
+          title: "<red>Annulla</red>"
+        cta_back:
+          title: "<gray>Indietro</gray>"
+        cta_next:
+          title: "<aqua>Avanti</aqua>"
+        cta_dialog_name:
+          title: "<yellow>Imposta nome città</yellow>"
+          lore1: "<gray>Apre dialog input</gray>"
+        cta_dialog_tag:
+          title: "<yellow>Imposta tag città</yellow>"
+          lore1: "<gray>Apre dialog input</gray>"
+        cta_banner:
+          title: "<gold>Scegli banner</gold>"
+          lore1: "<gray>Selettore visuale template</gray>"
+        cta_armor:
+          title: "<gold>Scegli armatura</gold>"
+          lore1: "<gray>Selettore visuale template</gray>"
+      dashboard:
+        title: "<gold>CittaEXP</gold> <gray>- <city> [<tag>]</gray>"
+        cta:
+          requests:
+            title: "<aqua>Richieste</aqua>"
+            lore1: "<gray>Ticket città e richieste staff</gray>"
+          claim_shop:
+            title: "<green>Claim Shop</green>"
+            lore1: "<gray>Acquista blocchi claim</gray>"
+          upgrade_delete:
+            title: "<gold>Upgrade/Delete</gold>"
+            lore1: "<gray>Conferme governance</gray>"
+        rank:
+          title: "<aqua>Rank #<rank></aqua>"
+          lore:
+            score: "<gray>Score: <white><score></white>"
+            online: "<gray>Online: <white><online>/<max></white>"
+            scenario: "<gray>Scenario: <white><scenario></white>"
+      members:
+        title: "<aqua>Membri</aqua> <gray>- <city></gray>"
+        member:
+          lore:
+            role: "<gray>Ruolo: <yellow><role></yellow>"
+            status_online: "<gray>Status: <green>Online</green>"
+            status_offline: "<gray>Status: <red>Offline</red>"
+      roles:
+        title: "<yellow>Ruoli</yellow> <gray>- <city></gray>"
+        flag:
+          invite: "Invita"
+          kick: "Espelli"
+          manage: "Gestione membri"
+        toggle:
+          enabled:
+            title: "<green>Inviti abilitati</green>"
+            lore1: "<gray>Toggle interattivo template</gray>"
+          disabled:
+            title: "<red>Inviti disabilitati</red>"
+            lore1: "<gray>Toggle interattivo template</gray>"
+      taxes:
+        title: "<gold>Tasse</gold> <gray>- <city></gray>"
+        monthly:
+          title: "<gold>Tassa mensile</gold>"
+          lore:
+            tier: "<gray>Tier: <white><tier></white>"
+            cost: "<gray>Costo: <white><cost></white>"
+            next_due: "<gray>Prossima scadenza: <white><date></white>"
+        freeze:
+          enabled:
+            title: "<red>Freeze attivo</red>"
+          disabled:
+            title: "<green>Nessun freeze attivo</green>"
+          lore1: "<gray>Inviti, upgrade e claim sono bloccati</gray>"
+          lore2: "<gray>solo durante lo stato freeze</gray>"
+      wizard:
+        step1:
+          title: "<light_purple>Wizard Creazione</light_purple> <gray>- Step 1</gray>"
+        step2:
+          title: "<light_purple>Wizard Creazione</light_purple> <gray>- Step 2</gray>"
+        confirm:
+          title: "<light_purple>Wizard Creazione</light_purple> <gray>- Conferma</gray>"
+          preview:
+            title: "<green>Conferma flusso template</green>"
+            lore1: "<gray>Nome/Tag sono legati allo state GUI</gray>"
+            lore2: "<gray>tramite DialogResponseBinding</gray>"
+            lore3: "<gray>Scope preview-only, no persistence</gray>"
+      requests:
+        title: "<aqua>Richieste</aqua> <gray>- <city></gray>"
+        empty:
+          title: "<gray>Nessun ticket</gray>"
+          lore1: "<gray>Non ci sono richieste disponibili</gray>"
+        ticket:
+          title: "<white><type></white> <gray>#<ticket></gray>"
+          lore:
+            status: "<gray>Status: <yellow><status></yellow>"
+            reason: "<gray>Motivo: <white><reason></white>"
+            pending: "<green>Click: annulla ticket</green>"
+            locked: "<gray>Ticket non annullabile</gray>"
+      claim_shop:
+        title: "<green>Claim Shop</green> <gray>- <city></gray>"
+        quota:
+          title: "<aqua>Quota città</aqua>"
+          lore:
+            owner: "<gray>Owner: <white><owner></white>"
+            total: "<gray>Totale acquistati: <white><total></white>"
+            active: "<gray>Attivi nel claim: <white><active></white>"
+        pack:
+          title: "<green>+<blocks> blocchi</green>"
+          lore:
+            cost: "<gray>Costo: <white><cost></white>"
+            payment: "<gray>Pagamento: treasury -> wallet capo</gray>"
+            click: "<yellow>Click per acquistare</yellow>"
+      upgrade:
+        title: "<gold>Upgrade</gold> <gray>- <city></gray>"
+        request_upgrade:
+          title: "<green>Richiedi upgrade</green>"
+          lore1: "<gray>Invia ticket staff per upgrade tier</gray>"
+        request_delete:
+          title: "<red>Richiedi delete</red>"
+          lore1: "<gray>Se BORGO: delete immediata</gray>"
+          lore2: "<gray>Altrimenti: ticket staff</gray>"
+        open_requests:
+          title: "<yellow>Richieste</yellow>"
+          lore1: "<gray>Apri coda richieste città</gray>"
+      delete:
+        title: "<red>Delete</red> <gray>- <city></gray>"
+        confirm:
+          title: "<red>Conferma richiesta delete</red>"
+          lore1: "<gray>Questo flow invia richiesta staff</gray>"
+          lore2: "<gray>Per BORGO la delete è immediata</gray>"
+      staff:
+        queue:
+          title: "<aqua>Staff Ticket Queue</aqua>"
+          refresh:
+            title: "<yellow>Aggiorna</yellow>"
+            lore1: "<gray>Ricarica la coda</gray>"
+          ticket:
+            title: "<white><type></white> <gray>#<ticket></gray>"
+            lore:
+              status: "<gray>Status: <yellow><status></yellow>"
+              reason: "<gray>Motivo: <white><reason></white>"
+              click: "<yellow>Click per aprire dettaglio</yellow>"
+        detail:
+          title: "<aqua>Staff Ticket Detail</aqua>"
+          ticket:
+            title: "<white>Ticket #<ticket></white>"
+            lore:
+              type: "<gray>Tipo: <yellow><type></yellow>"
+              status: "<gray>Status: <yellow><status></yellow>"
+              reason: "<gray>Motivo: <white><reason></white>"
+          back:
+            title: "<gray>Back queue</gray>"
+          approve:
+            title: "<green>Approva</green>"
+            lore1: "<gray>Approva ticket selezionato</gray>"
+          reject:
+            title: "<red>Rifiuta</red>"
+            lore1: "<gray>Rifiuta ticket selezionato</gray>"
     create:
       in_progress: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Creazione città in corso.</yellow>"
     error:
       generic: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione fallita.</red>"
       city_name_tag_conflict: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Nome o tag già in uso.</red>"
+    # alias legacy per compatibilità con vecchi path chiavi
+    city_name_tag_conflict: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Nome o tag già in uso.</red>"
     city:
       no_permission: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.player</yellow>"
       no_permission_moderation: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso mancante:</red> <yellow>cittaexp.city.moderation</yellow>"
       player_only: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Questo comando è solo per player.</red>"
       usage:
-        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <create|info|invite|request|kick|leave|roles|vice|perms|freeze></white>"
-        create: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city create <name> <tag></white>"
+        root: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/<label> <create|info|invite|request|kick|leave|roles|vice|perms|freeze|claimblocks|style|banner></white>"
+        create: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city create <name> <tag> [bannerSpec] [armorSpec]</white>"
         invite: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite <player></white>"
         invite_accept: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite accept <invitationId></white>"
         invite_deny: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city invite deny <invitationId></white>"
-        request: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request <join|approve|reject> ...</white>"
+        request: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request <join|approve|reject|upgrade|unfreeze|delete|list [pending|all]|cancel> ...</white>"
         request_join: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request join <city> [messaggio]</white>"
         request_approve: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request approve <requestId></white>"
         request_reject: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request reject <requestId> [nota]</white>"
+        request_cancel: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city request cancel <ticketId> [nota]</white>"
         kick: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city kick <player></white>"
-        roles: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles <list|toggle></white>"
+        roles: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles [list|toggle]</white>"
         roles_toggle: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city roles toggle <roleKey> <invite|kick|manage_members|manage_roles|request_upgrade|expand_claims|manage_settings> <on|off></white>"
         vice: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city vice <set|clear|info> [player]</white>"
         vice_set: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city vice set <player></white>"
         perms: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city perms <player|set></white>"
         perms_set: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city perms set <player> <access|container|build> <on|off></white>"
         freeze: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city freeze status</white>"
+        claimblocks: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city claimblocks <info|shop|buy></white>"
+        claimblocks_buy: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city claimblocks buy <blocks></white>"
+        style: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city style <show|set></white>"
+        style_set: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city style set <banner|armor> <spec></white>"
+        banner: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Uso:</yellow> <white>/city banner <show|setlocation|clearlocation|place|remove> [bannerSpec]</white>"
+      gui:
+        open:
+          dashboard: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Dashboard città aperta.</green>"
+          roles: "<gray>[<gold>CittaEXP</gold>]</gray> <green>GUI ruoli aperta.</green>"
+          requests: "<gray>[<gold>CittaEXP</gold>]</gray> <green>GUI richieste aperta.</green>"
+          claim_shop: "<gray>[<gold>CittaEXP</gold>]</gray> <green>GUI claim shop aperta.</green>"
+          failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Apertura GUI fallita:</red> <yellow><screen> -> <result></yellow>"
       create:
         in_progress: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Creazione città in corso:</yellow> <aqua><city> [<tag>]</aqua>"
-        success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Città creata:</green> <aqua><city> [<tag>]</aqua> <gray>(tier=<tier>)</gray>"
+        success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Città creata:</green> <aqua><city> [<tag>]</aqua> <gray>(tier=<tier> banner=<banner> armor=<armor>)</gray>"
         failed:
-          claims_unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <red>HuskClaims non disponibile.</red>"
+          claims_unavailable: "<gray>[<gold>CittaEXP</gold>]</gray> <red>GriefPrevention non disponibile.</red>"
           claim: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Creazione claim fallita:</red> <yellow><reason></yellow>"
           persistence: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Persistenza città fallita. Claim rollback eseguito.</red>"
           persistence_rollback_failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Persistenza città fallita e rollback claim non riuscito:</red> <yellow><reason></yellow>"
@@ -108,6 +386,14 @@ default:
           sent: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Richiesta inviata a</green> <aqua><city></aqua>"
         approved: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Richiesta approvata.</green>"
         rejected: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Richiesta rifiutata.</yellow>"
+        delete:
+          immediate: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Borgo eliminato immediatamente:</yellow> <aqua><city> [<tag>]</aqua>"
+        ticket:
+          created: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Ticket creato:</green> <white><ticket_id></white> <gray>(<type>/<status>)</gray>"
+          cancelled: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Ticket annullato:</yellow> <white><ticket_id></white> <gray>(<status>)</gray>"
+          list:
+            title: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Ticket città:</aqua> <white><count></white>"
+            entry: "<gray>[<gold>CittaEXP</gold>]</gray> <white><ticket_id></white> <gray><type>/<status></gray> <yellow><reason></yellow>"
       kick:
         success: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Membro espulso:</yellow> <aqua><player></aqua>"
       leave:
@@ -132,17 +418,60 @@ default:
           success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Permesso aggiornato:</green> <white><player></white> <gray><flag>=<value></gray>"
       freeze:
         status: "<gray>[<gold>CittaEXP</gold>]</gray> <white>Freeze status <city></white> <gray>-></gray> <yellow><value></yellow>"
+      claimblocks:
+        info: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Claim blocks città</aqua> <gray>owner=<owner> total=<total> active=<active></gray>"
+        shop:
+          opened: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Shop blocchi claim aperto.</green>"
+          purchase:
+            success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Acquisto completato:</green> <white>+<blocks></white> <gray>cost=<cost> treasury=<treasury> leader=<leader> active=<active></gray>"
+        error:
+          disabled: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Shop blocchi claim disabilitato.</red>"
+          quest_gated: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Shop blocchi claim bloccato da quest/city-level.</red>"
+          tier_blocked: "<gray>[<gold>CittaEXP</gold>]</gray> <red>I Borghi non possono acquistare blocchi claim.</red>"
+          funds_missing: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Fondi insufficienti (treasury + wallet capo).</red>"
+          range: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Quantità blocchi fuori range configurato.</red>"
+          purchase_failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Acquisto blocchi claim fallito.</red>"
+          reclaim_failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Delete bloccata: impossibile rimuovere i blocchi claim ora, riprova più tardi.</red>"
+          resize_denied: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Solo Capo o Vice possono ridimensionare il claim città.</red>"
+      style:
+        show: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Style città</aqua> <gray>banner=<banner> armor=<armor> location=<location></gray>"
+        set:
+          banner:
+            success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Banner città aggiornato:</green> <white><banner></white>"
+          armor:
+            success: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Armatura città aggiornata:</green> <white><armor></white>"
+        error:
+          invalid_banner: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Banner non valido o vuoto.</red>"
+          invalid_armor: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Armatura non valida o vuota.</red>"
+      banner:
+        show: "<gray>[<gold>CittaEXP</gold>]</gray> <aqua>Stendardo città</aqua> <gray>banner=<banner> location=<location></gray>"
+        location:
+          set: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Location stendardo salvata:</green> <white><world> <x> <y> <z></white> <gray>(render=<rendered>)</gray>"
+          cleared: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Location stendardo rimossa.</yellow> <gray>(display rimossi=<removed>)</gray>"
+        place: "<gray>[<gold>CittaEXP</gold>]</gray> <green>Render stendardo eseguito.</green> <gray>(ok=<rendered>)</gray>"
+        remove: "<gray>[<gold>CittaEXP</gold>]</gray> <yellow>Display stendardo rimossi:</yellow> <white><removed></white>"
+        error:
+          style_missing: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Style città non ancora configurato.</red>"
+          world_missing: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Mondo non valido per lo stendardo.</red>"
       error:
         generic: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Operazione fallita.</red> <gray>(<reason>)</gray>"
         city_not_found: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Città non trovata.</red>"
         city_name_tag_conflict: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Nome o tag già in uso.</red>"
         player_already_in_city: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Sei già in una città.</red>"
         player_not_in_city: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Non sei membro attivo di una città.</red>"
+        city_not_frozen: "<gray>[<gold>CittaEXP</gold>]</gray> <red>La città non è in freeze.</red>"
         freeze_restricted: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Azione bloccata: città in freeze.</red>"
         permission_denied: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permesso ruolo insufficiente.</red>"
         leader_restricted: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Azione non consentita al leader in questo stato.</red>"
         expired: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Richiesta o invito scaduto.</red>"
         member_limit: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Limite membri raggiunto.</red>"
         role_invalid: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ruolo o flag non valido.</red>"
+        invalid_upgrade_path: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Upgrade tier non valido.</red>"
         claim_sync_failed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Sincronizzazione permessi claim fallita.</red>"
         claim_system_role_immutable: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Permessi claim non modificabili per Capo/Vice.</red>"
+        ticket_pending_exists: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Esiste già un ticket pending di questo tipo.</red>"
+        ticket_not_found: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ticket non trovato.</red>"
+        ticket_not_pending: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Ticket non più pending.</red>"
+        ticket_cancel_not_allowed: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Non puoi annullare questo ticket.</red>"
+        reason_too_short: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Motivazione troppo corta (min 3 caratteri).</red>"
+        reason_too_long: "<gray>[<gold>CittaEXP</gold>]</gray> <red>Motivazione troppo lunga.</red>"

@@ -35,9 +35,10 @@ public final class EconomyConfigLoader {
                 cfg.getInt(root + ".schedule.tickIntervalSeconds", 30)
         );
         EconomySettings.TaxSettings tax = new EconomySettings.TaxSettings(
-                cfg.getLong(root + ".tax.borgoMonthlyCost", 1000L),
-                cfg.getLong(root + ".tax.villaggioMonthlyCost", 2500L),
-                cfg.getLong(root + ".tax.regnoMonthlyCost", 5000L),
+                cfg.getBoolean(root + ".tax.enabled", true),
+                cfg.getLong(root + ".tax.borgoMonthlyCost", 50_000L),
+                cfg.getLong(root + ".tax.villaggioMonthlyCost", 250_000L),
+                cfg.getLong(root + ".tax.regnoMonthlyCost", 500_000L),
                 cfg.getLong(root + ".tax.regnoShopMonthlyExtraCost", 0L),
                 cfg.getInt(root + ".tax.dueDayOfMonth", 1)
         );

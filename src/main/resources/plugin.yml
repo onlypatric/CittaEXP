@@ -5,14 +5,14 @@ api-version: '1.21'
 authors: [Patric]
 description: Framework plugin city-first con GUI di anteprima per Paper.
 softdepend: [ItemsAdder]
-depend: [Vault, HuskClaims, ClassificheEXP]
+depend: [Vault, GriefPrevention, ClassificheExp]
 commands:
   cittaexp:
     description: Comandi anteprima GUI e diagnostica di CittaEXP
     usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog|staff>
   city:
     description: Comandi lifecycle città per player
-    usage: /city <create|info|invite|request|kick|leave|roles|vice|perms|freeze>
+    usage: /city <create|info|invite|request|kick|leave|roles|vice|perms|freeze|claimblocks|style|banner>
 permissions:
   cittaexp.admin.gui.preview:
     description: Allows opening GUI previews and controlling scenarios/themes
@@ -24,5 +24,5 @@ permissions:
     description: Moderazione membri/ruoli città (leader o ruoli delegati)
     default: true
   cittaexp.staff.freeze:
-    description: Freeze/unfreeze/delete staff via /cittaexp staff city
+    description: Moderazione staff via /cittaexp staff city|ticket
     default: op

@@ -66,7 +66,7 @@ class DefaultEconomyServiceTest {
         EconomySettings economySettings = new EconomySettings(
                 true,
                 new EconomySettings.ScheduleSettings("Europe/Rome", LocalTime.of(0, 5), true, true, 30),
-                new EconomySettings.TaxSettings(1000L, 2500L, 5000L, 0L, 1),
+                new EconomySettings.TaxSettings(true, 1000L, 2500L, 5000L, 0L, 1),
                 new EconomySettings.CapitalSettings(1500L, "PRIMARY")
         );
         service = new DefaultEconomyService(

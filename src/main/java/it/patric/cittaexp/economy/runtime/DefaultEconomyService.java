@@ -121,6 +121,9 @@ public final class DefaultEconomyService implements TaxService, CapitalService, 
                 "[CittaEXP][economy] monthly engine started timezone="
                         + zoneId + " runTime=" + runTime + " catchUp=" + settings.schedule().catchUpEnabled()
         );
+        if (!settings.tax().enabled()) {
+            logger.info("[CittaEXP][economy] tax collection disabled by config (economy.tax.enabled=false)");
+        }
     }
 
     public void stop() {
@@ -193,6 +196,9 @@ public final class DefaultEconomyService implements TaxService, CapitalService, 
     public CityTaxPreview previewCityTax(UUID cityId, YearMonth month) {
         Objects.requireNonNull(cityId, "cityId");
         Objects.requireNonNull(month, "month");
+        if (!settings.tax().enabled()) {
+            return new CityTaxPreview(cityId, month, 0L, 0L, 0L, 0L, true);
+        }
         CityRecord city = readPort.findCityById(cityId)
                 .orElseThrow(() -> new IllegalStateException("city-not-found"));
         TaxPolicy policy = currentPolicy();
@@ -522,6 +528,9 @@ public final class DefaultEconomyService implements TaxService, CapitalService, 
     }
 
     private TaxCityResult collectTax(CityRecord city, TaxPolicy policy, YearMonth month, TriggerType triggerType) {
+        if (!settings.tax().enabled()) {
+            return TaxCityResult.skippedResult();
+        }
         if (shouldSkipForCreationMonth(city, month)) {
             return TaxCityResult.skippedResult();
         }

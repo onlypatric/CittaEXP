@@ -1,26 +1,45 @@
 package it.patric.cittaexp.command;
 
 import dev.patric.commonlib.api.MessageService;
+import it.patric.cittaexp.core.model.City;
 import it.patric.cittaexp.core.model.CityRole;
+import it.patric.cittaexp.core.model.CityTier;
 import it.patric.cittaexp.core.model.MemberClaimPermissions;
 import it.patric.cittaexp.core.model.RolePermissionSet;
+import it.patric.cittaexp.core.model.StaffApprovalTicket;
+import it.patric.cittaexp.core.model.TicketType;
 import it.patric.cittaexp.core.runtime.DefaultCityLifecycleService;
+import it.patric.cittaexp.core.service.CityClaimBlockService;
+import it.patric.cittaexp.core.service.CityModerationService;
+import it.patric.cittaexp.core.service.StaffApprovalService;
 import it.patric.cittaexp.core.view.MemberClaimPermissionsView;
+import it.patric.cittaexp.preview.PreviewScenario;
+import it.patric.cittaexp.preview.ThemeMode;
+import it.patric.cittaexp.style.CityBannerDisplayService;
+import it.patric.cittaexp.style.CityStyleRecord;
+import it.patric.cittaexp.style.CityStyleService;
+import it.patric.cittaexp.ui.contract.UiScreenKey;
+import it.patric.cittaexp.ui.framework.GuiFlowOrchestrator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.logging.Level;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,12 +54,56 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
 
     private final Plugin plugin;
     private final DefaultCityLifecycleService lifecycleService;
+    private final StaffApprovalService staffApprovalService;
+    private final CityModerationService cityModerationService;
+    private final CityClaimBlockService claimBlockService;
+    private final GuiFlowOrchestrator guiFlowOrchestrator;
     private final MessageService messageService;
+    private final CityStyleService cityStyleService;
+    private final CityBannerDisplayService bannerDisplayService;
 
-    public CityCommand(Plugin plugin, DefaultCityLifecycleService lifecycleService, MessageService messageService) {
+    public CityCommand(
+            Plugin plugin,
+            DefaultCityLifecycleService lifecycleService,
+            StaffApprovalService staffApprovalService,
+            CityModerationService cityModerationService,
+            CityClaimBlockService claimBlockService,
+            GuiFlowOrchestrator guiFlowOrchestrator,
+            MessageService messageService
+    ) {
+        this(
+                plugin,
+                lifecycleService,
+                staffApprovalService,
+                cityModerationService,
+                claimBlockService,
+                guiFlowOrchestrator,
+                messageService,
+                new InMemoryCityStyleService(),
+                null
+        );
+    }
+
+    public CityCommand(
+            Plugin plugin,
+            DefaultCityLifecycleService lifecycleService,
+            StaffApprovalService staffApprovalService,
+            CityModerationService cityModerationService,
+            CityClaimBlockService claimBlockService,
+            GuiFlowOrchestrator guiFlowOrchestrator,
+            MessageService messageService,
+            CityStyleService cityStyleService,
+            CityBannerDisplayService bannerDisplayService
+    ) {
         this.plugin = Objects.requireNonNull(plugin, "plugin");
         this.lifecycleService = Objects.requireNonNull(lifecycleService, "lifecycleService");
+        this.staffApprovalService = Objects.requireNonNull(staffApprovalService, "staffApprovalService");
+        this.cityModerationService = Objects.requireNonNull(cityModerationService, "cityModerationService");
+        this.claimBlockService = Objects.requireNonNull(claimBlockService, "claimBlockService");
+        this.guiFlowOrchestrator = Objects.requireNonNull(guiFlowOrchestrator, "guiFlowOrchestrator");
         this.messageService = Objects.requireNonNull(messageService, "messageService");
+        this.cityStyleService = Objects.requireNonNull(cityStyleService, "cityStyleService");
+        this.bannerDisplayService = bannerDisplayService;
     }
 
     @Override
@@ -71,6 +134,9 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                 case "vice" -> handleVice(player, args);
                 case "perms" -> handlePerms(player, args);
                 case "freeze" -> handleFreezeStatus(player, args);
+                case "claimblocks" -> handleClaimBlocks(player, args);
+                case "style" -> handleStyle(player, args);
+                case "banner" -> handleBanner(player, args);
                 default -> {
                     sender.sendMessage(msg(sender, "cittaexp.city.usage.root", Map.of("label", label)));
                     yield true;
@@ -87,6 +153,8 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(msg(player, "cittaexp.city.usage.create"));
             return true;
         }
+        String bannerSpec = args.length >= 4 ? args[3] : "";
+        String armorSpec = args.length >= 5 ? args[4] : "";
 
         var location = player.getLocation();
         var createCommand = new it.patric.cittaexp.core.service.CityLifecycleService.CreateCityCommand(
@@ -96,8 +164,8 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                 location.getWorld() == null ? "world" : location.getWorld().getName(),
                 location.getBlockX(),
                 location.getBlockZ(),
-                "",
-                ""
+                bannerSpec,
+                armorSpec
         );
 
         player.sendMessage(msg(player, "cittaexp.city.create.in_progress", Map.of(
@@ -111,6 +179,11 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                         return;
                     }
                     if (throwable == null) {
+                        CityStyleRecord style = cityStyleService.saveOnCreate(
+                                created.cityId(),
+                                bannerSpec,
+                                armorSpec
+                        );
                         plugin.getLogger().info(
                                 "[CittaEXP][command] /city create success"
                                         + " player=" + player.getUniqueId()
@@ -120,7 +193,9 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                         player.sendMessage(msg(player, "cittaexp.city.create.success", Map.of(
                                 "city", created.name(),
                                 "tag", created.tag(),
-                                "tier", created.tier().name()
+                                "tier", created.tier().name(),
+                                "banner", style.bannerSpec().isBlank() ? "-" : style.bannerSpec(),
+                                "armor", style.armorSpec().isBlank() ? "-" : style.armorSpec()
                         )));
                         return;
                     }
@@ -142,6 +217,11 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleInfo(Player player, String[] args) {
+        if (args.length >= 2 && "gui".equalsIgnoreCase(args[1])) {
+            ensurePlayerHasCity(player);
+            openProductionGui(player, UiScreenKey.DASHBOARD, "cittaexp.city.gui.open.dashboard");
+            return true;
+        }
         var maybeCity = (args.length >= 2)
                 ? lifecycleService.cityByReference(args[1])
                 : lifecycleService.cityByPlayer(player.getUniqueId());
@@ -248,6 +328,94 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(msg(player, "cittaexp.city.request.rejected"));
             return true;
         }
+        if ("upgrade".equals(sub) || "unfreeze".equals(sub) || "delete".equals(sub)) {
+            var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                    .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+            String note = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)).trim() : "";
+            if (note.isBlank()) {
+                throw new IllegalStateException("reason-too-short");
+            }
+            if ("delete".equals(sub) && city.tier() == CityTier.BORGO) {
+                cityModerationService.deleteCity(city.cityId().toString(), player.getUniqueId(), "borgo-autonomous-delete:" + note);
+                player.sendMessage(msg(
+                        player,
+                        "cittaexp.city.request.delete.immediate",
+                        Map.of("city", city.name(), "tag", city.tag())
+                ));
+                return true;
+            }
+            TicketType type = switch (sub) {
+                case "upgrade" -> TicketType.UPGRADE;
+                case "unfreeze" -> TicketType.UNFREEZE;
+                case "delete" -> TicketType.DELETE;
+                default -> throw new IllegalStateException("ticket-type-invalid");
+            };
+            StaffApprovalTicket ticket = staffApprovalService.request(
+                    city.cityId(),
+                    player.getUniqueId(),
+                    type,
+                    note,
+                    "{}"
+            );
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.request.ticket.created",
+                    Map.of(
+                            "ticket_id", ticket.ticketId().toString(),
+                            "type", ticket.type().name(),
+                            "status", ticket.status().name()
+                    )
+            ));
+            return true;
+        }
+        if ("list".equals(sub)) {
+            var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                    .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+            boolean pendingOnly = args.length < 3 || !"all".equalsIgnoreCase(args[2]);
+            openProductionGui(player, UiScreenKey.REQUESTS_QUEUE, "cittaexp.city.gui.open.requests");
+            List<StaffApprovalTicket> tickets = staffApprovalService.list(
+                    20,
+                    pendingOnly ? it.patric.cittaexp.core.model.TicketStatus.PENDING : null,
+                    null,
+                    city.cityId()
+            );
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.request.ticket.list.title",
+                    Map.of("count", String.valueOf(tickets.size()))
+            ));
+            for (StaffApprovalTicket ticket : tickets) {
+                player.sendMessage(msg(
+                        player,
+                        "cittaexp.city.request.ticket.list.entry",
+                        Map.of(
+                                "ticket_id", ticket.ticketId().toString(),
+                                "type", ticket.type().name(),
+                                "status", ticket.status().name(),
+                                "reason", ticket.reason()
+                        )
+                ));
+            }
+            return true;
+        }
+        if ("cancel".equals(sub)) {
+            if (args.length < 3) {
+                player.sendMessage(msg(player, "cittaexp.city.usage.request_cancel"));
+                return true;
+            }
+            UUID ticketId = UUID.fromString(args[2]);
+            String note = args.length >= 4 ? String.join(" ", Arrays.copyOfRange(args, 3, args.length)).trim() : "cancelled";
+            StaffApprovalTicket cancelled = staffApprovalService.cancel(ticketId, player.getUniqueId(), note);
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.request.ticket.cancelled",
+                    Map.of(
+                            "ticket_id", cancelled.ticketId().toString(),
+                            "status", cancelled.status().name()
+                    )
+            ));
+            return true;
+        }
 
         player.sendMessage(msg(player, "cittaexp.city.usage.request"));
         return true;
@@ -281,8 +449,9 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleRoles(Player player, String[] args) {
-        if (args.length < 2) {
-            player.sendMessage(msg(player, "cittaexp.city.usage.roles"));
+        if (args.length == 1) {
+            ensurePlayerHasCity(player);
+            openProductionGui(player, UiScreenKey.ROLES, "cittaexp.city.gui.open.roles");
             return true;
         }
         var city = lifecycleService.cityByPlayer(player.getUniqueId())
@@ -482,12 +651,224 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean handleClaimBlocks(Player player, String[] args) {
+        var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+        if (args.length < 2) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.claimblocks"));
+            return true;
+        }
+        String sub = args[1].toLowerCase(Locale.ROOT);
+        if ("info".equals(sub)) {
+            CityClaimBlockService.QuotaSnapshot snapshot = claimBlockService.quotaSnapshot(city.cityId());
+            player.sendMessage(msg(player, "cittaexp.city.claimblocks.info", Map.of(
+                    "owner", snapshot.ownerUuid().toString(),
+                    "total", String.valueOf(snapshot.totalPurchasedBlocks()),
+                    "active", String.valueOf(snapshot.activeAllocatedBlocks())
+            )));
+            return true;
+        }
+        if ("shop".equals(sub)) {
+            openProductionGui(player, UiScreenKey.CLAIM_SHOP, "cittaexp.city.gui.open.claim_shop");
+            return true;
+        }
+        if ("buy".equals(sub)) {
+            if (args.length < 3) {
+                player.sendMessage(msg(player, "cittaexp.city.usage.claimblocks_buy"));
+                return true;
+            }
+            int blocks = Integer.parseInt(args[2]);
+            CityClaimBlockService.PurchaseOutcome outcome = claimBlockService.purchaseBlocks(
+                    city.cityId(),
+                    player.getUniqueId(),
+                    blocks,
+                    "command-buy"
+            );
+            player.sendMessage(msg(player, "cittaexp.city.claimblocks.shop.purchase.success", Map.of(
+                    "blocks", String.valueOf(outcome.purchasedBlocks()),
+                    "cost", String.valueOf(outcome.totalCost()),
+                    "treasury", String.valueOf(outcome.treasuryContribution()),
+                    "leader", String.valueOf(outcome.leaderContribution()),
+                    "active", String.valueOf(outcome.newActiveAllocatedBlocks())
+            )));
+            return true;
+        }
+        player.sendMessage(msg(player, "cittaexp.city.usage.claimblocks"));
+        return true;
+    }
+
+    private boolean handleStyle(Player player, String[] args) {
+        var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+        if (args.length < 2) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.style"));
+            return true;
+        }
+        String sub = args[1].toLowerCase(Locale.ROOT);
+        if ("show".equals(sub)) {
+            CityStyleRecord style = cityStyleService.find(city.cityId())
+                    .orElse(new CityStyleRecord(city.cityId(), "", "", CityStyleRecord.BannerLocation.empty(), 0L));
+            String location = style.bannerLocation().configured()
+                    ? style.bannerLocation().world() + " "
+                    + Math.round(style.bannerLocation().x()) + ","
+                    + Math.round(style.bannerLocation().y()) + ","
+                    + Math.round(style.bannerLocation().z())
+                    : "-";
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.style.show",
+                    Map.of(
+                            "banner", style.bannerSpec().isBlank() ? "-" : style.bannerSpec(),
+                            "armor", style.armorSpec().isBlank() ? "-" : style.armorSpec(),
+                            "location", location
+                    )
+            ));
+            return true;
+        }
+        if (!isLeader(player, city)) {
+            throw new IllegalStateException("leader-required");
+        }
+        if (!"set".equals(sub)) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.style"));
+            return true;
+        }
+        if (args.length < 4) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.style_set"));
+            return true;
+        }
+        String field = args[2].toLowerCase(Locale.ROOT);
+        String value = String.join(" ", Arrays.copyOfRange(args, 3, args.length)).trim();
+        if (value.isBlank()) {
+            throw new IllegalStateException(field + "Spec-blank");
+        }
+        if ("banner".equals(field)) {
+            CityStyleRecord updated = cityStyleService.updateBanner(city.cityId(), value);
+            if (bannerDisplayService != null && updated.bannerLocation().configured()) {
+                bannerDisplayService.render(city.cityId(), updated);
+            }
+            player.sendMessage(msg(player, "cittaexp.city.style.set.banner.success", Map.of("banner", updated.bannerSpec())));
+            return true;
+        }
+        if ("armor".equals(field)) {
+            CityStyleRecord updated = cityStyleService.updateArmor(city.cityId(), value);
+            player.sendMessage(msg(player, "cittaexp.city.style.set.armor.success", Map.of("armor", updated.armorSpec())));
+            return true;
+        }
+        player.sendMessage(msg(player, "cittaexp.city.usage.style_set"));
+        return true;
+    }
+
+    private boolean handleBanner(Player player, String[] args) {
+        var city = lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+        if (args.length < 2) {
+            player.sendMessage(msg(player, "cittaexp.city.usage.banner"));
+            return true;
+        }
+        String sub = args[1].toLowerCase(Locale.ROOT);
+        if ("show".equals(sub)) {
+            CityStyleRecord style = cityStyleService.find(city.cityId())
+                    .orElse(new CityStyleRecord(city.cityId(), "", "", CityStyleRecord.BannerLocation.empty(), 0L));
+            String location = style.bannerLocation().configured()
+                    ? style.bannerLocation().world() + " "
+                    + Math.round(style.bannerLocation().x()) + ","
+                    + Math.round(style.bannerLocation().y()) + ","
+                    + Math.round(style.bannerLocation().z())
+                    : "-";
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.banner.show",
+                    Map.of(
+                            "banner", style.bannerSpec().isBlank() ? "-" : style.bannerSpec(),
+                            "location", location
+                    )
+            ));
+            return true;
+        }
+        if (!isLeader(player, city)) {
+            throw new IllegalStateException("leader-required");
+        }
+        if ("setlocation".equals(sub)) {
+            Location location = player.getLocation();
+            World world = location.getWorld();
+            if (world == null) {
+                throw new IllegalStateException("city-banner-world-missing");
+            }
+            CityStyleRecord style = cityStyleService.setBannerLocation(
+                    city.cityId(),
+                    world.getName(),
+                    location.getX(),
+                    location.getY(),
+                    location.getZ(),
+                    location.getYaw(),
+                    location.getPitch()
+            );
+            if (args.length >= 3) {
+                String bannerSpec = String.join(" ", Arrays.copyOfRange(args, 2, args.length)).trim();
+                if (!bannerSpec.isBlank()) {
+                    style = cityStyleService.updateBanner(city.cityId(), bannerSpec);
+                    style = cityStyleService.setBannerLocation(
+                            city.cityId(),
+                            world.getName(),
+                            location.getX(),
+                            location.getY(),
+                            location.getZ(),
+                            location.getYaw(),
+                            location.getPitch()
+                    );
+                }
+            }
+            boolean rendered = bannerDisplayService != null && bannerDisplayService.render(city.cityId(), style);
+            player.sendMessage(msg(
+                    player,
+                    "cittaexp.city.banner.location.set",
+                    Map.of(
+                            "world", world.getName(),
+                            "x", String.valueOf(Math.round(location.getX())),
+                            "y", String.valueOf(Math.round(location.getY())),
+                            "z", String.valueOf(Math.round(location.getZ())),
+                            "rendered", String.valueOf(rendered)
+                    )
+            ));
+            return true;
+        }
+        if ("clearlocation".equals(sub)) {
+            cityStyleService.clearBannerLocation(city.cityId());
+            int removed = bannerDisplayService == null ? 0 : bannerDisplayService.remove(city.cityId());
+            player.sendMessage(msg(player, "cittaexp.city.banner.location.cleared", Map.of("removed", String.valueOf(removed))));
+            return true;
+        }
+        if ("place".equals(sub)) {
+            CityStyleRecord style = cityStyleService.find(city.cityId())
+                    .orElseThrow(() -> new IllegalStateException("city-banner-style-missing"));
+            boolean rendered = bannerDisplayService != null && bannerDisplayService.render(city.cityId(), style);
+            player.sendMessage(msg(player, "cittaexp.city.banner.place", Map.of("rendered", String.valueOf(rendered))));
+            return true;
+        }
+        if ("remove".equals(sub)) {
+            int removed = bannerDisplayService == null ? 0 : bannerDisplayService.remove(city.cityId());
+            player.sendMessage(msg(player, "cittaexp.city.banner.remove", Map.of("removed", String.valueOf(removed))));
+            return true;
+        }
+        player.sendMessage(msg(player, "cittaexp.city.usage.banner"));
+        return true;
+    }
+
     private Component msg(CommandSender sender, String key) {
         return msg(sender, key, Map.of());
     }
 
     private Component msg(CommandSender sender, String key, Map<String, String> placeholders) {
-        return messageService.render(key, placeholders, resolveLocale(sender));
+        try {
+            return messageService.render(key, placeholders, resolveLocale(sender));
+        } catch (RuntimeException ex) {
+            plugin.getLogger().log(
+                    Level.WARNING,
+                    "Message render failed key=" + key + " placeholders=" + placeholders,
+                    ex
+            );
+            return messageService.render("cittaexp.city.error.generic", Map.of("reason", key), resolveLocale(sender));
+        }
     }
 
     private static Locale resolveLocale(CommandSender sender) {
@@ -542,16 +923,37 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             case "player-already-in-city" -> "cittaexp.city.error.player_already_in_city";
             case "city-name-tag-conflict" -> "cittaexp.city.error.city_name_tag_conflict";
             case "city-not-found" -> "cittaexp.city.error.city_not_found";
-            case "huskclaims-unavailable" -> "cittaexp.city.create.failed.claims_unavailable";
+            case "city-banner-style-missing" -> "cittaexp.city.banner.error.style_missing";
+            case "city-banner-world-missing" -> "cittaexp.city.banner.error.world_missing";
+            case "bannerSpec-blank" -> "cittaexp.city.style.error.invalid_banner";
+            case "armorSpec-blank" -> "cittaexp.city.style.error.invalid_armor";
+            case "claims-unavailable", "huskclaims-unavailable" -> "cittaexp.city.create.failed.claims_unavailable";
+            case "claim-block-shop-disabled" -> "cittaexp.city.claimblocks.error.disabled";
+            case "claim-block-shop-quest-gated" -> "cittaexp.city.claimblocks.error.quest_gated";
+            case "claim-block-purchase-tier-blocked" -> "cittaexp.city.claimblocks.error.tier_blocked";
+            case "claim-block-purchase-funds-missing" -> "cittaexp.city.claimblocks.error.funds_missing";
+            case "claim-block-purchase-out-of-range" -> "cittaexp.city.claimblocks.error.range";
+            case "claim-block-purchase-grant-failed", "claim-block-purchase-persistence-failed" -> "cittaexp.city.claimblocks.error.purchase_failed";
+            case "claim-block-reclaim-failed:remove-failed" -> "cittaexp.city.claimblocks.error.reclaim_failed";
             case "city-freeze-restricted" -> "cittaexp.city.error.freeze_restricted";
+            case "city-not-frozen" -> "cittaexp.city.error.city_not_frozen";
+            case "ticket-pending-exists" -> "cittaexp.city.error.ticket_pending_exists";
+            case "ticket-not-found" -> "cittaexp.city.error.ticket_not_found";
+            case "ticket-not-pending" -> "cittaexp.city.error.ticket_not_pending";
+            case "ticket-cancel-not-allowed" -> "cittaexp.city.error.ticket_cancel_not_allowed";
+            case "reason-too-short" -> "cittaexp.city.error.reason_too_short";
+            case "reason-too-long" -> "cittaexp.city.error.reason_too_long";
             case "permission-denied-invite", "permission-denied-kick", "permission-denied-manage-members", "permission-denied-manage-roles", "permission-denied-expand-claim", "permission-denied-request-upgrade" -> "cittaexp.city.error.permission_denied";
-            case "leader-must-transfer-before-leave", "leader-must-assign-vice-before-leave", "cannot-kick-leader", "cannot-kick-higher-role", "system-role-is-immutable", "vice-cannot-be-leader" -> "cittaexp.city.error.leader_restricted";
+            case "leader-must-transfer-before-leave", "leader-must-assign-vice-before-leave", "cannot-kick-leader", "cannot-kick-higher-role", "system-role-is-immutable", "vice-cannot-be-leader", "leader-required" -> "cittaexp.city.error.leader_restricted";
             case "invitation-expired", "join-request-expired" -> "cittaexp.city.error.expired";
             case "city-member-limit-reached" -> "cittaexp.city.error.member_limit";
             case "role-not-found", "roles-toggle-flag-invalid", "claim-permission-invalid" -> "cittaexp.city.error.role_invalid";
-            case "claim-binding-missing", "member-claim-sync-failed", "member-claim-sync-clear-failed", "vice-claim-sync-failed", "leader-succession-sync-failed" -> "cittaexp.city.error.claim_sync_failed";
+            case "claim-binding-missing", "member-claim-sync-failed", "member-claim-sync-clear-failed", "vice-claim-sync-failed",
+                 "leader-succession-sync-failed", "claim-owner-transfer-failed", "leader-succession-claim-transfer-failed" -> "cittaexp.city.error.claim_sync_failed";
+            case "claim-block-quota-transfer-failed", "leader-succession-quota-transfer-failed" -> "cittaexp.city.claimblocks.error.purchase_failed";
             case "cannot-modify-system-role-claim-permissions" -> "cittaexp.city.error.claim_system_role_immutable";
             case "player-not-in-city", "member-not-found" -> "cittaexp.city.error.player_not_in_city";
+            case "invalid-tier-upgrade-path" -> "cittaexp.city.error.invalid_upgrade_path";
             default -> "cittaexp.city.error.generic";
         };
     }
@@ -562,6 +964,41 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         }
         player.sendMessage(msg(player, "cittaexp.city.no_permission_moderation"));
         return false;
+    }
+
+    private static boolean isLeader(Player player, City city) {
+        return city.leaderUuid().equals(player.getUniqueId());
+    }
+
+    private void ensurePlayerHasCity(Player player) {
+        lifecycleService.cityByPlayer(player.getUniqueId())
+                .orElseThrow(() -> new IllegalStateException("player-not-in-city"));
+    }
+
+    private void openProductionGui(Player player, UiScreenKey screenKey, String openedMessageKey) {
+        GuiFlowOrchestrator.OpenResult result;
+        try {
+            result = guiFlowOrchestrator.open(
+                    player,
+                    screenKey,
+                    PreviewScenario.DEFAULT,
+                    ThemeMode.AUTO
+            );
+        } catch (RuntimeException ex) {
+            plugin.getLogger().log(Level.WARNING, "City GUI open failed screen=" + screenKey.key(), ex);
+            result = GuiFlowOrchestrator.OpenResult.OPEN_FAILED;
+        }
+        if (result == null) {
+            result = GuiFlowOrchestrator.OpenResult.OPEN_FAILED;
+        }
+        if (result == GuiFlowOrchestrator.OpenResult.OPENED) {
+            player.sendMessage(msg(player, openedMessageKey));
+            return;
+        }
+        player.sendMessage(msg(player, "cittaexp.city.gui.open.failed", Map.of(
+                "screen", screenKey.commandToken(),
+                "result", result.name()
+        )));
     }
 
     private static RuntimeException unwrapRuntime(Throwable throwable) {
@@ -581,10 +1018,13 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             return List.of();
         }
         if (args.length == 1) {
-            return complete(List.of("create", "info", "invite", "request", "kick", "leave", "roles", "vice", "perms", "freeze"), args[0]);
+            return complete(List.of("create", "info", "invite", "request", "kick", "leave", "roles", "vice", "perms", "freeze", "claimblocks", "style", "banner"), args[0]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("info")) {
-            return complete(cityReferences(), args[1]);
+            List<String> options = new ArrayList<>();
+            options.add("gui");
+            options.addAll(cityReferences());
+            return complete(options, args[1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("invite")) {
             List<String> options = new ArrayList<>();
@@ -594,10 +1034,16 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
             return complete(options, args[1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("request")) {
-            return complete(List.of("join", "approve", "reject"), args[1]);
+            return complete(List.of("join", "approve", "reject", "upgrade", "unfreeze", "delete", "list", "cancel"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("request") && args[1].equalsIgnoreCase("list")) {
+            return complete(List.of("pending", "all"), args[2]);
         }
         if (args.length == 3 && args[0].equalsIgnoreCase("request") && args[1].equalsIgnoreCase("join")) {
             return complete(cityReferences(), args[2]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("request") && args[1].equalsIgnoreCase("cancel")) {
+            return complete(currentCityTicketIds(sender), args[2]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("kick")) {
             return complete(currentCityMemberNames(sender), args[1]);
@@ -637,6 +1083,24 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("freeze")) {
             return complete(List.of("status"), args[1]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("claimblocks")) {
+            return complete(List.of("info", "shop", "buy"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("claimblocks") && args[1].equalsIgnoreCase("buy")) {
+            return complete(List.of("512", "1024", "2048", "4096"), args[2]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("style")) {
+            return complete(List.of("show", "set"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("style") && args[1].equalsIgnoreCase("set")) {
+            return complete(List.of("banner", "armor"), args[2]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("banner")) {
+            return complete(List.of("show", "setlocation", "clearlocation", "place", "remove"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("banner") && args[1].equalsIgnoreCase("setlocation")) {
+            return complete(List.of("white_banner", "red_banner", "blue_banner", "black_banner"), args[2]);
         }
         return List.of();
     }
@@ -686,11 +1150,113 @@ public final class CityCommand implements CommandExecutor, TabCompleter {
                 .toList();
     }
 
+    private List<String> currentCityTicketIds(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            return List.of();
+        }
+        var city = lifecycleService.cityByPlayer(player.getUniqueId());
+        if (city.isEmpty()) {
+            return List.of();
+        }
+        return staffApprovalService.list(20, null, null, city.get().cityId()).stream()
+                .filter(ticket -> ticket.status().name().equalsIgnoreCase("PENDING"))
+                .map(ticket -> ticket.ticketId().toString())
+                .toList();
+    }
+
     private static List<String> complete(List<String> options, String token) {
         String normalized = token == null ? "" : token.toLowerCase(Locale.ROOT);
         return options.stream()
                 .filter(option -> option.toLowerCase(Locale.ROOT).startsWith(normalized))
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    private static final class InMemoryCityStyleService implements CityStyleService {
+
+        private final Map<UUID, CityStyleRecord> store = new ConcurrentHashMap<>();
+
+        @Override
+        public Optional<CityStyleRecord> find(UUID cityId) {
+            return Optional.ofNullable(store.get(cityId));
+        }
+
+        @Override
+        public CityStyleRecord saveOnCreate(UUID cityId, String bannerSpec, String armorSpec) {
+            CityStyleRecord current = store.get(cityId);
+            CityStyleRecord next = new CityStyleRecord(
+                    cityId,
+                    nonBlank(bannerSpec, current == null ? "" : current.bannerSpec()),
+                    nonBlank(armorSpec, current == null ? "" : current.armorSpec()),
+                    current == null ? CityStyleRecord.BannerLocation.empty() : current.bannerLocation(),
+                    System.currentTimeMillis()
+            );
+            store.put(cityId, next);
+            return next;
+        }
+
+        @Override
+        public CityStyleRecord updateBanner(UUID cityId, String bannerSpec) {
+            CityStyleRecord current = store.get(cityId);
+            CityStyleRecord next = new CityStyleRecord(
+                    cityId,
+                    bannerSpec,
+                    current == null ? "" : current.armorSpec(),
+                    current == null ? CityStyleRecord.BannerLocation.empty() : current.bannerLocation(),
+                    System.currentTimeMillis()
+            );
+            store.put(cityId, next);
+            return next;
+        }
+
+        @Override
+        public CityStyleRecord updateArmor(UUID cityId, String armorSpec) {
+            CityStyleRecord current = store.get(cityId);
+            CityStyleRecord next = new CityStyleRecord(
+                    cityId,
+                    current == null ? "" : current.bannerSpec(),
+                    armorSpec,
+                    current == null ? CityStyleRecord.BannerLocation.empty() : current.bannerLocation(),
+                    System.currentTimeMillis()
+            );
+            store.put(cityId, next);
+            return next;
+        }
+
+        @Override
+        public CityStyleRecord setBannerLocation(UUID cityId, String world, double x, double y, double z, float yaw, float pitch) {
+            CityStyleRecord current = store.get(cityId);
+            CityStyleRecord next = new CityStyleRecord(
+                    cityId,
+                    current == null ? "" : current.bannerSpec(),
+                    current == null ? "" : current.armorSpec(),
+                    new CityStyleRecord.BannerLocation(world, x, y, z, yaw, pitch),
+                    System.currentTimeMillis()
+            );
+            store.put(cityId, next);
+            return next;
+        }
+
+        @Override
+        public CityStyleRecord clearBannerLocation(UUID cityId) {
+            CityStyleRecord current = store.get(cityId);
+            CityStyleRecord next = new CityStyleRecord(
+                    cityId,
+                    current == null ? "" : current.bannerSpec(),
+                    current == null ? "" : current.armorSpec(),
+                    CityStyleRecord.BannerLocation.empty(),
+                    System.currentTimeMillis()
+            );
+            store.put(cityId, next);
+            return next;
+        }
+
+        private static String nonBlank(String incoming, String fallback) {
+            String normalized = incoming == null ? "" : incoming.trim();
+            if (!normalized.isBlank()) {
+                return normalized;
+            }
+            return fallback == null ? "" : fallback.trim();
+        }
     }
 }

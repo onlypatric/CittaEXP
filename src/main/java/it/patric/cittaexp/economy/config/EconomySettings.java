@@ -34,6 +34,7 @@ public record EconomySettings(
     }
 
     public record TaxSettings(
+            boolean enabled,
             long borgoMonthlyCost,
             long villaggioMonthlyCost,
             long regnoMonthlyCost,

@@ -7,9 +7,10 @@ economy:
     skipCreationMonth: true
     tickIntervalSeconds: 30
   tax:
-    borgoMonthlyCost: 1000
-    villaggioMonthlyCost: 2500
-    regnoMonthlyCost: 5000
+    enabled: true
+    borgoMonthlyCost: 50000
+    villaggioMonthlyCost: 250000
+    regnoMonthlyCost: 500000
     regnoShopMonthlyExtraCost: 0
     dueDayOfMonth: 1
   capital:
