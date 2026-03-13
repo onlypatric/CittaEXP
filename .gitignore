@@ -38,3 +38,7 @@ scripts/quality/slimming-metrics.json
 # Bot harness local deps / artifacts
 scripts/bot-tests/node_modules/
 scripts/bot-tests/.cache/
+
+# Local packaged artifacts / reports
+dist/
+.reports/
