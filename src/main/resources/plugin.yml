@@ -3,26 +3,22 @@ version: ${version}
 main: it.patric.cittaexp.CittaExpPlugin
 api-version: '1.21'
 authors: [Patric]
-description: Framework plugin city-first con GUI di anteprima per Paper.
-softdepend: [ItemsAdder]
-depend: [Vault, GriefPrevention, ClassificheExp]
-commands:
-  cittaexp:
-    description: Comandi anteprima GUI e diagnostica di CittaEXP
-    usage: /cittaexp <dashboard|members|roles|taxes|wizard|scenario|theme|hud|probe|dialog|staff>
-  city:
-    description: Comandi lifecycle città per player
-    usage: /city <create|info|invite|request|kick|leave|roles|vice|perms|freeze|claimblocks|style|banner>
+description: Bootstrap minimale CittaEXP basato su HuskTowns.
+depend: [HuskTowns]
+softdepend: [HuskClaims]
 permissions:
-  cittaexp.admin.gui.preview:
-    description: Allows opening GUI previews and controlling scenarios/themes
+  cittaexp.city.use:
+    description: Accesso ai comandi /city
+    default: true
+  cittaexp.staff.level:
+    description: Accesso staff a /cittaexp staff level ...
     default: op
-  cittaexp.city.player:
-    description: Accesso ai comandi player /city
-    default: true
-  cittaexp.city.moderation:
-    description: Moderazione membri/ruoli città (leader o ruoli delegati)
-    default: true
-  cittaexp.staff.freeze:
-    description: Moderazione staff via /cittaexp staff city|ticket
+  cittaexp.town.level.bypass:
+    description: Bypass tecnico per usare /town level
+    default: op
+  cittaexp.city.players.staff:
+    description: Accesso staff a /cittaexp staff city players <citta>
+    default: op
+  cittaexp.admin.probe:
+    description: Accesso a /cittaexp probe
     default: op

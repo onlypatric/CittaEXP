@@ -1,0 +1,441 @@
+city:
+  create:
+    dialog:
+      intro:
+        title: "<gold>Creazione Citta</gold>"
+        body: "<gray>Benvenuto nella creazione citta.<newline></newline>Clicca <green>Prossimo</green> per inserire nome e tag.</gray>"
+        buttons:
+          cancel: "<red>Annulla</red>"
+          next: "<green>Prossimo</green>"
+      form:
+        title: "<gold>Dati Citta</gold>"
+        body: "<gray>Inserisci il nome della citta (solo alfanumerico) e un tag di 3 lettere.</gray>"
+        inputs:
+          name: "<yellow>Nome citta</yellow>"
+          tag: "<yellow>Tag (3 lettere)</yellow>"
+        buttons:
+          cancel: "<red>Annulla</red>"
+          next: "<green>Prossimo</green>"
+        errors:
+          name_required: "<red>Il nome citta deve contenere solo caratteri alfanumerici (senza spazi).</red>"
+          tag_invalid: "<red>Il tag deve contenere esattamente 3 lettere (A-Z).</red>"
+        create_in_progress: "<gray>Creazione citta in corso...</gray>"
+        create_success: "<green>Citta creata:</green> <yellow>{name}</yellow> <gray>(id: {id})</gray>"
+        create_failed: "<red>Creazione citta fallita:</red> <gray>{error}</gray>"
+        success: "<green>Dati validi:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray>"
+  disband:
+    dialog:
+      title: "<red>Elimina Citta</red>"
+      body: "<gray>Conferma di voler eliminare la tua citta. Questa azione e irreversibile.</gray>"
+      inputs:
+        confirm: "<yellow>Confermo di voler eliminare definitivamente la mia citta</yellow>"
+      buttons:
+        confirm: "<red>CONFERMA</red>"
+        cancel: "<gray>ANNULLA</gray>"
+      in_progress: "<gray>Richiesta eliminazione citta in corso...</gray>"
+      dispatch_failed: "<red>Impossibile eseguire la richiesta di eliminazione adesso.</red>"
+      errors:
+        unavailable: "<red>Dialog non disponibile su questo server.</red>"
+        no_town: "<red>Devi essere membro attivo di una citta.</red>"
+        no_privilege: "<red>Solo il capo citta puo eliminare la citta.</red>"
+        checkbox_required: "<red>Devi spuntare la conferma prima di procedere.</red>"
+  section:
+    gui:
+      title: "<gold>Mappa Claim</gold> <gray>{town}</gray> <dark_gray>[</dark_gray><white>{x}</white><gray>,</gray><white>{z}</white><dark_gray>]</dark_gray>"
+      nav:
+        up: "<yellow>Su</yellow>"
+        down: "<yellow>Giu</yellow>"
+        left: "<yellow>Sinistra</yellow>"
+        right: "<yellow>Destra</yellow>"
+        center: "<aqua>Centra su di te</aqua>"
+        close: "<red>Chiudi</red>"
+      legend:
+        own: "<green>Tuo claim</green>"
+        wilderness: "<gray>Wilderness claimabile</gray>"
+        blocked: "<red>Bloccato/altrui</red>"
+      cell:
+        name: "<white>Chunk</white> <yellow>{x}</yellow><gray>,</gray><yellow>{z}</yellow>"
+        lore:
+          state: "<gray>Stato:</gray> <white>{state}</white>"
+          owner: "<gray>Owner:</gray> <white>{owner}</white>"
+          type: "<gray>Tipo:</gray> <white>{type}</white>"
+          reason: "<gray>Reason:</gray> <white>{reason}</white>"
+          actions: "<dark_gray>LMB: claim/unclaim | RMB: edit type</dark_gray>"
+      actions:
+        claim_success: "<green>Claim richiesto su chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
+        claim_failed: "<red>Claim fallito:</red> <gray>{reason}</gray>"
+        unclaim_success: "<green>Unclaim richiesto su chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
+        unclaim_failed: "<red>Unclaim fallito:</red> <gray>{reason}</gray>"
+        edit_success: "<green>Tipo claim aggiornato a:</green> <yellow>{type}</yellow> <gray>({x},{z})</gray>"
+        edit_failed: "<red>Modifica claim fallita:</red> <gray>{reason}</gray>"
+      errors:
+        no_town: "<red>Devi essere membro attivo di una citta.</red>"
+        world_unavailable: "<red>Mondo non disponibile per la mappa claim.</red>"
+        huskclaims_blocked: "<red>Chunk bloccato: area protetta da HuskClaims.</red>"
+        claimed_other: "<red>Chunk gia claimato da:</red> <yellow>{owner}</yellow>"
+        no_claim_privilege: "<red>Permessi insufficienti per claimare chunk.</red>"
+        no_unclaim_privilege: "<red>Permessi insufficienti per rimuovere claim.</red>"
+        no_edit_privilege: "<red>Permessi insufficienti per modificare il tipo claim.</red>"
+        claim_cap_reached: "<red>Limite claim raggiunto per il tuo stage corrente.</red>"
+        no_adjacent_claim: "<red>Puoi claimare solo chunk adiacenti ai claim gia presenti (tranne il primo claim).</red>"
+        operation_denied: "<red>Non puoi operare su questo chunk secondo le policy attive.</red>"
+        out_of_range: "<red>Chunk troppo distante. Max {range} chunk.</red>"
+        edit_not_allowed: "<red>Puoi modificare il tipo solo sui claim della tua citta.</red>"
+        spawn_claim_protected: "<red>Non puoi rimuovere il claim che contiene lo spawn citta.</red>"
+        claim_missing_runtime: "<red>Claim non trovato o non appartenente alla tua citta.</red>"
+        generic: "<red>Operazione non disponibile su chunk {x},{z} ({reason}).</red>"
+  huskclaims:
+    guard:
+      deny_on_guard_error: true
+      user:
+        blocked: "<red>Claim bloccato: area gestita da una citta.</red> <gray>Usa i flussi /city per i territori citta.</gray>"
+        error: "<red>Operazione claim bloccata temporaneamente per sicurezza. Riprova tra poco.</red>"
+      probe:
+        summary: "[CittaEXP] huskclaims_guard: mode={mode}, hookEnabled={hookEnabled}, reason={reason}"
+        fallback_stats: "[CittaEXP] huskclaims_guard(fallback): cancelled={cancelled}, errors={errors}, lastError={lastError}"
+  list:
+    gui:
+      title: "<gold>Lista Citta</gold>"
+      nav:
+        prev: "<yellow>Pagina precedente</yellow>"
+        prev_disabled: "<gray>Pagina precedente</gray>"
+        next: "<yellow>Pagina successiva</yellow>"
+        next_disabled: "<gray>Pagina successiva</gray>"
+        page: "<gold>Pagina {current}/{total}</gold>"
+        count: "<gray>Citta:</gray> <white>{count}</white>"
+        sort: "<gray>Sort:</gray> <white>{sort}</white>"
+        close: "<red>Chiudi</red>"
+      sort:
+        title: "<gold>Ordina per:</gold> <white>{sort}</white>"
+        hint: "<gray>Clicca per cambiare ordinamento.</gray>"
+        labels:
+          xp_custom: "XP Custom"
+          tier: "Tier"
+          money: "Money"
+          founded: "Founded"
+          members: "Members"
+      entry:
+        display_prefix: "<bold>{name}</bold> <gray>|</gray>"
+        lore:
+          custom_level: "<gray>Livello XP:</gray> <white>{level}</white> <gray>(XP {xp})</gray> <gray>| Stage:</gray> <yellow>{stage}</yellow>"
+          tier: "<gray>Tier HuskTowns:</gray> <white>{tier}</white>"
+          members: "<gray>Membri:</gray> <white>{current}/{max}</white> <gray>| Capo:</gray> <white>{leader}</white>"
+          claims: "<gray>Claim:</gray> <white>{current}/{max}</white>"
+          money: "<gray>Bilancio:</gray> <white>{money}</white>"
+          founded: "<gray>Fondata:</gray> <white>{date}</white>"
+          warp_status:
+            available: "<green>Warp:</green> <white>Disponibile</white>"
+            no_spawn: "<gold>Warp:</gold> <gray>Non impostato</gray>"
+            private_spawn: "<red>Warp:</red> <gray>Privato</gray>"
+          click: "<green>Clicca per teletrasportarti al warp della citta.</green>"
+      actions:
+        warp_denied_no_spawn: "<red>Questa citta non ha ancora un warp impostato.</red>"
+        warp_denied_private: "<red>Il warp di questa citta e privato.</red>"
+        warp_failed: "<red>Teleport non riuscito:</red> <gray>{reason}</gray>"
+  players:
+    gui:
+      loading: "<gray>Caricamento membri citta in corso...</gray>"
+      errors:
+        no_town: "<red>Devi essere membro attivo di una citta.</red>"
+        town_not_found: "<red>Citta non trovata:</red> <yellow>{town}</yellow>"
+        town_not_found_runtime: "<red>La citta non e piu disponibile.</red>"
+        load_failed: "<red>Impossibile caricare la lista membri.</red>"
+        refresh_failed: "<red>Impossibile aggiornare la GUI membri.</red>"
+        member_not_found: "<red>Membro non trovato.</red>"
+        username_unresolved: "<red>Impossibile risolvere il nome utente del target.</red>"
+        session_expired: "<red>Sessione GUI scaduta. Riapri /city.</red>"
+      list:
+        title: "<gold>Membri Citta</gold> <gray>{town}</gray>"
+        actions: "<gold>Azioni</gold>"
+      city_actions:
+        title: "<gold>Azioni Citta</gold> <gray>{town}</gray>"
+        bank: "<gold>Banca Citta</gold>"
+        leave: "<red>Abbandona citta</red>"
+        town_list: "<aqua>Lista Citta</aqua>"
+        section: "<aqua>Gestione territori</aqua>"
+        claim_settings: "<aqua>Impostazioni claim</aqua>"
+        edit: "<yellow>Modifica citta</yellow>"
+        disband: "<red>Elimina citta</red>"
+        privacy_public: "<green>Privacy warp: public</green>"
+        privacy_private: "<gold>Privacy warp: private</gold>"
+        privacy_locked: "<gray>Privacy warp bloccata su public da</gray> <yellow>{stage}</yellow>"
+        privacy_no_spawn: "<gray>Privacy warp (spawn non impostato)</gray>"
+        back: "<yellow>Indietro</yellow>"
+        close: "<red>Chiudi</red>"
+      claim_settings:
+        title: "<gold>Impostazioni claim</gold> <gray>{town}</gray>"
+        claim: "<white>Impostazioni CLAIM</white>"
+        farm: "<green>Impostazioni FARM</green>"
+        plot: "<aqua>Impostazioni PLOT</aqua>"
+        privacy_public: "<green>Privacy warp: public</green>"
+        privacy_private: "<gold>Privacy warp: private</gold>"
+        privacy_locked: "<gray>Privacy warp bloccata su public da</gray> <yellow>{stage}</yellow>"
+        privacy_no_spawn: "<gray>Privacy warp (spawn non impostato)</gray>"
+        back: "<yellow>Indietro</yellow>"
+        close: "<red>Chiudi</red>"
+        actions:
+          save_success: "<green>Regole claim salvate per</green> <yellow>{type}</yellow>."
+          save_failed: "<red>Salvataggio regole claim fallito.</red>"
+        errors:
+          no_town: "<red>Devi essere membro attivo di una citta.</red>"
+          no_permission: "<red>Non hai i permessi per modificare le regole claim.</red>"
+          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+      bank:
+        title: "<gold>Banca Citta</gold> <gray>{town}</gray>"
+        deposit: "<green>Deposita</green>"
+        deposit_locked: "<gray>Deposita (permesso mancante)</gray>"
+        withdraw: "<gold>Preleva</gold>"
+        withdraw_locked: "<gray>Preleva (permesso mancante)</gray>"
+        back: "<yellow>Indietro</yellow>"
+        close: "<red>Chiudi</red>"
+        balance:
+          title: "<gold>Bilancio Citta</gold>"
+          value: "<gray>Saldo:</gray> <white>{amount}</white>"
+        errors:
+          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+          no_permission_deposit: "<red>Non hai i permessi per depositare nella banca citta.</red>"
+          no_permission_withdraw: "<red>Non hai i permessi per prelevare dalla banca citta.</red>"
+      privacy:
+        toggle_success: "<green>Privacy warp aggiornata:</green> <white>{value}</white>"
+        errors:
+          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+          no-town: "<red>Devi essere membro attivo di una citta.</red>"
+          town-spawn-required: "<red>Imposta prima il warp citta con /city setwarp.</red>"
+          no-privacy-permission: "<red>Non hai i permessi per modificare la privacy del warp.</red>"
+          privacy-policy-locked: "<red>Da BORGO II in poi la privacy warp e forzata su public.</red>"
+          town-update-failed: "<red>Aggiornamento privacy fallito. Riprova tra poco.</red>"
+          default: "<red>Aggiornamento privacy non riuscito:</red> <gray>{reason}</gray>"
+      member:
+        name: "<yellow>{name}</yellow> <gray>({role})</gray>"
+        lore:
+          status: "<gray>Stato:</gray> <white>{status}</white>"
+          role: "<gray>Ruolo:</gray> <white>{role}</white>"
+          last_seen: "<gray>Ultimo accesso:</gray> <white>{last_seen}</white>"
+          click: "<green>Clicca per gestire il membro</green>"
+          readonly: "<gray>Solo visualizzazione</gray>"
+      nav:
+        prev: "<yellow>Pagina precedente</yellow>"
+        prev_disabled: "<gray>Pagina precedente</gray>"
+        next: "<yellow>Pagina successiva</yellow>"
+        next_disabled: "<gray>Pagina successiva</gray>"
+        page: "<gold>Pagina {current}/{total}</gold>"
+        count: "<gray>Membri:</gray> <white>{count}</white>"
+      detail:
+        title: "<gold>Gestione Membro</gold> <gray>{name}</gray>"
+        back: "<yellow>Indietro</yellow>"
+        close: "<red>Chiudi</red>"
+        info:
+          title: "<yellow>Dati membro</yellow>"
+          name: "<gray>Nome:</gray> <white>{name}</white>"
+          role: "<gray>Ruolo:</gray> <white>{role}</white>"
+          weight: "<gray>Peso ruolo:</gray> <white>{weight}</white>"
+          staff_mode: "<gold>Modalita staff target attiva</gold>"
+        status:
+          title: "<yellow>Stato</yellow>"
+          value: "<gray>{status}</gray>"
+        actions:
+          promote: "<green>Promuovi</green>"
+          demote: "<gold>Demuovi</gold>"
+          evict: "<red>Espelli</red>"
+          transfer: "<yellow>Trasferisci capo</yellow>"
+      actions:
+        success: "<green>Azione completata:</green> <yellow>{action}</yellow> <gray>su</gray> <white>{target}</white>"
+        failed: "<red>Azione fallita:</red> <gray>{reason}</gray>"
+        dispatch_failed: "<red>Azione non eseguita. Riprova tra poco.</red>"
+        leave_success: "<green>Hai abbandonato la citta con successo.</green>"
+        leave_dispatch_failed: "<red>Uscita non eseguita. Riprova tra poco.</red>"
+        leave_staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+        disband_staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+    dialog:
+      confirm:
+        title: "<red>Conferma azione</red>"
+        body: "<gray>Confermi l'azione <yellow>{action}</yellow> su <white>{target}</white>?</gray>"
+        buttons:
+          confirm: "<red>CONFERMA</red>"
+          cancel: "<gray>ANNULLA</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+      leave_confirm:
+        title: "<red>Conferma uscita</red>"
+        body: "<gray>Vuoi davvero abbandonare la citta?</gray>"
+        buttons:
+          confirm: "<red>Abbandona</red>"
+          cancel: "<gray>Annulla</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+      bank:
+        buttons:
+          confirm: "<green>CONFERMA</green>"
+          cancel: "<gray>ANNULLA</gray>"
+        amount:
+          label: "<yellow>Importo</yellow>"
+          width: 320
+          max: 1000000000
+        deposit:
+          title: "<gold>Deposita in banca</gold>"
+          body: "<gray>Inserisci l'importo da depositare.</gray>"
+        withdraw:
+          title: "<gold>Preleva dalla banca</gold>"
+          body: "<gray>Inserisci l'importo da prelevare.</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+          invalid_amount: "<red>Importo non valido.</red>"
+          dispatch_failed: "<red>Operazione non eseguita. Riprova tra poco.</red>"
+          non_positive_amount: "<red>L'importo deve essere maggiore di zero.</red>"
+      claim_settings:
+        title: "<gold>Impostazioni claim</gold> <gray>{type}</gray>"
+        body: "<gray>Configura i flag per il tipo</gray> <white>{type}</white><gray>. Usa i pulsanti per ON/OFF e salva quando hai finito.</gray>"
+        buttons:
+          toggle_on: "<green>{flag}: ON</green>"
+          toggle_off: "<red>{flag}: OFF</red>"
+          save: "<green>SALVA</green>"
+          cancel: "<gray>ANNULLA</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+  edit:
+    dialog:
+      errors:
+        unavailable: "<red>Dialog non disponibile su questo server.</red>"
+        no_town: "<red>Devi essere membro di una citta per modificarla.</red>"
+        no_privilege: "<red>Permessi insufficienti per questa modifica.</red>"
+      root:
+        title: "<gold>Modifica Citta</gold>"
+        body: "<gray>Seleziona quale campo vuoi modificare.</gray>"
+        buttons:
+          bio: "<yellow>Bio</yellow>"
+          greeting: "<yellow>Greeting</yellow>"
+          farewell: "<yellow>Farewell</yellow>"
+          color: "<yellow>Colore</yellow>"
+          rename: "<yellow>Rinomina</yellow>"
+          cancel: "<red>Annulla</red>"
+      text:
+        width: 340
+        maxLength: 256
+        buttons:
+          save: "<green>Salva</green>"
+          cancel: "<red>Annulla</red>"
+        errors:
+          empty: "<red>Il valore non puo essere vuoto.</red>"
+        success: "<green>{field} aggiornato con successo.</green>"
+        failed: "<red>Modifica fallita:</red> <gray>{error}</gray>"
+        bio:
+          title: "<gold>Modifica Bio</gold>"
+          body: "<gray>Inserisci la nuova bio della citta.</gray>"
+          label: "<yellow>Bio</yellow>"
+        greeting:
+          title: "<gold>Modifica Greeting</gold>"
+          body: "<gray>Inserisci il messaggio di benvenuto.</gray>"
+          label: "<yellow>Greeting</yellow>"
+        farewell:
+          title: "<gold>Modifica Farewell</gold>"
+          body: "<gray>Inserisci il messaggio di uscita.</gray>"
+          label: "<yellow>Farewell</yellow>"
+      color:
+        title: "<gold>Scegli Colore Citta (RGB)</gold>"
+        body: "<gray>Imposta RGB (0-255), poi usa Anteprima o Salva.<newline></newline>Attuale: <white>{current}</white><newline>Anteprima: <white>{preview}</white></gray>"
+        width: 320
+        inputs:
+          red: "<red>Rosso</red>"
+          green: "<green>Verde</green>"
+          blue: "<blue>Blu</blue>"
+        buttons:
+          preview: "<yellow>Anteprima</yellow>"
+          save: "<green>Salva</green>"
+          cancel: "<red>Indietro</red>"
+        success: "<green>Colore citta aggiornato a</green> <white>{hex}</white>."
+        failed: "<red>Aggiornamento colore fallito:</red> <gray>{error}</gray>"
+  level:
+    blocked_town_level: "<red>Usa /city level per gestire il livello citta.</red>"
+    errors:
+      no_town: "<red>Devi essere membro attivo di una citta.</red>"
+      spawner_cap_reached: "<red>Limite spawner raggiunto per lo stage {stage}: {current}/{cap}</red>"
+    status:
+      header: "<gold>Livello Citta:</gold> <yellow>{town}</yellow>"
+      current: "<gray>Livello:</gray> <white>{level}</white> <gray>| XP:</gray> <white>{xp}</white> <gray>| Stage:</gray> <yellow>{stage}</yellow>"
+      next: "<gray>Prossimo stage:</gray> <yellow>{stage}</yellow> <gray>(L{required_level})</gray>"
+      requirement: "<gray>Requisito banca:</gray> <white>{required_balance}</white> <gray>| Costo upgrade:</gray> <white>{upgrade_cost}</white>"
+      max: "<green>Hai raggiunto lo stage massimo disponibile.</green>"
+      staff_required: "<gold>Questo upgrade richiede approvazione staff: usa</gold> <yellow>/city level request</yellow>."
+    upgrade:
+      success: "<green>Upgrade completato:</green> <yellow>{stage}</yellow>"
+      failed: "<red>Upgrade non riuscito:</red> <gray>{reason}</gray>"
+    request:
+      success: "<green>Richiesta creata:</green> <yellow>#{id}</yellow> <gray>per</gray> <white>{stage}</white>"
+      failed: "<red>Richiesta non creata:</red> <gray>{reason}</gray>"
+    notifications:
+      level_up: "<green>La tua citta e salita al livello</green> <yellow>{level}</yellow>."
+      stage_upgraded: "<gold>Upgrade citta completato:</gold> <yellow>{stage}</yellow>"
+      title_every_5:
+        title: "<gold>Citta Livello {level}</gold>"
+        subtitle: "<yellow>Traguardo raggiunto!</yellow>"
+    reasons:
+      no-town: "devi essere membro attivo di una citta"
+      not-mayor: "solo il capo citta puo eseguire questa azione"
+      already-max-stage: "stage massimo gia raggiunto"
+      level-too-low: "livello citta insufficiente"
+      town-spawn-required: "devi prima impostare il warp citta con /city setwarp"
+      insufficient-balance-requirement: "saldo banca citta insufficiente"
+      staff-approval-required: "serve approvazione staff (usa /city level request)"
+      pending-request-exists: "esiste gia una richiesta pending per questo stage"
+      request-not-required: "questo stage non richiede richiesta staff"
+      invalid-stage-transition: "transizione stage non valida"
+      town-update-failed: "aggiornamento town fallito"
+  privacy:
+    blocked_town_privacy: "<red>Usa la GUI /city -> Azioni Citta per gestire la privacy del warp.</red>"
+  warp:
+    errors:
+      no_town: "<red>Devi essere membro attivo di una citta.</red>"
+      town_not_found: "<red>Citta non trovata:</red> <yellow>{town}</yellow>"
+      failed: "<red>Teleport warp fallito:</red> <gray>{reason}</gray>"
+  setwarp:
+    success: "<green>Warp citta impostato con successo.</green>"
+    errors:
+      no_town: "<red>Devi essere membro attivo di una citta.</red>"
+      no_permission: "<red>Non hai i permessi per impostare lo spawn della citta.</red>"
+      outside_claim: "<red>Devi essere dentro un claim della tua citta per impostare lo spawn.</red>"
+      failed: "<red>Impostazione warp fallita:</red> <gray>{reason}</gray>"
+  rename:
+    cost:
+      amount: 0.0
+    dialog:
+      title: "<gold>Rinomina Citta</gold>"
+      body: "<gray>Imposta nuovo nome e tag citta.</gray>"
+      buttons:
+        confirm: "<green>CONFERMA</green>"
+        cancel: "<red>ANNULLA</red>"
+      inputs:
+        name:
+          label: "<yellow>Nuovo nome</yellow>"
+          width: 320
+          maxLength: 32
+        tag:
+          label: "<yellow>Tag (3 caratteri)</yellow>"
+          width: 140
+          maxLength: 3
+      success: "<green>Citta rinominata:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray> <gray>(costo: {cost})</gray>"
+      errors:
+        unavailable: "<red>Dialog non disponibile su questo server.</red>"
+        no_town: "<red>Devi essere membro attivo di una citta.</red>"
+        no_privilege: "<red>Non hai i permessi per rinominare la citta.</red>"
+        name_required: "<red>Il nome citta e obbligatorio.</red>"
+        tag_invalid: "<red>Il tag deve avere esattamente 3 caratteri alfanumerici.</red>"
+        no_changes: "<red>Nessuna modifica rilevata su nome/tag.</red>"
+        name_taken: "<red>Esiste gia una citta con questo nome.</red>"
+        insufficient_funds: "<red>Fondi banca citta insufficienti per rinominare.</red>"
+        failed: "<red>Rinomina fallita:</red> <gray>{reason}</gray>"
+
+cittaexp:
+  staff:
+    level:
+      invalid_status: "<red>Status non valido.</red>"
+      list:
+        header: "<gold>Level Requests:</gold> <white>{count}</white>"
+        row: "<gray>#{id}</gray> <yellow>town={town_id}</yellow> <white>{stage}</white> <gray>{status}</gray>"
+        more: "<gray>... e altre {count} richieste</gray>"
+      approve:
+        success: "<green>Richiesta approvata:</green> <yellow>#{id}</yellow>"
+        failed: "<red>Approve fallita:</red> <gray>{reason}</gray>"
+      reject:
+        success: "<yellow>Richiesta rifiutata:</yellow> <white>#{id}</white>"
+        failed: "<red>Reject fallita:</red> <gray>{reason}</gray>"
+        reason_required: "<red>Specifica un motivo per il reject.</red>"

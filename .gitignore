@@ -31,3 +31,10 @@ logs/
 world/
 world_nether/
 world_the_end/
+
+# Codebase slimming generated snapshot
+scripts/quality/slimming-metrics.json
+
+# Bot harness local deps / artifacts
+scripts/bot-tests/node_modules/
+scripts/bot-tests/.cache/

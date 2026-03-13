@@ -1,0 +1,102 @@
+progression:
+  xpPerLevel: 100
+  levelCap: 250
+  regnoExtraClaimMaxLevel: 250
+  xpScale: 10000
+scan:
+  intervalSeconds: 120
+  allowedContainers:
+    - CHEST
+    - TRAPPED_CHEST
+    - BARREL
+store:
+  flushSeconds: 3
+  flushBatchSize: 128
+  replayBackoffSeconds: 10
+  shutdownDrainSeconds: 5
+  cacheIdleTtlSeconds: 900
+  cacheEvictIntervalSeconds: 60
+  resyncSeconds: 120
+mysql:
+  enabled: false
+  host: 127.0.0.1
+  port: 3306
+  database: cittaexp
+  username: root
+  password: ""
+  params: useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+upgrade:
+  requiredBalanceMultiplier: 2.0
+spawnPrivacyPolicy:
+  enabled: true
+  forcePublicFromStage: BORGO_II
+  allowBorgoToggle: true
+tax:
+  timezone: Europe/Rome
+  runHour: 0
+  runMinute: 5
+  checkIntervalSeconds: 60
+stages:
+  BORGO_I:
+    requiredLevel: 1
+    upgradeCost: 0.0
+    claimCap: 9
+    memberCap: 3
+    spawnerCap: 2
+    monthlyTax: 0.0
+    staffApprovalRequired: false
+    huskTownLevel: 1
+  BORGO_II:
+    requiredLevel: 10
+    upgradeCost: 10000.0
+    claimCap: 18
+    memberCap: 5
+    spawnerCap: 3
+    monthlyTax: 0.0
+    staffApprovalRequired: false
+    huskTownLevel: 2
+  BORGO_III:
+    requiredLevel: 20
+    upgradeCost: 25000.0
+    claimCap: 27
+    memberCap: 7
+    spawnerCap: 4
+    monthlyTax: 25000.0
+    staffApprovalRequired: false
+    huskTownLevel: 3
+  VILLAGGIO_I:
+    requiredLevel: 30
+    upgradeCost: 50000.0
+    claimCap: 45
+    memberCap: 10
+    spawnerCap: 5
+    monthlyTax: 50000.0
+    staffApprovalRequired: true
+    huskTownLevel: 4
+  VILLAGGIO_II:
+    requiredLevel: 50
+    upgradeCost: 75000.0
+    claimCap: 63
+    memberCap: 13
+    spawnerCap: 7
+    monthlyTax: 75000.0
+    staffApprovalRequired: false
+    huskTownLevel: 5
+  VILLAGGIO_III:
+    requiredLevel: 70
+    upgradeCost: 100000.0
+    claimCap: 81
+    memberCap: 16
+    spawnerCap: 9
+    monthlyTax: 100000.0
+    staffApprovalRequired: false
+    huskTownLevel: 6
+  REGNO_I:
+    requiredLevel: 100
+    upgradeCost: 250000.0
+    claimCap: 162
+    memberCap: 50
+    spawnerCap: 12
+    monthlyTax: 250000.0
+    staffApprovalRequired: true
+    huskTownLevel: 7
