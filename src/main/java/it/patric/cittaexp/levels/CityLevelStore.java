@@ -43,6 +43,9 @@ public final class CityLevelStore {
     }
 
     private static final String SYSTEM_KEY_LAST_TAX_MONTH = "last_tax_month";
+    private static final String SYSTEM_KEY_LEVEL_SCHEMA_VERSION = "level_schema_version";
+    private static final String LEVEL_SCHEMA_M1 = "m1_v2";
+    private static final int STAGE_SEALS_REQUIRED = 6;
 
     private final Plugin plugin;
     private final CityLevelRepository sqlite;
@@ -150,7 +153,11 @@ public final class CityLevelStore {
                 townId,
                 0L,
                 1,
-                TownStage.BORGO_I,
+                TownStage.AVAMPOSTO_I,
+                0,
+                STAGE_SEALS_REQUIRED,
+                null,
+                null,
                 Instant.now()
         ));
     }
@@ -179,13 +186,17 @@ public final class CityLevelStore {
         TownProgression previous = getOrCreateProgression(townId);
         long safeAward = Math.max(0L, awardedScaled);
         long newXp = previous.xpScaled() + safeAward;
-        int previousLevel = previous.cityLevel();
-        int newLevel = Math.min(levelCap, (int) (newXp / Math.max(1, xpPerLevelScaled)) + 1);
+        int previousLevel = earnedLevelForXp(previous.xpScaled());
+        int newLevel = earnedLevelForXp(newXp);
         TownProgression updated = new TownProgression(
                 previous.townId(),
                 newXp,
-                newLevel,
+                previous.cityLevel(),
                 previous.stage(),
+                previous.stageSealsEarned(),
+                previous.stageSealsRequired(),
+                previous.stageCompletedAt(),
+                previous.subTierCompletedAt(),
                 Instant.now()
         );
         progressionCache.put(townId, updated);
@@ -223,6 +234,59 @@ public final class CityLevelStore {
         return new CityScanResult(townId, safeAward, previousLevel, newLevel, newXp, error);
     }
 
+    public TownProgression unlockLevel(int townId, int targetLevel) {
+        TownProgression current = getOrCreateProgression(townId);
+        int nextLevel = Math.max(1, Math.min(settings.levelCap(), targetLevel));
+        TownProgression updated = new TownProgression(
+                current.townId(),
+                current.xpScaled(),
+                nextLevel,
+                current.stage(),
+                current.stageSealsEarned(),
+                current.stageSealsRequired(),
+                current.stageCompletedAt(),
+                current.subTierCompletedAt(),
+                Instant.now()
+        );
+        progressionCache.put(townId, updated);
+        enqueueMutation(new UpsertProgressionMutation(nextMutationId(), updated));
+        return updated;
+    }
+
+    public TownProgression unlockLevelAndStage(int townId, int targetLevel, TownStage targetStage) {
+        TownProgression current = getOrCreateProgression(townId);
+        int nextLevel = Math.max(1, Math.min(settings.levelCap(), targetLevel));
+        TownProgression updated = new TownProgression(
+                current.townId(),
+                current.xpScaled(),
+                nextLevel,
+                targetStage == null ? current.stage() : targetStage,
+                current.stageSealsEarned(),
+                current.stageSealsRequired(),
+                current.stageCompletedAt(),
+                current.subTierCompletedAt(),
+                Instant.now()
+        );
+        progressionCache.put(townId, updated);
+        enqueueMutation(new UpsertProgressionMutation(nextMutationId(), updated));
+        return updated;
+    }
+
+    public int earnedLevel(int townId) {
+        TownProgression current = getOrCreateProgression(townId);
+        return earnedLevelForXp(current.xpScaled());
+    }
+
+    private int earnedLevelForXp(long xpScaled) {
+        return CityLevelCurve.levelFromXpScaled(
+                xpScaled,
+                settings.levelCap(),
+                settings.xpPerLevel(),
+                settings.xpScale(),
+                settings.curveExponent()
+        );
+    }
+
     public void updateStage(int townId, TownStage stage) {
         TownProgression current = getOrCreateProgression(townId);
         TownProgression updated = new TownProgression(
@@ -230,10 +294,101 @@ public final class CityLevelStore {
                 current.xpScaled(),
                 current.cityLevel(),
                 stage,
+                0,
+                STAGE_SEALS_REQUIRED,
+                null,
+                null,
                 Instant.now()
         );
         progressionCache.put(townId, updated);
         enqueueMutation(new UpsertProgressionMutation(nextMutationId(), updated));
+    }
+
+    public TownProgression addStageSeals(int townId, int delta, String milestoneKey) {
+        TownProgression current = getOrCreateProgression(townId);
+        if (delta <= 0) {
+            return current;
+        }
+        TownProgression updated = setStageSeals(townId, current.stageSealsEarned() + delta, true);
+        if (milestoneKey != null && !milestoneKey.isBlank()) {
+            String stateKey = "seal_milestone:" + townId + ':' + milestoneKey;
+            String now = Instant.now().toString();
+            systemStateCache.put(stateKey, now);
+            enqueueMutation(new SetSystemStateMutation(nextMutationId(), stateKey, now));
+        }
+        return updated;
+    }
+
+    public TownProgression setStageSeals(int townId, int seals, boolean preserveCurrentStage) {
+        TownProgression current = getOrCreateProgression(townId);
+        int required = Math.max(STAGE_SEALS_REQUIRED, current.stageSealsRequired());
+        int nextSeals = Math.min(required, Math.max(0, seals));
+        Instant now = Instant.now();
+        Instant subTierCompletedAt = nextSeals > 0
+                ? (current.subTierCompletedAt() == null ? now : current.subTierCompletedAt())
+                : null;
+        Instant stageCompletedAt = nextSeals >= required
+                ? (current.stageCompletedAt() == null ? now : current.stageCompletedAt())
+                : null;
+        TownProgression updated = new TownProgression(
+                current.townId(),
+                current.xpScaled(),
+                current.cityLevel(),
+                current.stage(),
+                nextSeals,
+                required,
+                stageCompletedAt,
+                subTierCompletedAt,
+                now
+        );
+        progressionCache.put(townId, updated);
+        enqueueMutation(new UpsertProgressionMutation(nextMutationId(), updated));
+        return updated;
+    }
+
+    public TownProgression setXpScaled(int townId, long targetXpScaled, String source, UUID actor, String reason) {
+        touchTown(townId);
+        TownProgression current = getOrCreateProgression(townId);
+        long nextXp = Math.max(0L, targetXpScaled);
+        int nextLevel = earnedLevelForXp(nextXp);
+        TownProgression updated = new TownProgression(
+                current.townId(),
+                nextXp,
+                current.cityLevel(),
+                current.stage(),
+                current.stageSealsEarned(),
+                current.stageSealsRequired(),
+                current.stageCompletedAt(),
+                current.subTierCompletedAt(),
+                Instant.now()
+        );
+        progressionCache.put(townId, updated);
+        enqueueMutation(new UpsertProgressionMutation(nextMutationId(), updated));
+
+        long delta = nextXp - current.xpScaled();
+        if (delta != 0L) {
+            long eventId = xpLedgerEventSequence.incrementAndGet();
+            enqueueMutation(new AppendXpLedgerMutation(
+                    nextMutationId(),
+                    eventId,
+                    townId,
+                    delta,
+                    source == null || source.isBlank() ? "xp_admin_set" : source,
+                    actor == null ? null : actor.toString(),
+                    reason == null || reason.isBlank() ? "admin-xp-set" : reason,
+                    nextXp,
+                    nextLevel,
+                    Instant.now()
+            ));
+        }
+        return updated;
+    }
+
+    public boolean hasSealMilestone(int townId, String milestoneKey) {
+        if (milestoneKey == null || milestoneKey.isBlank()) {
+            return false;
+        }
+        return systemStateCache.containsKey("seal_milestone:" + townId + ':' + milestoneKey);
     }
 
     public double getDebt(int townId) {
@@ -369,15 +524,50 @@ public final class CityLevelStore {
                 }
             }
 
-            progressionCache.putAll(sqlite.loadAllProgressions());
+            systemStateCache.putAll(sqlite.loadAllSystemState());
+            if (!LEVEL_SCHEMA_M1.equalsIgnoreCase(systemStateCache.get(SYSTEM_KEY_LEVEL_SCHEMA_VERSION))) {
+                plugin.getLogger().warning("[levels-store] applying M1 cutover reset (non-prod)");
+                sqlite.resetForM1Cutover();
+                systemStateCache.clear();
+                systemStateCache.put(SYSTEM_KEY_LEVEL_SCHEMA_VERSION, LEVEL_SCHEMA_M1);
+                sqlite.setSystemState(SYSTEM_KEY_LEVEL_SCHEMA_VERSION, LEVEL_SCHEMA_M1);
+            }
+
+            Map<Integer, TownProgression> loadedProgressions = sqlite.loadAllProgressions();
+            for (TownProgression progression : loadedProgressions.values()) {
+                int unlockedLevel = Math.max(1, Math.min(settings.levelCap(), progression.cityLevel()));
+                int required = Math.max(STAGE_SEALS_REQUIRED, progression.stageSealsRequired());
+                TownProgression normalized = new TownProgression(
+                        progression.townId(),
+                        progression.xpScaled(),
+                        unlockedLevel,
+                        progression.stage(),
+                        progression.stageSealsEarned(),
+                        required,
+                        progression.stageCompletedAt(),
+                        progression.subTierCompletedAt(),
+                        progression.updatedAt()
+                );
+                progressionCache.put(normalized.townId(), normalized);
+                if (!normalized.equals(progression)) {
+                    sqlite.upsertProgression(normalized);
+                    if (mysql.enabled() && mysqlAvailable.get()) {
+                        try {
+                            mysql.upsertProgression(normalized);
+                        } catch (Exception ignored) {
+                            // Non blocca bootstrap: verra allineato dal replay.
+                        }
+                    }
+                }
+            }
             highwaterCache.putAll(sqlite.loadAllHighwater());
             sqlite.loadAllDebts().forEach((townId, debt) -> debtCache.put(townId, new DebtState(debt, Instant.now())));
-            systemStateCache.putAll(sqlite.loadAllSystemState());
 
             List<StaffApprovalRequest> approvals = sqlite.loadAllApprovalRequests();
             for (StaffApprovalRequest approval : approvals) {
                 approvalCache.put(approval.id(), approval);
             }
+            reconcilePendingStageApprovals();
             approvalSequence.set(Math.max(approvalSequence.get(), sqlite.maxStaffApprovalId()));
 
             outboxPendingCount.set(sqlite.countOutboxPending());
@@ -388,6 +578,66 @@ public final class CityLevelStore {
         } catch (Exception exception) {
             plugin.getLogger().severe("[levels-store] bootstrap failed reason=" + normalizeError(exception));
         }
+    }
+
+    private void reconcilePendingStageApprovals() {
+        for (StaffApprovalRequest request : approvalCache.values()) {
+            if (request.status() != CityLevelRepository.RequestStatus.PENDING
+                    || request.type() != StaffApprovalType.STAGE_UPGRADE) {
+                continue;
+            }
+            String rawStage = request.payloadValue("targetStage");
+            if (rawStage == null || rawStage.isBlank()) {
+                continue;
+            }
+            final TownStage targetStage;
+            try {
+                targetStage = TownStage.valueOf(rawStage.trim());
+            } catch (IllegalArgumentException ignored) {
+                continue;
+            }
+            TownProgression progression = progressionCache.get(request.townId());
+            if (progression == null || progression.stage() != targetStage) {
+                continue;
+            }
+            TownStage fallbackStage = targetStage.ordinal() > 0
+                    ? TownStage.values()[targetStage.ordinal() - 1]
+                    : TownStage.AVAMPOSTO_I;
+            int requiredSeals = Math.max(STAGE_SEALS_REQUIRED, progression.stageSealsRequired());
+            Instant now = Instant.now();
+            TownProgression reconciled = new TownProgression(
+                    progression.townId(),
+                    progression.xpScaled(),
+                    progression.cityLevel(),
+                    fallbackStage,
+                    requiredSeals,
+                    requiredSeals,
+                    progression.stageCompletedAt() == null ? now : progression.stageCompletedAt(),
+                    progression.subTierCompletedAt() == null ? now : progression.subTierCompletedAt(),
+                    now
+            );
+            progressionCache.put(reconciled.townId(), reconciled);
+            sqlite.upsertProgression(reconciled);
+            if (mysql.enabled() && mysqlAvailable.get()) {
+                try {
+                    mysql.upsertProgression(reconciled);
+                } catch (Exception ignored) {
+                    // Replay/resync will heal MySQL later.
+                }
+            }
+            plugin.getLogger().warning("[levels-store] reconciled pending stage town=" + reconciled.townId()
+                    + " target=" + targetStage.name()
+                    + " fallback=" + fallbackStage.name());
+        }
+    }
+
+    private TownStage resolveSubTier(PrincipalStage principalStage, SubTier subTier) {
+        for (TownStage value : TownStage.values()) {
+            if (value.principalStage() == principalStage && value.subTier() == subTier) {
+                return value;
+            }
+        }
+        return TownStage.AVAMPOSTO_I;
     }
 
     private void flushAndReplaySafe() {

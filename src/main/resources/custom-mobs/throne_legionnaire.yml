@@ -1,0 +1,44 @@
+id: throne_legionnaire
+type: WITHER_SKELETON
+name: "<gray>Legionario del Trono</gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: throne
+pools:
+  - defense
+  - regular
+themes:
+  - throne
+  - apocalypse
+stats:
+  GENERIC_MAX_HEALTH: 72.0
+  GENERIC_ATTACK_DAMAGE: 11.0
+  GENERIC_MOVEMENT_SPEED: 0.30
+equipment:
+  helmet: DIAMOND_HELMET
+  chestplate: DIAMOND_CHESTPLATE
+  leggings: IRON_LEGGINGS
+  boots: DIAMOND_BOOTS
+  mainHand: IRON_SWORD
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - throne
+  - regular
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_guardian_hunter
+  - trait_leaper
+  - trait_overseer
+  - trait_runner
+variants:
+  - variant_imperial_lancer
+  - variant_royal
+  - variant_imperial_plate
+  - variant_blackguard

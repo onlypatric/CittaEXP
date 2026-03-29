@@ -9,7 +9,6 @@ import io.papermc.paper.registry.data.dialog.body.DialogBody;
 import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
-import it.patric.cittaexp.utils.CommandBridgeUtils;
 import it.patric.cittaexp.utils.DialogViewUtils;
 import it.patric.cittaexp.utils.PluginConfigUtils;
 import java.time.Duration;
@@ -108,13 +107,7 @@ public final class TownDisbandDialogFlow {
         player.sendMessage(configUtils.msg(
                 "city.disband.dialog.in_progress",
                 "<gray>Richiesta eliminazione citta in corso...</gray>"));
-
-        boolean dispatched = CommandBridgeUtils.dispatchTown(plugin, player, "disband", "confirm");
-        if (!dispatched) {
-            player.sendMessage(configUtils.msg(
-                    "city.disband.dialog.dispatch_failed",
-                    "<red>Impossibile eseguire la richiesta di eliminazione adesso.</red>"));
-        }
+        huskTownsApiHook.disbandTown(player, true);
     }
 
     private Optional<Member> requireMayor(Player player) {

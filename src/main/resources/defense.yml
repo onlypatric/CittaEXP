@@ -1,0 +1,866 @@
+enabled: true
+globalActiveCap: 2
+antiCheeseRadius: 18
+maxMobsAlive: 140
+playerDeathPenaltyPercent: 0.15
+timing:
+  prepSeconds: 60
+  interWaveSeconds: 14
+  sessionTimeoutSeconds: 3600
+spawn:
+  minPoints: 6
+  radiusMin: 22
+  radiusMax: 38
+  minDistanceFromGuardian: 25
+  maxDistanceFromGuardian: 50
+  frontCountMin: 2
+  frontCountMax: 4
+  groupSizeMin: 3
+  groupSizeMax: 6
+  frontJitterRadius: 8
+  intraGroupSpacing: 3
+  allowInsideClaims: true
+  allowOutsideClaims: true
+breach:
+  enabled: true
+  pathFailSeconds: 6
+  breakCooldownSeconds: 4
+  maxBreaksPerMob: 8
+  maxVerticalDelta: 2
+  searchDepth: 1
+  vanillaBreacherTypes: []
+recovery:
+  stuckSampleSeconds: 3
+  stuckDistanceThreshold: 2.0
+  stuckTimeoutSeconds: 8
+  repositionStepDistance: 8
+  maxAttemptsPerWave: 3
+defenderScaling:
+  perExtraDefender: 0.2
+  maxMultiplier: 3.75
+levels:
+  l1:
+    minCityLevel: 10
+    waves: 4
+    guardianHp: 450
+    startCost: 600
+    cooldownSeconds: 7200
+    rewardXp: 250
+    rewardItems:
+      IRON_INGOT: 96
+      BREAD: 64
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l1
+        amount: 1
+    baseMobCount: 9
+    waveIncrement: 3
+    bossSupportCount: 6
+    eliteChance: 0.08
+    regularMobs:
+    - ZOMBIE
+    - SKELETON
+    - SPIDER
+    - custom:frontier_raider
+    eliteMobs:
+    - HUSK
+    - custom:frontier_shieldbearer
+    bossMob: custom:frontier_ram
+    rewardMoney: 150
+    maxDurationSeconds: 1800
+  l2:
+    minCityLevel: 20
+    waves: 5
+    guardianHp: 650
+    startCost: 900
+    cooldownSeconds: 10800
+    rewardXp: 400
+    rewardItems:
+      IRON_INGOT: 128
+      GOLD_INGOT: 32
+      COOKED_BEEF: 64
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l2
+        amount: 1
+    baseMobCount: 10
+    waveIncrement: 3
+    bossSupportCount: 7
+    eliteChance: 0.1
+    regularMobs:
+    - ZOMBIE
+    - SKELETON
+    - SPIDER
+    - CREEPER
+    - custom:frontier_raider
+    - custom:frontier_bolter
+    eliteMobs:
+    - HUSK
+    - STRAY
+    - custom:frontier_shieldbearer
+    bossMob: custom:frontier_ram
+    rewardMoney: 243
+    maxDurationSeconds: 1950
+  l3:
+    minCityLevel: 30
+    waves: 6
+    guardianHp: 900
+    startCost: 1300
+    cooldownSeconds: 14400
+    rewardXp: 650
+    rewardItems:
+      IRON_INGOT: 160
+      GOLD_INGOT: 64
+      REDSTONE: 128
+      COOKED_BEEF: 96
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l3
+        amount: 1
+    baseMobCount: 11
+    waveIncrement: 4
+    bossSupportCount: 8
+    eliteChance: 0.12
+    regularMobs:
+    - ZOMBIE
+    - SKELETON
+    - CREEPER
+    - PILLAGER
+    - custom:frontier_raider
+    - custom:frontier_bolter
+    eliteMobs:
+    - STRAY
+    - VINDICATOR
+    - custom:frontier_shieldbearer
+    bossMob: custom:frontier_war_ram
+    rewardMoney: 377
+    maxDurationSeconds: 2100
+  l4:
+    minCityLevel: 40
+    waves: 7
+    guardianHp: 1200
+    startCost: 1800
+    cooldownSeconds: 21600
+    rewardXp: 1000
+    rewardItems:
+      GOLD_INGOT: 96
+      LAPIS_LAZULI: 128
+      DIAMOND: 8
+      COOKED_BEEF: 96
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l4
+        amount: 1
+    baseMobCount: 12
+    waveIncrement: 4
+    bossSupportCount: 9
+    eliteChance: 0.14
+    regularMobs:
+    - SKELETON
+    - CREEPER
+    - PILLAGER
+    - custom:frontier_raider
+    - custom:frontier_bolter
+    eliteMobs:
+    - VINDICATOR
+    - WITCH
+    - custom:frontier_shieldbearer
+    bossMob: custom:frontier_war_ram
+    rewardMoney: 576
+    maxDurationSeconds: 2250
+  l5:
+    minCityLevel: 50
+    waves: 8
+    guardianHp: 1600
+    startCost: 2500
+    cooldownSeconds: 32400
+    rewardXp: 1500
+    rewardItems:
+      GOLD_INGOT: 128
+      DIAMOND: 12
+      EMERALD: 16
+      COOKED_BEEF: 128
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l5
+        amount: 1
+    baseMobCount: 13
+    waveIncrement: 5
+    bossSupportCount: 10
+    eliteChance: 0.16
+    regularMobs:
+    - PILLAGER
+    - SKELETON
+    - CREEPER
+    - custom:frontier_raider
+    - custom:frontier_bolter
+    eliteMobs:
+    - VINDICATOR
+    - WITCH
+    - custom:frontier_shieldbearer
+    bossMob: custom:frontier_war_ram
+    rewardMoney: 875
+    maxDurationSeconds: 2400
+  l6:
+    minCityLevel: 60
+    waves: 9
+    guardianHp: 2100
+    startCost: 3200
+    cooldownSeconds: 43200
+    rewardXp: 2200
+    rewardItems:
+      DIAMOND: 16
+      EMERALD: 24
+      BLAZE_ROD: 32
+      COOKED_BEEF: 128
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l6
+        amount: 1
+    baseMobCount: 15
+    waveIncrement: 5
+    bossSupportCount: 12
+    eliteChance: 0.19
+    regularMobs:
+    - PILLAGER
+    - CREEPER
+    - custom:breach_sapper
+    - custom:breach_marksman
+    eliteMobs:
+    - WITCH
+    - custom:breach_vanguard
+    bossMob: custom:crimson_breach_brute
+    rewardMoney: 960
+    maxDurationSeconds: 2400
+  l7:
+    minCityLevel: 70
+    waves: 10
+    guardianHp: 2700
+    startCost: 4000
+    cooldownSeconds: 54000
+    rewardXp: 3000
+    rewardItems:
+      DIAMOND: 20
+      EMERALD: 32
+      ENDER_PEARL: 64
+      BLAZE_ROD: 48
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l7
+        amount: 1
+    baseMobCount: 16
+    waveIncrement: 6
+    bossSupportCount: 13
+    eliteChance: 0.22
+    regularMobs:
+    - PILLAGER
+    - CREEPER
+    - STRAY
+    - custom:breach_sapper
+    - custom:breach_marksman
+    eliteMobs:
+    - WITCH
+    - WITHER_SKELETON
+    - custom:breach_vanguard
+    bossMob: custom:crimson_breach_brute
+    rewardMoney: 1280
+    maxDurationSeconds: 2550
+  l8:
+    minCityLevel: 80
+    waves: 11
+    guardianHp: 3400
+    startCost: 4900
+    cooldownSeconds: 64800
+    rewardXp: 4100
+    rewardItems:
+      DIAMOND: 24
+      EMERALD: 40
+      OBSIDIAN: 128
+      ENDER_PEARL: 64
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l8
+        amount: 1
+    baseMobCount: 17
+    waveIncrement: 6
+    bossSupportCount: 14
+    eliteChance: 0.24
+    regularMobs:
+    - PILLAGER
+    - VINDICATOR
+    - CREEPER
+    - custom:breach_sapper
+    - custom:breach_marksman
+    eliteMobs:
+    - WITCH
+    - WITHER_SKELETON
+    - custom:breach_vanguard
+    bossMob: custom:crimson_breachlord
+    rewardMoney: 1666
+    maxDurationSeconds: 2700
+  l9:
+    minCityLevel: 90
+    waves: 11
+    guardianHp: 4200
+    startCost: 5900
+    cooldownSeconds: 86400
+    rewardXp: 5500
+    rewardItems:
+      DIAMOND: 28
+      EMERALD: 48
+      BLAZE_ROD: 64
+      ENDER_PEARL: 96
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l9
+        amount: 1
+    baseMobCount: 19
+    waveIncrement: 6
+    bossSupportCount: 15
+    eliteChance: 0.26
+    regularMobs:
+    - PILLAGER
+    - ENDERMAN
+    - STRAY
+    - custom:breach_sapper
+    - custom:breach_marksman
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:breach_vanguard
+    bossMob: custom:crimson_breachlord
+    rewardMoney: 2124
+    maxDurationSeconds: 2850
+  l10:
+    minCityLevel: 100
+    waves: 12
+    guardianHp: 5200
+    startCost: 7000
+    cooldownSeconds: 108000
+    rewardXp: 7200
+    rewardItems:
+      DIAMOND: 32
+      EMERALD: 56
+      NETHERITE_SCRAP: 2
+      ENDER_PEARL: 96
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l10
+        amount: 1
+      - item: cittaexp_gui:golem_poppy
+        amount: 1
+    baseMobCount: 20
+    waveIncrement: 7
+    bossSupportCount: 16
+    eliteChance: 0.28
+    regularMobs:
+    - ENDERMAN
+    - PILLAGER
+    - WITHER_SKELETON
+    - custom:breach_sapper
+    - custom:breach_marksman
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:breach_vanguard
+    bossMob: custom:crimson_breachlord
+    rewardMoney: 2660
+    maxDurationSeconds: 3000
+  l11:
+    minCityLevel: 110
+    waves: 12
+    guardianHp: 6500
+    startCost: 8500
+    cooldownSeconds: 129600
+    rewardXp: 9300
+    rewardItems:
+      DIAMOND: 36
+      EMERALD: 64
+      NETHERITE_SCRAP: 3
+      BLAZE_ROD: 80
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l11
+        amount: 1
+    baseMobCount: 22
+    waveIncrement: 7
+    bossSupportCount: 18
+    eliteChance: 0.31
+    regularMobs:
+    - SKELETON
+    - WITHER_SKELETON
+    - custom:ash_cultist
+    - custom:ash_hexer
+    eliteMobs:
+    - WITCH
+    - custom:ash_revenant
+    bossMob: custom:ash_behemoth
+    rewardMoney: 2975
+    maxDurationSeconds: 3000
+  l12:
+    minCityLevel: 120
+    waves: 13
+    guardianHp: 7900
+    startCost: 10000
+    cooldownSeconds: 151200
+    rewardXp: 11800
+    rewardItems:
+      DIAMOND: 40
+      EMERALD: 72
+      ECHO_SHARD: 8
+      NETHERITE_SCRAP: 4
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l12
+        amount: 1
+      - item: cittaexp_gui:golem_guard_helmet
+        amount: 1
+    baseMobCount: 23
+    waveIncrement: 7
+    bossSupportCount: 19
+    eliteChance: 0.33
+    regularMobs:
+    - SKELETON
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:ash_cultist
+    - custom:ash_hexer
+    eliteMobs:
+    - WITCH
+    - custom:ash_revenant
+    bossMob: custom:ash_behemoth
+    rewardMoney: 3700
+    maxDurationSeconds: 3150
+  l13:
+    minCityLevel: 130
+    waves: 14
+    guardianHp: 9500
+    startCost: 11600
+    cooldownSeconds: 172800
+    rewardXp: 14800
+    rewardItems:
+      DIAMOND: 44
+      EMERALD: 80
+      ECHO_SHARD: 12
+      TOTEM_OF_UNDYING: 1
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l13
+        amount: 1
+    baseMobCount: 25
+    waveIncrement: 8
+    bossSupportCount: 20
+    eliteChance: 0.35
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:ash_cultist
+    - custom:ash_hexer
+    eliteMobs:
+    - WITCH
+    - custom:ash_revenant
+    - PIGLIN_BRUTE
+    bossMob: custom:cinder_hierophant
+    rewardMoney: 4524
+    maxDurationSeconds: 3300
+  l14:
+    minCityLevel: 140
+    waves: 14
+    guardianHp: 11300
+    startCost: 13300
+    cooldownSeconds: 194400
+    rewardXp: 18300
+    rewardItems:
+      DIAMOND: 48
+      EMERALD: 88
+      NETHERITE_SCRAP: 5
+      TOTEM_OF_UNDYING: 1
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l14
+        amount: 1
+    baseMobCount: 26
+    waveIncrement: 8
+    bossSupportCount: 22
+    eliteChance: 0.37
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - PILLAGER
+    - custom:ash_cultist
+    - custom:ash_hexer
+    eliteMobs:
+    - WITCH
+    - PIGLIN_BRUTE
+    - custom:ash_revenant
+    bossMob: custom:cinder_hierophant
+    rewardMoney: 5586
+    maxDurationSeconds: 3450
+  l15:
+    minCityLevel: 150
+    waves: 15
+    guardianHp: 13300
+    startCost: 15000
+    cooldownSeconds: 216000
+    rewardXp: 22400
+    rewardItems:
+      DIAMOND: 52
+      EMERALD: 96
+      ECHO_SHARD: 16
+      TOTEM_OF_UNDYING: 2
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l15
+        amount: 1
+      - item: cittaexp_gui:golem_guard_boots
+        amount: 1
+    baseMobCount: 28
+    waveIncrement: 8
+    bossSupportCount: 24
+    eliteChance: 0.39
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:ash_cultist
+    - custom:ash_hexer
+    eliteMobs:
+    - WITCH
+    - PIGLIN_BRUTE
+    - custom:ash_revenant
+    bossMob: custom:cinder_hierophant
+    rewardMoney: 6750
+    maxDurationSeconds: 3600
+  l16:
+    minCityLevel: 160
+    waves: 15
+    guardianHp: 15600
+    startCost: 17500
+    cooldownSeconds: 237600
+    rewardXp: 27200
+    rewardItems:
+      DIAMOND: 56
+      EMERALD: 104
+      NETHERITE_SCRAP: 6
+      TOTEM_OF_UNDYING: 2
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l16
+        amount: 1
+    baseMobCount: 30
+    waveIncrement: 9
+    bossSupportCount: 26
+    eliteChance: 0.42
+    regularMobs:
+    - DROWNED
+    - custom:tide_reaver
+    - custom:omen_harpooner
+    eliteMobs:
+    - STRAY
+    - custom:omen_channeler
+    bossMob: custom:omen_tidebreaker
+    rewardMoney: 7000
+    maxDurationSeconds: 3600
+  l17:
+    minCityLevel: 170
+    waves: 16
+    guardianHp: 18200
+    startCost: 19500
+    cooldownSeconds: 259200
+    rewardXp: 32800
+    rewardItems:
+      DIAMOND: 60
+      EMERALD: 112
+      ECHO_SHARD: 20
+      NETHERITE_SCRAP: 6
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l17
+        amount: 1
+      - item: cittaexp_gui:golem_guard_leggings
+        amount: 1
+    baseMobCount: 31
+    waveIncrement: 9
+    bossSupportCount: 28
+    eliteChance: 0.44
+    regularMobs:
+    - DROWNED
+    - STRAY
+    - ENDERMAN
+    - custom:tide_reaver
+    - custom:omen_harpooner
+    eliteMobs:
+    - WITCH
+    - custom:omen_channeler
+    bossMob: custom:omen_tidebreaker
+    rewardMoney: 8190
+    maxDurationSeconds: 3825
+  l18:
+    minCityLevel: 180
+    waves: 17
+    guardianHp: 21100
+    startCost: 21600
+    cooldownSeconds: 302400
+    rewardXp: 39200
+    rewardItems:
+      DIAMOND: 64
+      EMERALD: 120
+      TOTEM_OF_UNDYING: 2
+      ENCHANTED_GOLDEN_APPLE: 1
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l18
+        amount: 1
+      - item: cittaexp_gui:golem_guard_chestplate
+        amount: 1
+    baseMobCount: 33
+    waveIncrement: 9
+    bossSupportCount: 30
+    eliteChance: 0.46
+    regularMobs:
+    - DROWNED
+    - ENDERMAN
+    - STRAY
+    - custom:tide_reaver
+    - custom:omen_harpooner
+    eliteMobs:
+    - WITCH
+    - WITHER_SKELETON
+    - custom:omen_channeler
+    bossMob: custom:abyssal_herald
+    rewardMoney: 9720
+    maxDurationSeconds: 4050
+  l19:
+    minCityLevel: 190
+    waves: 17
+    guardianHp: 24400
+    startCost: 23800
+    cooldownSeconds: 345600
+    rewardXp: 46500
+    rewardItems:
+      DIAMOND: 68
+      EMERALD: 128
+      NETHERITE_SCRAP: 8
+      ENCHANTED_GOLDEN_APPLE: 1
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l19
+        amount: 1
+    baseMobCount: 35
+    waveIncrement: 10
+    bossSupportCount: 32
+    eliteChance: 0.48
+    regularMobs:
+    - DROWNED
+    - ENDERMAN
+    - PILLAGER
+    - custom:tide_reaver
+    - custom:omen_harpooner
+    eliteMobs:
+    - WITCH
+    - PIGLIN_BRUTE
+    - custom:omen_channeler
+    bossMob: custom:abyssal_herald
+    rewardMoney: 11424
+    maxDurationSeconds: 4275
+  l20:
+    minCityLevel: 200
+    waves: 18
+    guardianHp: 28000
+    startCost: 26000
+    cooldownSeconds: 388800
+    rewardXp: 54800
+    rewardItems:
+      DIAMOND: 72
+      EMERALD: 144
+      ECHO_SHARD: 24
+      TOTEM_OF_UNDYING: 3
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l20
+        amount: 1
+      - item: cittaexp_gui:golem_guard_sword
+        amount: 1
+    baseMobCount: 36
+    waveIncrement: 10
+    bossSupportCount: 34
+    eliteChance: 0.5
+    regularMobs:
+    - DROWNED
+    - ENDERMAN
+    - WITHER_SKELETON
+    - custom:tide_reaver
+    - custom:omen_harpooner
+    eliteMobs:
+    - WITCH
+    - PIGLIN_BRUTE
+    - custom:omen_channeler
+    bossMob: custom:abyssal_herald
+    rewardMoney: 13000
+    maxDurationSeconds: 4500
+  l21:
+    minCityLevel: 210
+    waves: 18
+    guardianHp: 32000
+    startCost: 30000
+    cooldownSeconds: 432000
+    rewardXp: 64200
+    rewardItems:
+      DIAMOND: 80
+      EMERALD: 160
+      NETHERITE_SCRAP: 10
+      ENCHANTED_GOLDEN_APPLE: 1
+      TOTEM_OF_UNDYING: 3
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l21
+        amount: 1
+    baseMobCount: 38
+    waveIncrement: 10
+    bossSupportCount: 36
+    eliteChance: 0.52
+    regularMobs:
+    - WITHER_SKELETON
+    - SKELETON
+    - custom:throne_legionnaire
+    - custom:throne_ballista
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - custom:doom_guard
+    bossMob: custom:doom_juggernaut
+    rewardMoney: 15000
+    maxDurationSeconds: 4500
+  l22:
+    minCityLevel: 220
+    waves: 19
+    guardianHp: 36500
+    startCost: 33000
+    cooldownSeconds: 475200
+    rewardXp: 74800
+    rewardItems:
+      DIAMOND: 88
+      EMERALD: 176
+      ECHO_SHARD: 32
+      NETHERITE_SCRAP: 10
+      TOTEM_OF_UNDYING: 3
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l22
+        amount: 1
+    baseMobCount: 39
+    waveIncrement: 11
+    bossSupportCount: 38
+    eliteChance: 0.54
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:throne_legionnaire
+    - custom:throne_ballista
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:doom_guard
+    bossMob: custom:doom_juggernaut
+    rewardMoney: 17160
+    maxDurationSeconds: 4725
+  l23:
+    minCityLevel: 230
+    waves: 20
+    guardianHp: 41500
+    startCost: 36000
+    cooldownSeconds: 518400
+    rewardXp: 86700
+    rewardItems:
+      DIAMOND: 96
+      EMERALD: 192
+      NETHERITE_SCRAP: 12
+      ENCHANTED_GOLDEN_APPLE: 2
+      TOTEM_OF_UNDYING: 4
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l23
+        amount: 1
+    baseMobCount: 41
+    waveIncrement: 11
+    bossSupportCount: 40
+    eliteChance: 0.56
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:throne_legionnaire
+    - custom:throne_ballista
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:doom_guard
+    bossMob: custom:last_siege_king
+    rewardMoney: 19080
+    maxDurationSeconds: 4950
+  l24:
+    minCityLevel: 240
+    waves: 20
+    guardianHp: 47000
+    startCost: 39000
+    cooldownSeconds: 561600
+    rewardXp: 100000
+    rewardItems:
+      DIAMOND: 112
+      EMERALD: 224
+      ECHO_SHARD: 40
+      NETHERITE_SCRAP: 14
+      TOTEM_OF_UNDYING: 4
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l24
+        amount: 1
+    baseMobCount: 42
+    waveIncrement: 12
+    bossSupportCount: 42
+    eliteChance: 0.58
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - PILLAGER
+    - custom:throne_legionnaire
+    - custom:throne_ballista
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:doom_guard
+    bossMob: custom:last_siege_king
+    rewardMoney: 21060
+    maxDurationSeconds: 5175
+  l25:
+    minCityLevel: 250
+    waves: 22
+    guardianHp: 53000
+    startCost: 42000
+    cooldownSeconds: 604800
+    rewardXp: 115000
+    rewardItems:
+      DIAMOND: 128
+      EMERALD: 256
+      ECHO_SHARD: 48
+      NETHERITE_SCRAP: 16
+      ENCHANTED_GOLDEN_APPLE: 3
+      TOTEM_OF_UNDYING: 5
+    firstClearUniqueRewards:
+      - item: cittaexp_gui:mob_invasion_trophy_l25
+        amount: 1
+    baseMobCount: 44
+    waveIncrement: 12
+    bossSupportCount: 46
+    eliteChance: 0.6
+    regularMobs:
+    - WITHER_SKELETON
+    - ENDERMAN
+    - custom:throne_legionnaire
+    - custom:throne_ballista
+    - custom:doom_guard
+    eliteMobs:
+    - PIGLIN_BRUTE
+    - WITCH
+    - custom:doom_guard
+    bossMob: custom:last_siege_king
+    rewardMoney: 23100
+    maxDurationSeconds: 5400
+retry:
+  exemptFromTier: L16
+  l1To5:
+    moneyMultiplier: 0.2
+    baseResourceMultiplier: 1.5
+  l6To10:
+    moneyMultiplier: 0.35
+    baseResourceMultiplier: 1.35
+  l11To15:
+    moneyMultiplier: 0.5
+    baseResourceMultiplier: 1.2
+  boostedMaterials:
+  - IRON_INGOT
+  - GOLD_INGOT
+  - COPPER_INGOT
+  - REDSTONE
+  - COAL
+  - LAPIS_LAZULI
+  - QUARTZ
+  - BREAD
+  - ARROW
+  - STRING
+  - LEATHER
+  - PRISMARINE
+  - OBSIDIAN

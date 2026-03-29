@@ -1,0 +1,7 @@
+id: trait_ritualist
+nameSuffix: "del Rito"
+tags:
+  - ritualist
+addAbilities:
+  - defense_ritual_burst
+removeAbilities: []

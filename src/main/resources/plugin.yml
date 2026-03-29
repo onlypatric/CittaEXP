@@ -3,22 +3,58 @@ version: ${version}
 main: it.patric.cittaexp.CittaExpPlugin
 api-version: '1.21'
 authors: [Patric]
-description: Bootstrap minimale CittaEXP basato su HuskTowns.
+description: Core principale di CittaEXP.
 depend: [HuskTowns]
-softdepend: [HuskClaims]
+softdepend: [Vault, HuskClaims]
 permissions:
   cittaexp.city.use:
     description: Accesso ai comandi /city
     default: true
   cittaexp.staff.level:
-    description: Accesso staff a /cittaexp staff level ...
+    description: Accesso staff/admin a /cittaexp admin level ... e /cittaexp admin xp ...
     default: op
   cittaexp.town.level.bypass:
     description: Bypass tecnico per usare /town level
     default: op
+  cittaexp.town.war.bypass:
+    description: Bypass tecnico per usare /war quando e attiva una guerra globale
+    default: op
   cittaexp.city.players.staff:
-    description: Accesso staff a /cittaexp staff city players <citta>
+    description: Accesso staff/admin a GUI target citta e /cittaexp admin vault open <citta>
     default: op
   cittaexp.admin.probe:
     description: Accesso a /cittaexp probe
+    default: op
+  cittaexp.admin.reload:
+    description: Accesso a /cittaexp reload per ricaricare config e YAML di CittaEXP
+    default: op
+  cittaexp.staff.custommobs:
+    description: Accesso staff/admin a /cittaexp admin custommobs ...
+    default: op
+  cittaexp.staff.defense:
+    description: Accesso staff/admin a /cittaexp admin defense ...
+    default: op
+  cittaexp.staff.economy:
+    description: Accesso staff/admin a /cittaexp admin economy ... e /cittaexp admin bank ...
+    default: op
+  cittaexp.staff.discord:
+    description: Accesso staff/admin a /cittaexp admin discord ...
+    default: op
+  cittaexp.staff.claims:
+    description: Accesso staff/admin a /cittaexp admin claims ...
+    default: op
+  cittaexp.staff.hopper:
+    description: Accesso staff/admin a /cittaexp admin hopper ...
+    default: op
+  cittaexp.staff.events.manage:
+    description: Accesso staff/admin ai comandi di creazione e gestione staff events
+    default: op
+  cittaexp.staff.events.review:
+    description: Accesso staff/admin alla review delle submission eventi
+    default: op
+  cittaexp.staff.events.reward:
+    description: Accesso staff/admin all'assegnazione reward manuali degli eventi
+    default: op
+  cittaexp.husktowns.raw.bypass:
+    description: Bypass admin per usare direttamente i comandi raw del core citta
     default: op

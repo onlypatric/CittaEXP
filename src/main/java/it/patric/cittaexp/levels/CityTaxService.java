@@ -1,5 +1,7 @@
 package it.patric.cittaexp.levels;
 
+import it.patric.cittaexp.economy.EconomyBalanceCategory;
+import it.patric.cittaexp.economy.EconomyValueService;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -23,6 +25,7 @@ public final class CityTaxService {
     private final HuskTownsApiHook huskTownsApiHook;
     private final CityLevelStore store;
     private final CityLevelSettings settings;
+    private final EconomyValueService economyValueService;
 
     private volatile String lastError;
     private volatile Instant lastRunAt;
@@ -32,12 +35,14 @@ public final class CityTaxService {
             Plugin plugin,
             HuskTownsApiHook huskTownsApiHook,
             CityLevelStore store,
-            CityLevelSettings settings
+            CityLevelSettings settings,
+            EconomyValueService economyValueService
     ) {
         this.plugin = plugin;
         this.huskTownsApiHook = huskTownsApiHook;
         this.store = store;
         this.settings = settings;
+        this.economyValueService = economyValueService;
     }
 
     public void start() {
@@ -73,12 +78,13 @@ public final class CityTaxService {
                 TownProgression progression = store.getOrCreateProgression(town.getId());
                 TownStage stage = progression.stage();
                 CityLevelSettings.StageSpec spec = settings.spec(stage);
-                if (spec.monthlyTax() <= 0.0D) {
+                double effectiveTax = economyValueService.effectiveAmount(EconomyBalanceCategory.TOWN_MONTHLY_TAX, spec.monthlyTax());
+                if (effectiveTax <= 0.0D) {
                     continue;
                 }
 
                 double debt = store.getDebt(town.getId());
-                double due = debt + spec.monthlyTax();
+                double due = debt + effectiveTax;
                 double balance = town.getMoney().doubleValue();
                 double paid = Math.min(due, Math.max(0.0D, balance));
                 double debtAfter = Math.max(0.0D, due - paid);

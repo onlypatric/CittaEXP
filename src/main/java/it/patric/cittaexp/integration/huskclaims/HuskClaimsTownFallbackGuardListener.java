@@ -72,10 +72,6 @@ public final class HuskClaimsTownFallbackGuardListener implements Listener {
     }
 
     private void guard(Player player, Cancellable cancellable, Region region, String action) {
-        if (hookStateService.mode() != HuskClaimsHookStateService.GuardMode.FALLBACK_GUARD_ACTIVE) {
-            return;
-        }
-
         try {
             if (!overlapChecker.overlapsTownClaim(player.getWorld(), region)) {
                 return;

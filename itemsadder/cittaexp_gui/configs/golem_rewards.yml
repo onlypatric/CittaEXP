@@ -1,0 +1,151 @@
+info:
+  namespace: cittaexp_gui
+
+equipments:
+  golem_guard:
+    type: armor
+    layer_1: armor/golem_guard/layer_1
+    layer_2: armor/golem_guard/layer_2
+
+items:
+  golem_poppy:
+    enabled: true
+    name: "<gradient:#d74b4b:#ffb37a><bold>Papavero del Guardiano</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Ai piedi delle mura cadde un solo fiore.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>Il golem resto fermo finche il villaggio fu salvo.</white>"
+      - "<gray>Ricordo della prima difesa contro l'orda.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: POPPY
+    item_model: cittaexp_gui:golem_poppy
+    glint: true
+
+  golem_guard_helmet:
+    enabled: true
+    name: "<gradient:#d3d7de:#f2c66d><bold>Elmo del Guardiano di Pietra</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Il primo colpo trovo ferro, non paura.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>Questo elmo ricorda la notte in cui il villaggio resse.</white>"
+      - "<gray>Premio unico per la prima vittoria del livello 12.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: LEATHER_HELMET
+    item_model: cittaexp_gui:golem_guard_helmet
+    durability:
+      max_durability: 600
+    equipment:
+      id: cittaexp_gui:golem_guard
+    attribute_modifiers:
+      head:
+        armor: 6
+        armor_toughness: 4
+        max_health: 2
+        knockback_resistance: 0.01
+    enchants:
+      - minecraft:protection:6
+      - minecraft:blast_protection:3
+      - minecraft:unbreaking:3
+      - minecraft:mending:1
+
+  golem_guard_boots:
+    enabled: true
+    name: "<gradient:#c6ccd6:#dfb862><bold>Stivali del Guardiano di Pietra</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Ogni passo spinse l'orda lontano dalle case.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>La polvere del villaggio si fermo solo all'alba.</white>"
+      - "<gray>Premio unico per la prima vittoria del livello 15.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: LEATHER_BOOTS
+    item_model: cittaexp_gui:golem_guard_boots
+    durability:
+      max_durability: 600
+    equipment:
+      id: cittaexp_gui:golem_guard
+    attribute_modifiers:
+      feet:
+        armor: 6
+        armor_toughness: 4
+        max_health: 2
+        knockback_resistance: 0.01
+    enchants:
+      - minecraft:protection:6
+      - minecraft:blast_protection:3
+      - minecraft:unbreaking:3
+      - minecraft:mending:1
+
+  golem_guard_leggings:
+    enabled: true
+    name: "<gradient:#c0c7d1:#d8b15d><bold>Gambiere del Guardiano di Pietra</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Nel fumo restarono in piedi come mura vive.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>Chi le indossa porta con se il peso di quella veglia.</white>"
+      - "<gray>Premio unico per la prima vittoria del livello 17.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: LEATHER_LEGGINGS
+    item_model: cittaexp_gui:golem_guard_leggings
+    durability:
+      max_durability: 600
+    equipment:
+      id: cittaexp_gui:golem_guard
+    attribute_modifiers:
+      legs:
+        armor: 6
+        armor_toughness: 4
+        max_health: 2
+        knockback_resistance: 0.01
+    enchants:
+      - minecraft:protection:6
+      - minecraft:blast_protection:3
+      - minecraft:unbreaking:3
+      - minecraft:mending:1
+
+  golem_guard_chestplate:
+    enabled: true
+    name: "<gradient:#b6beca:#d5a84f><bold>Corazza del Guardiano di Pietra</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Qui batte il cuore che tenne la linea fino all'ultimo.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>Quando il portone tremo, il guardiano non si mosse.</white>"
+      - "<gray>Premio unico per la prima vittoria del livello 18.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: LEATHER_CHESTPLATE
+    item_model: cittaexp_gui:golem_guard_chestplate
+    durability:
+      max_durability: 600
+    equipment:
+      id: cittaexp_gui:golem_guard
+    attribute_modifiers:
+      chest:
+        armor: 6
+        armor_toughness: 4
+        max_health: 2
+        knockback_resistance: 0.01
+    enchants:
+      - minecraft:protection:6
+      - minecraft:blast_protection:3
+      - minecraft:unbreaking:3
+      - minecraft:mending:1
+
+  golem_guard_sword:
+    enabled: true
+    name: "<gradient:#d6d8dd:#f0b35c><bold>Spada del Guardiano di Pietra</bold></gradient>"
+    lore:
+      - "<dark_gray><bold>—————————————</bold>"
+      - "<gold><bold>➥</bold></gold> <yellow>Quando il sole torno, il guardiano lascio solo questa lama.</yellow>"
+      - "<gold><bold>➥</bold></gold> <white>Non parlo mai, ma salvo il villaggio fino alla fine.</white>"
+      - "<gray>Premio unico per la prima vittoria del livello 20.</gray>"
+      - "<dark_gray><bold>—————————————</bold>"
+    material: NETHERITE_SWORD
+    item_model: cittaexp_gui:golem_guard_sword
+    durability:
+      max_durability: 2031
+    enchants:
+      - minecraft:sharpness:6
+      - minecraft:looting:4
+      - minecraft:unbreaking:5
+      - minecraft:mending:1
+      - minecraft:knockback:1
+      - minecraft:binding_curse:1

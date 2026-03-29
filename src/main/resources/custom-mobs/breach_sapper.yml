@@ -1,0 +1,43 @@
+id: breach_sapper
+type: ZOMBIE
+name: "<red>Zappatore Cremisi</red>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: breach
+pools:
+  - defense
+  - regular
+themes:
+  - breach
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 36.0
+  GENERIC_ATTACK_DAMAGE: 6.0
+  GENERIC_MOVEMENT_SPEED: 0.27
+equipment:
+  helmet: CHAINMAIL_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: CHAINMAIL_LEGGINGS
+  boots: IRON_BOOTS
+  mainHand: STONE_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - breach
+  - sapper
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_guardian_hunter
+  - trait_sapper
+  - trait_runner
+variants:
+  - variant_breach_lancer
+  - variant_scorched
+  - variant_breach_plated
+  - variant_breach_raze

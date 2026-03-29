@@ -1,0 +1,41 @@
+id: throne_ballista
+type: SKELETON
+name: "<gray>Ballista del Trono</gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: throne
+pools:
+  - defense
+  - regular
+themes:
+  - throne
+  - apocalypse
+stats:
+  GENERIC_MAX_HEALTH: 56.0
+  GENERIC_ATTACK_DAMAGE: 7.0
+  GENERIC_MOVEMENT_SPEED: 0.27
+equipment:
+  helmet: DIAMOND_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: DIAMOND_LEGGINGS
+  boots: IRON_BOOTS
+  mainHand: CROSSBOW
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - throne
+  - ranged
+mainAbilities:
+  - defense_royal_barrage
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_marksman
+variants:
+  - variant_royal
+  - variant_imperial_plate
+  - variant_blackguard

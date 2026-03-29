@@ -1,0 +1,44 @@
+id: frontier_shieldbearer
+type: HUSK
+name: "<gold>Portascudi del Confine</gold>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: frontier
+pools:
+  - defense
+  - elite
+themes:
+  - frontier
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 48.0
+  GENERIC_ATTACK_DAMAGE: 7.0
+  GENERIC_MOVEMENT_SPEED: 0.24
+equipment:
+  helmet: IRON_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: IRON_LEGGINGS
+  boots: IRON_BOOTS
+  mainHand: IRON_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - frontier
+  - elite
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_guardian_hunter
+  - trait_breacher
+  - trait_leaper
+  - trait_overseer
+variants:
+  - variant_ironclad
+  - variant_bastion
+  - variant_frontier_lancer
+  - variant_frontier_watch

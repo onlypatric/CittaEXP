@@ -1,0 +1,19 @@
+id: defense_guardian_sunder
+trigger: ON_TARGET
+cooldownTicks: 80
+targeting:
+  type: GUARDIAN
+conditions:
+  - type: targetExists
+  - type: waveAtLeast
+    wave: 3
+actions:
+  - type: particles
+    particle: EXPLOSION
+    count: 6
+  - type: sound
+    sound: ENTITY_RAVAGER_ATTACK
+    volume: 1.2
+    pitch: 0.8
+  - type: directDamage
+    amount: 10.0

@@ -1,0 +1,187 @@
+objectives:
+  resource_contribution:
+    name: "Consegna risorse"
+    description: "Metti {target} punti di risorse nell'Item Vault.<br>- i materiali comuni valgono 1 punto<br>- i materiali rari valgono di piu"
+  vault_delivery:
+    name: "Deposito richiesto"
+    description: "Deposita {target} {focus_label} nell'Item Vault della citta.<br>Quando completi la sfida, questi materiali vengono presi dal vault."
+  mob_kill:
+    name: "Elimina mob"
+    description: "Uccidi {target} mob ostili mentre giochi normalmente."
+  rare_mob_kill:
+    name: "Elimina mob rari"
+    description: "Uccidi {target} mob rari validi per il contesto della sfida."
+  boss_kill:
+    name: "Elimina boss"
+    description: "Sconfiggi {target} boss validi per questa sfida."
+  block_mine:
+    name: "Scava blocchi"
+    description: "Rompi {target} blocchi mentre mini."
+  crop_harvest:
+    name: "Raccogli colture"
+    description: "Raccogli {target} colture mature come grano, patate, carote o barbabietole."
+  farming_ecosystem:
+    name: "Attivita in fattoria"
+    description: "Completa {target} azioni tra raccolta campi e gestione animali."
+  construction:
+    name: "Costruisci"
+    description: "Piazza {target} blocchi utili per la tua citta."
+  redstone_automation:
+    name: "Usa la redstone"
+    description: "Completa {target} azioni valide con circuiti o automazioni redstone."
+  fish_catch:
+    name: "Pesca"
+    description: "Pesca {target} catture."
+  animal_interaction:
+    name: "Gestisci animali"
+    description: "Completa {target} interazioni con gli animali, per esempio nutrire o allevare."
+  structure_discovery:
+    name: "Scopri strutture"
+    description: "Trova e visita {target} strutture naturali del mondo."
+  archaeology_brush:
+    name: "Archeologia"
+    description: "Usa il pennello su {target} blocchi archeologici."
+  structure_loot:
+    name: "Apri loot di strutture"
+    description: "Apri {target} chest o loot trovati nelle strutture naturali."
+  trial_vault_open:
+    name: "Apri Trial Vault"
+    description: "Apri {target} vault nelle Trial Chamber."
+  raid_win:
+    name: "Vinci raid"
+    description: "Completa {target} raid difendendo il villaggio fino alla vittoria."
+  food_craft:
+    name: "Prepara cibo"
+    description: "Produci {target} porzioni di cibo utile alla citta, per esempio pane, bistecche o carote dorate."
+  brew_potion:
+    name: "Prepara pozioni"
+    description: "Produci {target} pozioni nel brewing stand. Vanno bene normali, splash o livello II."
+  item_craft:
+    name: "Craft avanzato"
+    description: "Crafta {target} oggetti importanti, per esempio beacon, armature in diamante o netherite e macchine redstone."
+  nether_activity:
+    name: "Attivita nel Nether"
+    description: "Nel Nether completa {target} azioni valide, per esempio combattimento o raccolta di materiali rari."
+  ocean_activity:
+    name: "Attivita nell'oceano"
+    description: "Nell'oceano completa {target} azioni valide, per esempio combattimento o raccolta di blocchi marini."
+  place_block:
+    name: "Costruisci il monumento"
+    description: "Piazza {target} blocchi per il monumento della citta."
+  team_phase_quest:
+    name: "Missione di squadra"
+    description: "Missione in 3 fasi: raccogli risorse, costruisci la struttura e sconfiggi il boss finale."
+  secret_quest:
+    name: "Missione segreta"
+    description: "Missione nascosta: completa i 3 trigger segreti per sbloccare il premio."
+  transport_distance:
+    name: "Distanza percorsa"
+    description: "Percorri in totale {target} metri."
+  dimension_travel:
+    name: "Viaggi tra dimensioni"
+    description: "Completa {target} passaggi validi tra Overworld, Nether ed End."
+  villager_trade:
+    name: "Scambi coi villager"
+    description: "Fai {target} scambi con i villager."
+  economy_advanced:
+    name: "Economia avanzata"
+    description: "Completa {target} scambi conclusi con i villager usando la finestra di trade."
+  playtime_minutes:
+    name: "Tempo online"
+    description: "Resta attivo per {target} minuti."
+  xp_pickup:
+    name: "Raccogli XP"
+    description: "Raccogli {target} punti esperienza."
+
+definitions:
+  archaeology_challenge:
+    description: "Usa il pennello su {target} blocchi archeologici."
+  exploration_challenge:
+    description: "Trova {target} strutture, per esempio un tempio della giungla, un tempio del deserto o una rovina."
+  mining_global:
+    description: "Rompi {target} blocchi in miniera."
+  mob_hunt:
+    description: "Uccidi {target} mob ostili con il tuo team."
+  boss_challenge:
+    description: "Sconfiggi {target} boss validi per questa sfida."
+  rare_mob_encounter:
+    description: "Uccidi {target} mob rari validi."
+  transport_challenge:
+    description: "Raggiungi una distanza totale di {target} metri."
+  dimension_challenge:
+    description: "Completa {target} viaggi validi tra le dimensioni."
+  resources_contribution:
+    description: "Contribuisci al vault cittadino fino a {target} punti."
+  proc_vault_delivery:
+    description: "Deposita {target} {focus_label} nell'Item Vault della citta. Quando completi la sfida, questi materiali vengono presi dal vault."
+  farming_global:
+    description: "Raccogli {target} colture mature."
+  construction_challenge:
+    description: "Piazza {target} blocchi da costruzione."
+  redstone_challenge:
+    description: "Completa {target} azioni con la redstone."
+  fishing_challenge:
+    description: "Pesca {target} catture."
+  proc_food_production:
+    description: "Produci {target} porzioni di cibo."
+  proc_brew_potion:
+    description: "Produci {target} pozioni."
+  proc_craft_master:
+    description: "Crafta {target} oggetti importanti, per esempio beacon, armature in diamante o netherite e macchine redstone."
+  proc_nether_activity:
+    description: "Nel Nether completa {target} azioni valide, per esempio combattimento o raccolta di materiali rari."
+  proc_ocean_operation:
+    description: "Nell'oceano completa {target} azioni valide, per esempio combattimento o raccolta di blocchi marini."
+  proc_build_monument:
+    description: "Piazza {target} blocchi insieme al tuo team per finire il monumento cittadino."
+  proc_secret_quest:
+    description: "Trova e completa i 3 trigger segreti del mese."
+  proc_season_team_phase_01:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_02:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_03:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_04:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_05:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_06:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_07:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_08:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_09:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  proc_season_team_phase_10:
+    description: "Missione stagionale a fasi: raccogli risorse, costruisci e sconfiggi il boss."
+  animal_interaction:
+    description: "Completa {target} interazioni con gli animali."
+  playtime:
+    description: "Resta attivo per {target} minuti."
+  xp_pickup:
+    description: "Raccogli {target} punti esperienza."
+
+narratives:
+  mob_kill: "Uccidi {target} {focus} in {dimension}."
+  rare_mob_kill: "Uccidi {target} {focus} in {dimension}."
+  block_mine: "Rompi {target} {focus} in {dimension}."
+  vault_delivery: "Deposita {target} {focus_label} nell'Item Vault della citta."
+  crop_harvest: "Raccogli {target} unita di {focus}."
+  fish_catch: "Pesca {target} catture."
+  construction: "Piazza {target} blocchi di {focus}."
+  redstone_automation: "Completa {target} azioni redstone con {focus}."
+  animal_interaction: "Completa {target} interazioni con {focus}."
+  structure_discovery: "Scopri {target} strutture naturali."
+  structure_loot: "Apri {target} loot di strutture in {dimension}."
+  trial_vault_open: "Apri {target} vault nelle Trial Chamber."
+  raid_win: "Completa {target} raid vincendo la difesa del villaggio."
+  food_craft: "Produci {target} porzioni di {focus}."
+  brew_potion: "Produci {target} pozioni con focus {focus}."
+  item_craft: "Crafta {target} unita di {focus}."
+  nether_activity: "Nel Nether completa {target} azioni valide."
+  ocean_activity: "Nell'oceano completa {target} azioni valide."
+  place_block: "Piazza {target} blocchi per il monumento cittadino."
+  team_phase_quest: "Missione stagionale in 3 fasi: raccogli risorse, costruisci e sconfiggi il boss finale."
+  secret_quest: "Missione nascosta: completa i 3 trigger segreti del mese."

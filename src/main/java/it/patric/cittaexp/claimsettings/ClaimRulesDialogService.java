@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,62 +98,78 @@ public final class ClaimRulesDialogService {
                 claimType,
                 state
         ));
-        showDialog(player, buildDialog(player, claimType, onReturn), configUtils.msg(
+        showDialog(player, buildDialog(player, claimType, member.get().town().getName(), onReturn), configUtils.msg(
                 "city.players.dialog.claim_settings.errors.unavailable",
                 "<red>Dialog non disponibile su questo server.</red>"
         ));
     }
 
-    private Dialog buildDialog(Player viewer, Claim.Type claimType, Runnable onReturn) {
+    private Dialog buildDialog(Player viewer, Claim.Type claimType, String townName, Runnable onReturn) {
         ClaimRulesDialogSession session = sessionsByViewer.get(viewer.getUniqueId());
         if (session == null) {
             return Dialog.create(factory -> factory.empty());
         }
 
-        String typeName = claimType.name();
+        String typeName = claimTypeLabel(claimType);
+        long enabledCount = session.flagStates().values().stream().filter(Boolean.TRUE::equals).count();
+        long disabledCount = session.flagStates().size() - enabledCount;
         DialogBase base = DialogBase.builder(configUtils.msg(
-                        "city.players.dialog.claim_settings.title",
-                        "<gold>Impostazioni claim</gold> <gray>{type}</gray>",
-                        Placeholder.unparsed("type", typeName)
+                        "city.players.dialog.claim_settings.mmo.title",
+                        "<gradient:#f0d38a:#c98932>✦ Regole {type} ✦</gradient> <gray>{town}</gray>",
+                        Placeholder.unparsed("type", typeName),
+                        Placeholder.unparsed("town", townName)
                 ))
                 .canCloseWithEscape(true)
                 .pause(false)
                 .afterAction(DialogBase.DialogAfterAction.CLOSE)
-                .body(List.of(DialogBody.plainMessage(configUtils.msg(
-                        "city.players.dialog.claim_settings.body",
-                        "<gray>Configura i flag per il tipo</gray> <white>{type}</white><gray>. " +
-                                "Usa i pulsanti per ON/OFF e salva quando hai finito.</gray>",
-                        Placeholder.unparsed("type", typeName)
-                ))))
+                .body(List.of(
+                        DialogBody.plainMessage(configUtils.msg(
+                                "city.players.dialog.claim_settings.mmo.body_intro",
+                                "<gray>Qui la citta decide il tenore del territorio</gray> <white>{type}</white><gray>. " +
+                                        "Ogni sigillo cambia cio che alleati, ospiti e stranieri possono fare entro questi confini.</gray>",
+                                Placeholder.unparsed("type", typeName)
+                        )),
+                        DialogBody.plainMessage(configUtils.msg(
+                                "city.players.dialog.claim_settings.mmo.body_role",
+                                "<gold>Ruolo del dominio:</gold> <white>{role}</white>",
+                                Placeholder.unparsed("role", typeRole(claimType))
+                        )),
+                        DialogBody.plainMessage(configUtils.msg(
+                                "city.players.dialog.claim_settings.mmo.body_state",
+                                "<green>Attivi:</green> <white>{enabled}</white> <gray>|</gray> <red>Bloccati:</red> <white>{disabled}</white>",
+                                Placeholder.unparsed("enabled", Long.toString(enabledCount)),
+                                Placeholder.unparsed("disabled", Long.toString(disabledCount))
+                        ))
+                ))
                 .build();
 
         return Dialog.create(factory -> {
             List<ActionButton> buttons = new ArrayList<>();
             session.flagStates().entrySet().stream()
-                    .sorted(Comparator.comparing(Map.Entry::getKey, String.CASE_INSENSITIVE_ORDER))
+                    .sorted(Comparator.comparing(entry -> prettifyFlag(entry.getKey()), String.CASE_INSENSITIVE_ORDER))
                     .forEach(entry -> buttons.add(ActionButton.create(
                             configUtils.msg(entry.getValue()
-                                            ? "city.players.dialog.claim_settings.buttons.toggle_on"
-                                            : "city.players.dialog.claim_settings.buttons.toggle_off",
+                                            ? "city.players.dialog.claim_settings.mmo.buttons.toggle_on"
+                                            : "city.players.dialog.claim_settings.mmo.buttons.toggle_off",
                                     entry.getValue()
-                                            ? "<green>{flag}: ON</green>"
-                                            : "<red>{flag}: OFF</red>",
-                                    Placeholder.unparsed("flag", entry.getKey())
+                                            ? "<green>✦ {flag} <gray>•</gray> Attivo</green>"
+                                            : "<red>✦ {flag} <gray>•</gray> Bloccato</red>",
+                                    Placeholder.unparsed("flag", prettifyFlag(entry.getKey()))
                             ),
                             null,
-                            120,
-                            DialogAction.customClick((response, audience) -> toggleFlag(audience, session, entry.getKey(), onReturn), CLICK_OPTIONS)
+                            160,
+                            DialogAction.customClick((response, audience) -> toggleFlag(audience, session, entry.getKey(), townName, onReturn), CLICK_OPTIONS)
                     )));
 
             buttons.add(ActionButton.create(
-                    configUtils.msg("city.players.dialog.claim_settings.buttons.save", "<green>SALVA</green>"),
+                    configUtils.msg("city.players.dialog.claim_settings.mmo.buttons.save", "<green>✦ Sigilla l'assetto</green>"),
                     null,
                     140,
                     DialogAction.customClick((response, audience) -> saveRules(response, audience, session, onReturn), CLICK_OPTIONS)
             ));
 
             ActionButton cancelButton = ActionButton.create(
-                    configUtils.msg("city.players.dialog.claim_settings.buttons.cancel", "<gray>ANNULLA</gray>"),
+                    configUtils.msg("city.players.dialog.claim_settings.mmo.buttons.cancel", "<gray>Ritorna al presidio</gray>"),
                     null,
                     140,
                     DialogAction.customClick((response, audience) -> {
@@ -168,7 +185,7 @@ public final class ClaimRulesDialogService {
         });
     }
 
-    private void toggleFlag(Audience audience, ClaimRulesDialogSession session, String flagId, Runnable onReturn) {
+    private void toggleFlag(Audience audience, ClaimRulesDialogSession session, String flagId, String townName, Runnable onReturn) {
         if (!(audience instanceof Player player)) {
             return;
         }
@@ -179,7 +196,7 @@ public final class ClaimRulesDialogService {
             return;
         }
         current.toggle(flagId);
-        showDialog(player, buildDialog(player, current.claimType(), onReturn), configUtils.msg(
+        showDialog(player, buildDialog(player, current.claimType(), townName, onReturn), configUtils.msg(
                 "city.players.dialog.claim_settings.errors.unavailable",
                 "<red>Dialog non disponibile su questo server.</red>"
         ));
@@ -236,6 +253,42 @@ public final class ClaimRulesDialogService {
                 && current.citySessionId().equals(expected.citySessionId())
                 && current.townId() == expected.townId()
                 && current.claimType() == expected.claimType();
+    }
+
+    private String claimTypeLabel(Claim.Type claimType) {
+        return switch (claimType) {
+            case CLAIM -> "CLAIM";
+            case FARM -> "FARM";
+            case PLOT -> "PLOT";
+        };
+    }
+
+    private String typeRole(Claim.Type claimType) {
+        return switch (claimType) {
+            case CLAIM -> "i confini principali, la sicurezza ordinaria e il respiro politico della citta";
+            case FARM -> "i campi, le filiere e le zone in cui la produzione deve restare disciplinata";
+            case PLOT -> "i lotti sensibili, gli spazi speciali e le aree che richiedono permessi piu stretti";
+        };
+    }
+
+    private String prettifyFlag(String flagId) {
+        if (flagId == null || flagId.isBlank()) {
+            return "Flag sconosciuto";
+        }
+        String normalized = flagId.replace('_', ' ').replace('-', ' ').trim().toLowerCase(Locale.ROOT);
+        StringBuilder builder = new StringBuilder(normalized.length());
+        boolean capitalize = true;
+        for (int index = 0; index < normalized.length(); index++) {
+            char current = normalized.charAt(index);
+            if (Character.isWhitespace(current)) {
+                capitalize = true;
+                builder.append(current);
+                continue;
+            }
+            builder.append(capitalize ? Character.toUpperCase(current) : current);
+            capitalize = false;
+        }
+        return builder.toString();
     }
 
     private void showDialog(Audience audience, Dialog dialog, Component unavailableMessage) {

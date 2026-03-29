@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.logging.Logger;
@@ -103,6 +104,21 @@ public final class HuskTownsRoleLadderService {
 
         public String roleName(int weight) {
             return weightNames.getOrDefault(weight, "Ruolo " + weight);
+        }
+
+        public OptionalInt weightForRoleNameContains(String... fragments) {
+            if (fragments == null || fragments.length == 0) {
+                return OptionalInt.empty();
+            }
+            for (Integer weight : sortedWeights) {
+                String roleName = roleName(weight).toLowerCase(Locale.ROOT);
+                for (String fragment : fragments) {
+                    if (fragment != null && !fragment.isBlank() && roleName.contains(fragment.toLowerCase(Locale.ROOT))) {
+                        return OptionalInt.of(weight);
+                    }
+                }
+            }
+            return OptionalInt.empty();
         }
 
         public int mayorWeight() {

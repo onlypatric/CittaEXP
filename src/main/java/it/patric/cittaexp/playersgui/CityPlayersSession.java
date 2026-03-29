@@ -12,6 +12,7 @@ public final class CityPlayersSession {
     private String townName;
     private UUID mayorId;
     private boolean staffView;
+    private CityPlayersBackTarget backTarget;
     private int page;
     private List<CityPlayersMemberView> members;
 
@@ -22,6 +23,7 @@ public final class CityPlayersSession {
             String townName,
             UUID mayorId,
             boolean staffView,
+            CityPlayersBackTarget backTarget,
             List<CityPlayersMemberView> members
     ) {
         this.sessionId = sessionId;
@@ -30,6 +32,7 @@ public final class CityPlayersSession {
         this.townName = townName;
         this.mayorId = mayorId;
         this.staffView = staffView;
+        this.backTarget = backTarget;
         this.page = 0;
         this.members = new ArrayList<>(members);
     }
@@ -56,6 +59,14 @@ public final class CityPlayersSession {
 
     public boolean staffView() {
         return staffView;
+    }
+
+    public CityPlayersBackTarget backTarget() {
+        return backTarget;
+    }
+
+    public void backTarget(CityPlayersBackTarget backTarget) {
+        this.backTarget = backTarget == null ? CityPlayersBackTarget.LIST : backTarget;
     }
 
     public int page() {

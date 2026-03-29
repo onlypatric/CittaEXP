@@ -8,6 +8,10 @@ public record TownProgression(
         long xpScaled,
         int cityLevel,
         TownStage stage,
+        int stageSealsEarned,
+        int stageSealsRequired,
+        Instant stageCompletedAt,
+        Instant subTierCompletedAt,
         Instant updatedAt
 ) implements Serializable {
 }

@@ -1,0 +1,35 @@
+id: ash_behemoth
+type: RAVAGER
+name: "<dark_red>Colosso di Cenere</dark_red>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: ash
+pools:
+  - defense
+  - miniboss
+themes:
+  - ash
+  - ritual
+stats:
+  GENERIC_MAX_HEALTH: 190.0
+  GENERIC_ATTACK_DAMAGE: 13.0
+  GENERIC_MOVEMENT_SPEED: 0.31
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - ash
+  - miniboss
+mainAbilities:
+  - defense_ritual_burst
+  - defense_guardian_sunder
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_leaper
+variants:
+  - variant_ashen

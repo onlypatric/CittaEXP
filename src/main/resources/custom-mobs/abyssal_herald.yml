@@ -1,0 +1,86 @@
+id: abyssal_herald
+type: DROWNED
+name: "<dark_aqua>Araldo Abissale</dark_aqua>"
+showName: true
+boss: true
+packId: cittaexp_defense_v3
+arc: omen
+pools:
+  - defense
+  - boss
+themes:
+  - omen
+  - tide
+stats:
+  GENERIC_MAX_HEALTH: 360.0
+  GENERIC_ATTACK_DAMAGE: 12.0
+  GENERIC_MOVEMENT_SPEED: 0.30
+equipment:
+  helmet: TURTLE_HELMET
+  chestplate: DIAMOND_CHESTPLATE
+  leggings: DIAMOND_LEGGINGS
+  boots: DIAMOND_BOOTS
+  mainHand: TRIDENT
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - omen
+  - boss
+mainAbilities:
+  - defense_anchor_bolt
+  - defense_dragnet_pull
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_abyssal
+  - variant_deepguard
+bossbar:
+  enabled: true
+  title: "<dark_aqua><bold>{boss}</bold></dark_aqua> <gray>•</gray> <aqua>{phase}</aqua>"
+  color: BLUE
+  overlay: PROGRESS
+localBroadcasts:
+  spawn: "<dark_aqua>❖ L'Araldo Abissale emerge dalla risacca oscura per reclamare il baluardo.</dark_aqua>"
+  phase: "<gold>❖ La marea si torce e l'Araldo richiama la corrente profonda.</gold>"
+  defeat: "<green>❖ L'Araldo Abissale viene ricacciato nell'abisso e la risacca si ritira.</green>"
+phaseBindings:
+  - phase: 1
+    id: herald_phase_i
+    label: Marea Nera
+    hpBelow: 1.0
+    addAbilities: []
+    removeAbilities: []
+    entryActions:
+      - type: particles
+        particle: SQUID_INK
+        count: 20
+  - phase: 2
+    id: herald_phase_ii
+    label: Corrente Profonda
+    hpBelow: 0.66
+    addAbilities:
+      - defense_tide_reinforce
+    removeAbilities: []
+    namePrefix: "<aqua>Profondo</aqua>"
+    entryActions:
+      - type: sound
+        sound: ENTITY_DROWNED_AMBIENT
+        volume: 1.3
+        pitch: 0.7
+  - phase: 3
+    id: herald_phase_iii
+    label: Abisso Scatenato
+    hpBelow: 0.33
+    addAbilities:
+      - defense_final_pulse
+      - defense_phase_rally
+    removeAbilities: []
+    nameSuffix: "<dark_aqua>della Marea</dark_aqua>"
+    entryActions:
+      - type: particles
+        particle: CLOUD
+        count: 28

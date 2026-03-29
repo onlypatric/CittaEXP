@@ -1,0 +1,6 @@
+id: variant_scorched
+namePrefix: "<red>Arso</red>"
+tags:
+  - scorched
+addAbilities: []
+removeAbilities: []

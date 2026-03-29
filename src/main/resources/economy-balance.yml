@@ -1,0 +1,48 @@
+enabled: true
+diamondBaselineCoins: 80.0
+recalcIntervalSeconds: 300
+
+observation:
+  minActiveTowns: 3
+  targetAverageTownTreasury: 18000.0
+  targetRecentRewardEmission: 3500.0
+  treasuryWeight: 0.7
+  emissionWeight: 0.3
+  emissionHalfLifeHours: 24.0
+
+drift:
+  dailyGrowthPercent: 0.35
+
+curves:
+  costExponent: 1.0
+  rewardExponent: 0.75
+  minCostMultiplier: 0.85
+  maxCostMultiplier: 3.0
+  minRewardMultiplier: 0.9
+  maxRewardMultiplier: 2.0
+
+economicRewardMaterials:
+  - DIAMOND
+  - DIAMOND_BLOCK
+  - EMERALD
+  - EMERALD_BLOCK
+  - NETHERITE_INGOT
+  - ANCIENT_DEBRIS
+  - GOLD_BLOCK
+  - BEACON
+  - TOTEM_OF_UNDYING
+  - ENCHANTED_GOLDEN_APPLE
+  - END_CRYSTAL
+
+categoryMultipliers:
+  PLAYER_CITY_CREATE: 1.0
+  TOWN_RENAME: 1.0
+  TOWN_STAGE_UPGRADE: 1.0
+  TOWN_STAGE_REQUIRED_BALANCE: 1.0
+  TOWN_MONTHLY_TAX: 1.0
+  DEFENSE_START_COST: 1.0
+  DEFENSE_MONEY_REWARD: 1.0
+  CHALLENGE_MONEY_REWARD: 1.0
+  RACE_REWARD: 1.0
+  MILESTONE_MONEY_REWARD: 1.0
+  ECONOMIC_ITEM_REWARD: 1.0

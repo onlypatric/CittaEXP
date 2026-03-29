@@ -1,0 +1,37 @@
+id: doom_juggernaut
+type: RAVAGER
+name: "<dark_red>Mastodonte del Tramonto</dark_red>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: throne
+pools:
+  - defense
+  - miniboss
+themes:
+  - throne
+  - apocalypse
+stats:
+  GENERIC_MAX_HEALTH: 300.0
+  GENERIC_ATTACK_DAMAGE: 16.0
+  GENERIC_MOVEMENT_SPEED: 0.33
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - throne
+  - miniboss
+mainAbilities:
+  - defense_breach_slam
+  - defense_guardian_sunder
+  - defense_phase_rally
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_leaper
+  - trait_runner_frenzied
+variants:
+  - variant_last_siege

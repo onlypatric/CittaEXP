@@ -39,7 +39,7 @@ public final class TownLevelCommandBlockListener implements Listener {
             event.setCancelled(true);
             event.getPlayer().sendMessage(configUtils.msg(
                     "city.level.blocked_town_level",
-                    "<red>Usa /city level per gestire il livello citta.</red>"
+                    "<red>Usa /city -> Azioni Citta -> Livelli per gestire il livello citta.</red>"
             ));
             return;
         }

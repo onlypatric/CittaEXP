@@ -1,0 +1,81 @@
+id: frontier_war_ram
+type: RAVAGER
+name: "<dark_red>Ariete di Guerra</dark_red>"
+showName: true
+boss: true
+packId: cittaexp_defense_v3
+arc: frontier
+pools:
+  - defense
+  - boss
+themes:
+  - frontier
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 240.0
+  GENERIC_ATTACK_DAMAGE: 14.0
+  GENERIC_MOVEMENT_SPEED: 0.33
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - frontier
+  - boss
+mainAbilities:
+  - defense_guardian_sunder
+  - defense_breach_slam
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_bastion
+  - variant_ironclad
+bossbar:
+  enabled: true
+  title: "<dark_red><bold>{boss}</bold></dark_red> <gray>•</gray> <gold>{phase}</gold>"
+  color: RED
+  overlay: PROGRESS
+localBroadcasts:
+  spawn: "<dark_red>❖ Un Ariete di Guerra si scaglia contro il baluardo.</dark_red>"
+  phase: "<gold>❖ L'Ariete di Guerra serra il colpo e forza una nuova breccia.</gold>"
+  defeat: "<green>❖ L'Ariete di Guerra crolla ai piedi delle mura.</green>"
+phaseBindings:
+  - phase: 1
+    id: ram_phase_i
+    label: Primo Urto
+    hpBelow: 1.0
+    addAbilities: []
+    removeAbilities: []
+    entryActions:
+      - type: particles
+        particle: SMOKE
+        count: 30
+  - phase: 2
+    id: ram_phase_ii
+    label: Muraglia Spezzata
+    hpBelow: 0.66
+    addAbilities:
+      - defense_frontier_reinforce
+    removeAbilities: []
+    namePrefix: "<red>Furente</red>"
+    entryActions:
+      - type: sound
+        sound: ENTITY_RAVAGER_ROAR
+        volume: 1.4
+        pitch: 0.8
+  - phase: 3
+    id: ram_phase_iii
+    label: Schianto Finale
+    hpBelow: 0.33
+    addAbilities:
+      - defense_final_pulse
+      - defense_phase_rally
+    removeAbilities: []
+    nameSuffix: "<dark_red>della Rovina</dark_red>"
+    entryActions:
+      - type: particles
+        particle: EXPLOSION
+        count: 12

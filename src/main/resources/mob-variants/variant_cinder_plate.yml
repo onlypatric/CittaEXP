@@ -1,0 +1,13 @@
+id: variant_cinder_plate
+weight: 2
+namePrefix: "<dark_red>Carbonizzato</dark_red>"
+tags:
+  - ash
+  - cinder_plate
+equipment:
+  helmet: CHAINMAIL_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: IRON_LEGGINGS
+  boots: CHAINMAIL_BOOTS
+addAbilities: []
+removeAbilities: []

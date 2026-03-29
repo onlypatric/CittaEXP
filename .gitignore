@@ -42,3 +42,5 @@ scripts/bot-tests/.cache/
 # Local packaged artifacts / reports
 dist/
 .reports/
+src/main/resources/config.yml
+src/main/resources/discord.yml

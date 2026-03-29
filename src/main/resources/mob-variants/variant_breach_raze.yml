@@ -1,0 +1,13 @@
+id: variant_breach_raze
+weight: 2
+nameSuffix: "del Varco"
+tags:
+  - breach
+  - raze
+equipment:
+  helmet: GOLDEN_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: CHAINMAIL_LEGGINGS
+  boots: GOLDEN_BOOTS
+addAbilities: []
+removeAbilities: []

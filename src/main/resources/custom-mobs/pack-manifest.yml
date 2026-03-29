@@ -1,0 +1,27 @@
+packId: cittaexp_defense_v3
+defaults:
+  - abyssal_herald.yml
+  - ash_behemoth.yml
+  - ash_cultist.yml
+  - ash_hexer.yml
+  - ash_revenant.yml
+  - breach_marksman.yml
+  - breach_sapper.yml
+  - breach_vanguard.yml
+  - cinder_hierophant.yml
+  - crimson_breach_brute.yml
+  - crimson_breachlord.yml
+  - doom_guard.yml
+  - doom_juggernaut.yml
+  - frontier_bolter.yml
+  - frontier_raider.yml
+  - frontier_ram.yml
+  - frontier_shieldbearer.yml
+  - frontier_war_ram.yml
+  - last_siege_king.yml
+  - omen_channeler.yml
+  - omen_harpooner.yml
+  - omen_tidebreaker.yml
+  - throne_ballista.yml
+  - throne_legionnaire.yml
+  - tide_reaver.yml

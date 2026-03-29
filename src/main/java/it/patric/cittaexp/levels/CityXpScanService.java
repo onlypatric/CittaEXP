@@ -121,7 +121,9 @@ public final class CityXpScanService {
                 if (!settings.materialXpScaled().containsKey(item.getType())) {
                     continue;
                 }
-                counts.merge(item.getType(), (long) item.getAmount(), Long::sum);
+                Long current = counts.get(item.getType());
+                long updated = Math.max(0L, current == null ? 0L : current) + (long) item.getAmount();
+                counts.put(item.getType(), updated);
             }
         });
 

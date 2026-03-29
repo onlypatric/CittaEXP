@@ -6,10 +6,12 @@ import io.papermc.paper.registry.data.dialog.ActionButton;
 import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.body.DialogBody;
-import io.papermc.paper.registry.data.dialog.input.DialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
+import it.patric.cittaexp.discord.DiscordTownSyncService;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
 import it.patric.cittaexp.renametown.TownRenameDialogFlow;
+import it.patric.cittaexp.text.MiniMessageHelper;
+import it.patric.cittaexp.utils.DialogBodyUtils;
 import it.patric.cittaexp.utils.DialogInputUtils;
 import it.patric.cittaexp.utils.DialogViewUtils;
 import it.patric.cittaexp.utils.ExceptionUtils;
@@ -17,6 +19,7 @@ import it.patric.cittaexp.utils.PluginConfigUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.event.ClickCallback;
@@ -33,25 +36,86 @@ public final class TownEditDialogFlow {
             .uses(1)
             .lifetime(Duration.ofMinutes(2))
             .build();
+    private static final List<PresetColor> PRESET_COLORS = List.of(
+            new PresetColor("Rubino", "#e63946"),
+            new PresetColor("Cremisi", "#c1121f"),
+            new PresetColor("Corallo", "#ff6b6b"),
+            new PresetColor("Ambra", "#f77f00"),
+            new PresetColor("Oro", "#ffb703"),
+            new PresetColor("Ocra", "#d4a373"),
+            new PresetColor("Smeraldo", "#2a9d8f"),
+            new PresetColor("Giada", "#52b788"),
+            new PresetColor("Salvia", "#84a98c"),
+            new PresetColor("Menta", "#80ed99"),
+            new PresetColor("Lime", "#a7c957"),
+            new PresetColor("Muschio", "#6a994e"),
+            new PresetColor("Turchese", "#00b4d8"),
+            new PresetColor("Azzurro", "#48cae4"),
+            new PresetColor("Zaffiro", "#3a86ff"),
+            new PresetColor("Cobalto", "#4361ee"),
+            new PresetColor("Indaco", "#3f37c9"),
+            new PresetColor("Notte", "#1d3557"),
+            new PresetColor("Lavanda", "#9d4edd"),
+            new PresetColor("Ametista", "#7b2cbf"),
+            new PresetColor("Viola", "#c77dff"),
+            new PresetColor("Orchidea", "#ff70a6"),
+            new PresetColor("Rosa", "#ff99c8"),
+            new PresetColor("Perla", "#f8edeb"),
+            new PresetColor("Avorio", "#f3e9dc"),
+            new PresetColor("Argento", "#adb5bd"),
+            new PresetColor("Ardesia", "#6c757d"),
+            new PresetColor("Ferro", "#495057"),
+            new PresetColor("Bronzo", "#b08968"),
+            new PresetColor("Carbone", "#212529")
+    );
 
     private final Plugin plugin;
     private final HuskTownsApiHook huskTownsApiHook;
+    private final DiscordTownSyncService discordTownSyncService;
     private final TownRenameDialogFlow townRenameDialogFlow;
     private final PluginConfigUtils configUtils;
 
     public TownEditDialogFlow(
             Plugin plugin,
             HuskTownsApiHook huskTownsApiHook,
+            DiscordTownSyncService discordTownSyncService,
             TownRenameDialogFlow townRenameDialogFlow
     ) {
         this.plugin = plugin;
         this.huskTownsApiHook = huskTownsApiHook;
+        this.discordTownSyncService = discordTownSyncService;
         this.townRenameDialogFlow = townRenameDialogFlow;
         this.configUtils = new PluginConfigUtils(plugin);
     }
 
     public void openRoot(Player player) {
         DialogViewUtils.showDialog(plugin, player, buildRootDialog(player), configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"), "city-edit");
+    }
+
+    public void openBio(Player player) {
+        openTextDialog(EditField.BIO, player);
+    }
+
+    public void openGreeting(Player player) {
+        openTextDialog(EditField.GREETING, player);
+    }
+
+    public void openFarewell(Player player) {
+        openTextDialog(EditField.FAREWELL, player);
+    }
+
+    public void openColor(Player player) {
+        openColorDialog(player);
+    }
+
+    public void openRename(Player player) {
+        if (!hasTownPrivilege(player, Privilege.RENAME)) {
+            player.sendMessage(configUtils.msg(
+                    "city.edit.dialog.errors.no_privilege",
+                    "<red>Permessi insufficienti per questa modifica.</red>"));
+            return;
+        }
+        townRenameDialogFlow.open(player);
     }
 
     private Dialog buildRootDialog(Player viewer) {
@@ -180,55 +244,38 @@ public final class TownEditDialogFlow {
         if (member.isEmpty()) {
             return;
         }
-        RgbValue current = parseHexColor(member.get().town().getColorRgb());
-        DialogViewUtils.showDialog(plugin, audience, buildColorDialog(member.get().town().getColorRgb(), current, current), configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"), "city-edit");
+        DialogViewUtils.showDialog(
+                plugin,
+                audience,
+                buildColorDialog(normalizeTownHex(member.get().town().getColorRgb())),
+                configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"),
+                "city-edit");
     }
 
-    private Dialog buildColorDialog(String currentColorHex, RgbValue input, RgbValue preview) {
+    private Dialog buildColorDialog(String currentColorHex) {
         DialogBase base = DialogBase.builder(configUtils.msg(
                         "city.edit.dialog.color.title",
-                        "<gold>Scegli Colore Citta (RGB)</gold>"))
+                        "<gold>Araldica Cromatica</gold>"))
                 .canCloseWithEscape(true)
                 .pause(false)
                 .afterAction(DialogBase.DialogAfterAction.CLOSE)
-                .body(List.of(DialogBody.plainMessage(configUtils.msg(
+                .body(DialogBodyUtils.plainMessages(
+                        configUtils,
                         "city.edit.dialog.color.body",
-                        "<gray>Imposta RGB (0-255), poi usa Anteprima o Salva.<newline></newline>Attuale: <white>{current}</white><newline>Anteprima: <white>{preview}</white></gray>",
+                        "<gray>Scegli uno dei sigilli cromatici della tua citta.<newline></newline>Colore attuale: <white>{current}</white><newline>Palette disponibili: <gold>{count}</gold></gray>",
                         Placeholder.unparsed("current", currentColorHex),
-                        Placeholder.unparsed("preview", preview.toHex())))))
-                .inputs(List.of(
-                        DialogInput.numberRange("red", configUtils.msg("city.edit.dialog.color.inputs.red", "<red>Rosso</red>"), 0f, 255f)
-                                .width(configUtils.cfgInt("city.edit.dialog.color.width", 320))
-                                .initial((float) input.red())
-                                .step(1f)
-                                .build(),
-                        DialogInput.numberRange("green", configUtils.msg("city.edit.dialog.color.inputs.green", "<green>Verde</green>"), 0f, 255f)
-                                .width(configUtils.cfgInt("city.edit.dialog.color.width", 320))
-                                .initial((float) input.green())
-                                .step(1f)
-                                .build(),
-                        DialogInput.numberRange("blue", configUtils.msg("city.edit.dialog.color.inputs.blue", "<blue>Blu</blue>"), 0f, 255f)
-                                .width(configUtils.cfgInt("city.edit.dialog.color.width", 320))
-                                .initial((float) input.blue())
-                                .step(1f)
-                                .build()
-                ))
+                        Placeholder.unparsed("count", Integer.toString(PRESET_COLORS.size()))))
                 .build();
 
         return Dialog.create(factory -> {
-            ActionButton previewButton = ActionButton.create(
-                    configUtils.msg("city.edit.dialog.color.buttons.preview", "<yellow>Anteprima</yellow>"),
-                    null,
-                    120,
-                    DialogAction.customClick((response, audience) -> handleColorPreview(currentColorHex, response, audience), CLICK_OPTIONS)
-            );
-            ActionButton saveButton = ActionButton.create(
-                    configUtils.msg("city.edit.dialog.color.buttons.save", "<green>Salva</green>"),
-                    null,
-                    120,
-                    DialogAction.customClick((response, audience) -> handleColorSubmit(currentColorHex, response, audience), CLICK_OPTIONS)
-            );
-
+            List<ActionButton> paletteButtons = PRESET_COLORS.stream()
+                    .map(color -> ActionButton.create(
+                            color.buttonLabel(),
+                            color.hoverText(currentColorHex),
+                            110,
+                            DialogAction.customClick((response, audience) -> handleColorSubmit(color, audience), CLICK_OPTIONS)
+                    ))
+                    .toList();
             ActionButton cancelButton = ActionButton.create(
                     configUtils.msg("city.edit.dialog.color.buttons.cancel", "<red>Indietro</red>"),
                     null,
@@ -238,7 +285,7 @@ public final class TownEditDialogFlow {
 
             factory.empty()
                     .base(base)
-                    .type(DialogType.multiAction(List.of(previewButton, saveButton), cancelButton, 2));
+                    .type(DialogType.multiAction(paletteButtons, cancelButton, 3));
         });
     }
 
@@ -264,7 +311,9 @@ public final class TownEditDialogFlow {
         }
 
         try {
-            huskTownsApiHook.editTown(player, member.get().town().getId(), town -> field.apply(town, value));
+            int townId = member.get().town().getId();
+            huskTownsApiHook.editTown(player, townId, town -> field.apply(town, value));
+            discordTownSyncService.registerTownMetadataEdit(townId, player.getUniqueId());
             player.sendMessage(configUtils.msg(
                     "city.edit.dialog.text.success",
                     "<green>{field} aggiornato con successo.</green>",
@@ -282,23 +331,7 @@ public final class TownEditDialogFlow {
         }
     }
 
-    private void handleColorPreview(String currentColorHex, DialogResponseView response, Audience audience) {
-        if (!(audience instanceof Player player)) {
-            audience.sendMessage(configUtils.msg(
-                    "city.edit.dialog.errors.unavailable",
-                    "<red>Dialog non disponibile su questo server.</red>"));
-            return;
-        }
-        Optional<Member> member = requireMemberWithPrivilege(player, Privilege.SET_COLOR);
-        if (member.isEmpty()) {
-            return;
-        }
-        RgbValue fallback = parseHexColor(member.get().town().getColorRgb());
-        RgbValue rgb = readRgb(response, fallback);
-        DialogViewUtils.showDialog(plugin, audience, buildColorDialog(currentColorHex, rgb, rgb), configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"), "city-edit");
-    }
-
-    private void handleColorSubmit(String currentColorHex, DialogResponseView response, Audience audience) {
+    private void handleColorSubmit(PresetColor presetColor, Audience audience) {
         if (!(audience instanceof Player player)) {
             audience.sendMessage(configUtils.msg(
                     "city.edit.dialog.errors.unavailable",
@@ -310,17 +343,26 @@ public final class TownEditDialogFlow {
             return;
         }
 
-        RgbValue fallback = parseHexColor(member.get().town().getColorRgb());
-        RgbValue rgb = readRgb(response, fallback);
-        String rawHex = rgb.toHex();
-        TextColor color = TextColor.color(rgb.red(), rgb.green(), rgb.blue());
+        String rawHex = presetColor.hex();
+        TextColor color = TextColor.fromHexString(rawHex);
+        if (color == null) {
+            player.sendMessage(configUtils.msg(
+                    "city.edit.dialog.color.failed",
+                    "<red>Aggiornamento colore fallito:</red> <gray>{error}</gray>",
+                    Placeholder.unparsed("error", "preset colore non valido")
+            ));
+            return;
+        }
 
         try {
-            huskTownsApiHook.editTown(player, member.get().town().getId(), town -> town.setTextColor(color));
+            int townId = member.get().town().getId();
+            huskTownsApiHook.editTown(player, townId, town -> town.setTextColor(color));
+            discordTownSyncService.registerTownMetadataEdit(townId, player.getUniqueId());
             player.sendMessage(configUtils.msg(
                     "city.edit.dialog.color.success",
-                    "<green>Colore citta aggiornato a</green> <white>{hex}</white>.",
-                    Placeholder.unparsed("hex", rawHex)
+                    "<green>Colore citta consacrato:</green> <white>{hex}</white> <gray>({name})</gray>.",
+                    Placeholder.unparsed("hex", rawHex),
+                    Placeholder.unparsed("name", presetColor.name())
             ));
         } catch (RuntimeException exception) {
             player.sendMessage(configUtils.msg(
@@ -331,31 +373,13 @@ public final class TownEditDialogFlow {
             plugin.getLogger().warning("Town color edit failed player=" + player.getUniqueId()
                     + " hex=" + rawHex
                     + " reason=" + exception.getMessage());
-            DialogViewUtils.showDialog(plugin, audience, buildColorDialog(currentColorHex, rgb, rgb), configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"), "city-edit");
+            DialogViewUtils.showDialog(
+                    plugin,
+                    audience,
+                    buildColorDialog(normalizeTownHex(member.get().town().getColorRgb())),
+                    configUtils.msg("city.edit.dialog.errors.unavailable", "<red>Dialog non disponibile su questo server.</red>"),
+                    "city-edit");
         }
-    }
-
-    private RgbValue readRgb(DialogResponseView response, RgbValue fallback) {
-        int red = clampColor(response.getFloat("red"), fallback.red());
-        int green = clampColor(response.getFloat("green"), fallback.green());
-        int blue = clampColor(response.getFloat("blue"), fallback.blue());
-        return new RgbValue(red, green, blue);
-    }
-
-    private static int clampColor(Float value, int fallback) {
-        if (value == null) {
-            return fallback;
-        }
-        int rounded = Math.round(value);
-        return Math.max(0, Math.min(255, rounded));
-    }
-
-    private static RgbValue parseHexColor(String rawHex) {
-        TextColor parsed = TextColor.fromHexString(rawHex);
-        if (parsed == null) {
-            return new RgbValue(255, 255, 255);
-        }
-        return new RgbValue(parsed.red(), parsed.green(), parsed.blue());
     }
 
     private Optional<Member> requireMemberWithPrivilege(Player player, Privilege privilege) {
@@ -390,9 +414,29 @@ public final class TownEditDialogFlow {
                 "<red>Dialog non disponibile su questo server.</red>"));
     }
 
-    private record RgbValue(int red, int green, int blue) {
-        private String toHex() {
-            return String.format("#%02x%02x%02x", red, green, blue);
+    private static String normalizeTownHex(String rawHex) {
+        TextColor parsed = TextColor.fromHexString(rawHex);
+        if (parsed == null) {
+            return "#ffffff";
+        }
+        return String.format(Locale.ROOT, "#%02x%02x%02x", parsed.red(), parsed.green(), parsed.blue());
+    }
+
+    private record PresetColor(String name, String hex) {
+        private net.kyori.adventure.text.Component buttonLabel() {
+            return configLabel(name, hex);
+        }
+
+        private net.kyori.adventure.text.Component hoverText(String currentColorHex) {
+            String suffix = hex.equalsIgnoreCase(currentColorHex)
+                    ? "<gray>Colore attuale della citta</gray>"
+                    : "<gray>Imposta questo sigillo cromatico</gray>";
+            return MiniMessageHelper.parse(
+                    "<white>" + name + "</white> <dark_gray>•</dark_gray> <white>" + hex + "</white><newline>" + suffix);
+        }
+
+        private static net.kyori.adventure.text.Component configLabel(String name, String hex) {
+            return MiniMessageHelper.parse("<" + hex + ">" + name + "</" + hex + ">");
         }
     }
 

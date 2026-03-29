@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
-import it.patric.cittaexp.utils.CommandBridgeUtils;
 import it.patric.cittaexp.utils.CommandGuards;
 import it.patric.cittaexp.utils.PluginConfigUtils;
 import it.patric.cittaexp.utils.TownMemberGuards;
@@ -59,10 +58,8 @@ public final class TownChatCommand {
         }
 
         String normalized = message == null ? "" : message.trim();
-        if (normalized.isEmpty()) {
-            return CommandBridgeUtils.dispatchTownCommand(plugin, player, "chat");
-        }
-        return CommandBridgeUtils.dispatchTownCommand(plugin, player, "chat", normalized);
+        huskTownsApiHook.sendTownChatMessage(player, normalized.isEmpty() ? null : normalized);
+        return Command.SINGLE_SUCCESS;
     }
 
 }

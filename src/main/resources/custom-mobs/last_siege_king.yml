@@ -1,0 +1,81 @@
+id: last_siege_king
+type: WARDEN
+name: "<dark_red>Re dell'Ultimo Assedio</dark_red>"
+showName: true
+boss: true
+packId: cittaexp_defense_v3
+arc: throne
+pools:
+  - defense
+  - boss
+themes:
+  - throne
+  - apocalypse
+stats:
+  GENERIC_MAX_HEALTH: 520.0
+  GENERIC_ATTACK_DAMAGE: 18.0
+  GENERIC_MOVEMENT_SPEED: 0.32
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - throne
+  - boss
+mainAbilities:
+  - defense_guardian_sunder
+  - defense_royal_barrage
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_royal
+  - variant_last_siege
+bossbar:
+  enabled: true
+  title: "<dark_red><bold>{boss}</bold></dark_red> <gray>•</gray> <gold>{phase}</gold>"
+  color: RED
+  overlay: PROGRESS
+localBroadcasts:
+  spawn: "<dark_red>❖ Il Re dell'Ultimo Assedio avanza sul cuore del baluardo.</dark_red>"
+  phase: "<gold>❖ Il Re dell'Ultimo Assedio rinnova la guerra e stringe il fronte.</gold>"
+  defeat: "<green>❖ Il Re dell'Ultimo Assedio cade; il baluardo resta inciso nelle cronache.</green>"
+phaseBindings:
+  - phase: 1
+    id: king_phase_i
+    label: Marcia del Trono
+    hpBelow: 1.0
+    addAbilities: []
+    removeAbilities: []
+    entryActions:
+      - type: particles
+        particle: SMOKE
+        count: 24
+  - phase: 2
+    id: king_phase_ii
+    label: Corona di Guerra
+    hpBelow: 0.66
+    addAbilities:
+      - defense_throne_reinforce
+      - defense_phase_rally
+    removeAbilities: []
+    namePrefix: "<red>Imperiale</red>"
+    entryActions:
+      - type: sound
+        sound: ENTITY_WARDEN_ROAR
+        volume: 1.5
+        pitch: 0.8
+  - phase: 3
+    id: king_phase_iii
+    label: Ultimo Assedio
+    hpBelow: 0.33
+    addAbilities:
+      - defense_final_pulse
+    removeAbilities: []
+    nameSuffix: "<dark_red>del Tramonto</dark_red>"
+    entryActions:
+      - type: particles
+        particle: EXPLOSION
+        count: 16

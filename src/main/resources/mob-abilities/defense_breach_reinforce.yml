@@ -1,0 +1,19 @@
+id: defense_breach_reinforce
+trigger: ON_HURT
+cooldownTicks: 240
+targeting:
+  type: SELF
+conditions:
+  - type: hpBelow
+    ratio: 0.70
+actions:
+  - type: sound
+    sound: ENTITY_VINDICATOR_AMBIENT
+    volume: 1.0
+    pitch: 0.8
+  - type: summon
+    spawnRef: custom:breach_sapper
+    count: 2
+  - type: summon
+    spawnRef: custom:breach_marksman
+    count: 1

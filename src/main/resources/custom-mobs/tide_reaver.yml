@@ -1,0 +1,43 @@
+id: tide_reaver
+type: DROWNED
+name: "<aqua>Predatore di Risacca</aqua>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: omen
+pools:
+  - defense
+  - regular
+themes:
+  - omen
+  - tide
+stats:
+  GENERIC_MAX_HEALTH: 48.0
+  GENERIC_ATTACK_DAMAGE: 7.0
+  GENERIC_MOVEMENT_SPEED: 0.27
+equipment:
+  helmet: CHAINMAIL_HELMET
+  chestplate: CHAINMAIL_CHESTPLATE
+  leggings: IRON_LEGGINGS
+  boots: CHAINMAIL_BOOTS
+  mainHand: IRON_SWORD
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - omen
+  - tide
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_guardian_hunter
+  - trait_breacher
+  - trait_tidecaller
+  - trait_leaper
+  - trait_runner
+variants:
+  - variant_abyssal
+  - variant_tidebound

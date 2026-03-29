@@ -1,0 +1,3273 @@
+enabled: true
+
+tier4:
+  enabled: false
+
+cutover:
+  flagKey: atlas.m3m4.cutover.v1
+
+seals:
+  interimFallbackEnabled: false
+
+chapters:
+  extraction:
+    displayName: Estrazione
+    icon: IRON_PICKAXE
+  combat:
+    displayName: Combattimento
+    icon: DIAMOND_SWORD
+  agronomy:
+    displayName: Agronomia
+    icon: WHEAT
+  industry:
+    displayName: Industria
+    icon: PISTON
+  frontier:
+    displayName: Esplorazione
+    icon: COMPASS
+  civic:
+    displayName: Vita di citta
+    icon: EMERALD
+
+rewardProfiles:
+  tier_i:
+    xpCity: 250
+  tier_ii:
+    xpCity: 600
+  tier_iii:
+    xpCity: 1400
+  tier_iv:
+    xpCity: 3000
+  low_xp:
+    xpCity: 120
+  no_xp:
+    xpCity: 0
+  story_early:
+    xpCity: 350
+    vaultItems:
+      BREAD: 24
+      TORCH: 32
+  story_growth:
+    xpCity: 650
+    vaultItems:
+      IRON_INGOT: 24
+      OAK_LOG: 64
+  story_mid:
+    xpCity: 950
+    vaultItems:
+      GOLD_INGOT: 18
+      REDSTONE: 64
+  story_late:
+    xpCity: 1350
+    vaultItems:
+      DIAMOND: 12
+      OBSIDIAN: 48
+  story_peak:
+    xpCity: 1800
+    vaultItems:
+      EMERALD: 16
+      ANCIENT_DEBRIS: 2
+  story_elite:
+    xpCity: 2400
+    vaultItems:
+      NETHERITE_SCRAP: 4
+      EMERALD_BLOCK: 4
+
+families:
+  atlas.extract.coal:
+    displayName: Carbone
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [COAL_ORE, DEEPSLATE_COAL_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 256, II: 1024, III: 3072}
+
+  atlas.extract.iron:
+    displayName: Ferro
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [IRON_ORE, DEEPSLATE_IRON_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 128, II: 512, III: 1536}
+
+  atlas.extract.copper:
+    displayName: Rame
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [COPPER_ORE, DEEPSLATE_COPPER_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 256, II: 1024, III: 3072}
+
+  atlas.extract.gold:
+    displayName: Oro
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [GOLD_ORE, DEEPSLATE_GOLD_ORE, NETHER_GOLD_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 128, II: 512, III: 1536}
+
+  atlas.extract.redstone:
+    displayName: Redstone
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [REDSTONE_ORE, DEEPSLATE_REDSTONE_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 256, II: 1024, III: 3072}
+
+  atlas.extract.lapis:
+    displayName: Lapis
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [LAPIS_ORE, DEEPSLATE_LAPIS_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 192, II: 768, III: 2304}
+
+  atlas.extract.diamond:
+    displayName: Diamante
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 48, II: 192, III: 576}
+
+  atlas.extract.emerald:
+    displayName: Smeraldo
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [EMERALD_ORE, DEEPSLATE_EMERALD_ORE]
+    minStage: AVAMPOSTO
+    targets: {I: 32, II: 128, III: 384}
+
+  atlas.extract.debris:
+    displayName: Ancient Debris
+    chapter: EXTRACTION
+    objectiveType: block_mine
+    focusType: MATERIAL
+    focusKeys: [ANCIENT_DEBRIS]
+    minStage: VILLAGGIO
+    targets: {I: 8, II: 24, III: 64}
+    defaultRewardProfile: tier_iii
+
+  atlas.combat.zombie:
+    displayName: Zombie
+    chapter: COMBAT
+    objectiveType: mob_kill
+    focusType: ENTITY_TYPE
+    focusKeys: [ZOMBIE, DROWNED, HUSK]
+    minStage: AVAMPOSTO
+    targets: {I: 60, II: 240, III: 720}
+
+  atlas.combat.skeleton:
+    displayName: Scheletri
+    chapter: COMBAT
+    objectiveType: mob_kill
+    focusType: ENTITY_TYPE
+    focusKeys: [SKELETON, STRAY, WITHER_SKELETON]
+    minStage: AVAMPOSTO
+    targets: {I: 50, II: 200, III: 600}
+
+  atlas.combat.spider:
+    displayName: Ragni
+    chapter: COMBAT
+    objectiveType: mob_kill
+    focusType: ENTITY_TYPE
+    focusKeys: [SPIDER, CAVE_SPIDER]
+    minStage: AVAMPOSTO
+    targets: {I: 50, II: 200, III: 600}
+
+  atlas.combat.creeper:
+    displayName: Creeper
+    chapter: COMBAT
+    objectiveType: mob_kill
+    focusType: ENTITY_TYPE
+    focusKeys: [CREEPER]
+    minStage: AVAMPOSTO
+    targets: {I: 25, II: 100, III: 300}
+
+  atlas.combat.enderman:
+    displayName: Enderman
+    chapter: COMBAT
+    objectiveType: mob_kill
+    focusType: ENTITY_TYPE
+    focusKeys: [ENDERMAN]
+    minStage: AVAMPOSTO
+    targets: {I: 20, II: 80, III: 240}
+
+  atlas.combat.nether:
+    displayName: Mob del Nether
+    chapter: COMBAT
+    objectiveType: nether_activity
+    focusType: ENTITY_TYPE
+    focusKeys: [BLAZE, PIGLIN_BRUTE, MAGMA_CUBE, WITHER_SKELETON]
+    minStage: BORGO
+    targets: {I: 40, II: 160, III: 480}
+
+  atlas.combat.ocean:
+    displayName: Mob dell'Oceano
+    chapter: COMBAT
+    objectiveType: ocean_activity
+    focusType: ENTITY_TYPE
+    focusKeys: [DROWNED, GUARDIAN, ELDER_GUARDIAN]
+    minStage: BORGO
+    targets: {I: 30, II: 120, III: 360}
+
+  atlas.combat.rare:
+    displayName: Mob Rari
+    chapter: COMBAT
+    objectiveType: rare_mob_kill
+    minStage: VILLAGGIO
+    targets: {I: 5, II: 15, III: 40}
+    defaultRewardProfile: tier_iii
+
+  atlas.agro.wheat:
+    displayName: Grano
+    chapter: AGRONOMY
+    objectiveType: crop_harvest
+    focusType: MATERIAL
+    focusKeys: [WHEAT]
+    minStage: AVAMPOSTO
+    targets: {I: 256, II: 1024, III: 3072}
+
+  atlas.agro.roots:
+    displayName: Radici
+    chapter: AGRONOMY
+    objectiveType: crop_harvest
+    focusType: MATERIAL
+    focusKeys: [CARROTS, POTATOES, BEETROOTS]
+    minStage: AVAMPOSTO
+    targets: {I: 192, II: 768, III: 2304}
+
+  atlas.agro.cane:
+    displayName: Canna da zucchero
+    chapter: AGRONOMY
+    objectiveType: crop_harvest
+    focusType: MATERIAL
+    focusKeys: [SUGAR_CANE]
+    minStage: AVAMPOSTO
+    targets: {I: 256, II: 1024, III: 3072}
+
+  atlas.agro.melon_pumpkin:
+    displayName: Meloni e Zucche
+    chapter: AGRONOMY
+    objectiveType: crop_harvest
+    focusType: MATERIAL
+    focusKeys: [MELON, PUMPKIN]
+    minStage: AVAMPOSTO
+    targets: {I: 128, II: 512, III: 1536}
+
+  atlas.agro.nether_wart:
+    displayName: Nether Wart
+    chapter: AGRONOMY
+    objectiveType: crop_harvest
+    focusType: MATERIAL
+    focusKeys: [NETHER_WART]
+    minStage: BORGO
+    targets: {I: 128, II: 512, III: 1536}
+
+  atlas.agro.animals:
+    displayName: Allevamento
+    chapter: AGRONOMY
+    objectiveType: animal_interaction
+    minStage: AVAMPOSTO
+    targets: {I: 20, II: 80, III: 240}
+    defaultRewardProfile: low_xp
+
+  atlas.agro.fishing:
+    displayName: Pesca
+    chapter: AGRONOMY
+    objectiveType: fish_catch
+    minStage: AVAMPOSTO
+    targets: {I: 20, II: 80, III: 240}
+
+  atlas.industry.construction:
+    displayName: Costruzione
+    chapter: INDUSTRY
+    objectiveType: construction
+    minStage: BORGO
+    targets: {I: 256, II: 1024, III: 4096}
+
+  atlas.industry.monument:
+    displayName: Monumento
+    chapter: INDUSTRY
+    objectiveType: place_block
+    minStage: CITTADINA
+    targets: {I: 1000, II: 4000, III: 12000}
+    defaultRewardProfile: tier_iii
+
+  atlas.industry.food:
+    displayName: Produzione Cibo
+    chapter: INDUSTRY
+    objectiveType: food_craft
+    minStage: BORGO
+    targets: {I: 48, II: 192, III: 576}
+    defaultRewardProfile: no_xp
+
+  atlas.industry.potion:
+    displayName: Pozioni
+    chapter: INDUSTRY
+    objectiveType: brew_potion
+    minStage: BORGO
+    targets: {I: 12, II: 48, III: 144}
+    defaultRewardProfile: no_xp
+
+  atlas.industry.redstone:
+    displayName: Redstone
+    chapter: INDUSTRY
+    objectiveType: redstone_automation
+    minStage: BORGO
+    targets: {I: 48, II: 192, III: 576}
+
+  atlas.industry.craft_master:
+    displayName: Craft Master
+    chapter: INDUSTRY
+    objectiveType: item_craft
+    minStage: BORGO
+    targets: {I: 24, II: 96, III: 288}
+
+  atlas.industry.villager_trade:
+    displayName: Commercio Villager
+    chapter: INDUSTRY
+    objectiveType: villager_trade
+    minStage: BORGO
+    targets: {I: 24, II: 96, III: 288}
+    defaultRewardProfile: no_xp
+
+  atlas.frontier.structure:
+    displayName: Esplorazione Strutture
+    chapter: FRONTIER
+    objectiveType: structure_discovery
+    minStage: VILLAGGIO
+    targets: {I: 1, II: 4, III: 10}
+
+  atlas.frontier.archaeology:
+    displayName: Archeologia
+    chapter: FRONTIER
+    objectiveType: archaeology_brush
+    minStage: VILLAGGIO
+    targets: {I: 8, II: 32, III: 96}
+
+  atlas.frontier.trial_vault:
+    displayName: Trial Vault
+    chapter: FRONTIER
+    objectiveType: trial_vault_open
+    minStage: VILLAGGIO
+    targets: {I: 1, II: 3, III: 8}
+    defaultRewardProfile: tier_iii
+
+  atlas.frontier.dimension:
+    displayName: Viaggi Dimensionali
+    chapter: FRONTIER
+    objectiveType: dimension_travel
+    minStage: BORGO
+    targets: {I: 10, II: 40, III: 120}
+
+  atlas.frontier.raid:
+    displayName: Difesa Raid
+    chapter: FRONTIER
+    objectiveType: raid_win
+    minStage: VILLAGGIO
+    targets: {I: 1, II: 3, III: 8}
+    defaultRewardProfile: tier_iii
+
+  atlas.frontier.boss:
+    displayName: Boss Maggiori
+    chapter: FRONTIER
+    objectiveType: boss_kill
+    minStage: CITTADINA
+    targets: {I: 1, II: 3, III: 6}
+    defaultRewardProfile: tier_iii
+
+  atlas.civic.contribution:
+    displayName: Contributo Risorse
+    chapter: CIVIC
+    objectiveType: resource_contribution
+    minStage: BORGO
+    targets: {I: 1024, II: 4096, III: 12288}
+    defaultRewardProfile: no_xp
+
+  atlas.civic.transport:
+    displayName: Logistica
+    chapter: CIVIC
+    objectiveType: transport_distance
+    minStage: BORGO
+    targets: {I: 2000, II: 8000, III: 24000}
+    defaultRewardProfile: low_xp
+
+  atlas.civic.economy:
+    displayName: Economia
+    chapter: CIVIC
+    objectiveType: economy_advanced
+    minStage: BORGO
+    targets: {I: 5000, II: 25000, III: 100000}
+    defaultRewardProfile: no_xp
+
+storyMode:
+  enabled: true
+  chapterUnlockEveryLevels: 5
+  completionGatePercent: 100
+  templates:
+    chapter_01.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi comuni
+      description: Versa risorse nel deposito cittadino per dare un primo centro alla crescita.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_01.task_2:
+      type: TASK
+      proofType: STOCKPILE
+      title: Carbone di base
+      description: Estrai il combustibile che sostiene i primi lavori della città.
+      familyId: atlas.extract.coal
+      tier: I
+    chapter_01.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Campi di grano
+      description: Raccogli il raccolto più semplice per dare continuità ai pasti cittadini.
+      familyId: atlas.agro.wheat
+      tier: I
+    chapter_01.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Primo cantiere
+      description: Avanza nei lavori che trasformano il nucleo della città in un luogo stabile.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_01.proof:
+      type: PROOF
+      proofType: STOCKPILE
+      title: Ferro del nucleo
+      description: Raccogli il metallo che permette alla città di passare dall'improvvisazione alla stabilità.
+      familyId: atlas.extract.iron
+      tier: I
+    chapter_02.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Orti da dispensa
+      description: Raccogli radici e colture semplici per allargare le scorte alimentari cittadine.
+      familyId: atlas.agro.roots
+      tier: I
+    chapter_02.task_2:
+      type: TASK
+      proofType: STOCKPILE
+      title: Rame utile
+      description: Estrai rame per sostenere attrezzi, lavori e prime lavorazioni diffuse.
+      familyId: atlas.extract.copper
+      tier: I
+    chapter_02.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Pasti comuni
+      description: Prepara cibo lavorato per rendere la città più pronta e ordinata.
+      familyId: atlas.industry.food
+      tier: I
+    chapter_02.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Scorta distribuita
+      description: Convoglia risorse nel deposito cittadino per creare una riserva che serva tutti.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_02.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Magazzino sicuro
+      description: Raggiungi una soglia di contributi che faccia sentire la città pronta a resistere.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_03.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Blocchi per la crescita
+      description: Posa materiali e costruisci il tessuto che definisce il primo centro cittadino.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_03.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Manifattura semplice
+      description: Produci oggetti utili per sostenere l'espansione e il lavoro della città.
+      familyId: atlas.industry.craft_master
+      tier: I
+    chapter_03.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Linea del pane
+      description: Prepara cibo lavorato per accompagnare il ritmo dei primi cantieri.
+      familyId: atlas.industry.food
+      tier: I
+    chapter_03.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Trasporto locale
+      description: Muovi risorse per servire i lavori e dare continuità ai primi quartieri.
+      familyId: atlas.civic.transport
+      tier: I
+    chapter_03.proof:
+      type: PROOF
+      proofType: CONSTRUCTION
+      title: Cantiere del nucleo
+      description: Completa un'opera costruttiva che trasformi il centro cittadino in una base vera.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_04.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Pattuglia del perimetro
+      description: Elimina minacce comuni attorno alla città per rendere sicuro il perimetro.
+      familyId: atlas.combat.zombie
+      tier: I
+    chapter_04.task_2:
+      type: TASK
+      proofType: DEFENSE
+      title: Minacce a distanza
+      description: Contieni gli assalitori che colpiscono da lontano prima che raggiungano il centro.
+      familyId: atlas.combat.skeleton
+      tier: I
+    chapter_04.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Barriere operative
+      description: Costruisci e rinforza i punti che tengono la città pronta alla pressione esterna.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_04.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Allerta cittadina
+      description: Convoglia contributi per preparare la città a una difesa coordinata.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_04.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Difesa delle prime mura
+      description: La città affronta una vera prova difensiva per dimostrare di poter proteggere ciò che ha costruito.
+      defenseTier: L1
+    chapter_05.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Allevamenti comuni
+      description: Sostieni la filiera animale che affianca i campi e rafforza la dispensa.
+      familyId: atlas.agro.animals
+      tier: I
+    chapter_05.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Raccolti continui
+      description: Mantieni attiva la base agricola che alimenta il borgo giorno dopo giorno.
+      familyId: atlas.agro.wheat
+      tier: I
+    chapter_05.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Dispensa lavorata
+      description: Trasforma il raccolto in cibo pronto per la crescita condivisa della città.
+      familyId: atlas.industry.food
+      tier: I
+    chapter_05.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Contributi del borgo
+      description: Versa risorse nella città per stabilizzare il nuovo ritmo produttivo.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_05.proof:
+      type: PROOF
+      proofType: SUPPLY
+      title: Scorta del borgo
+      description: Completa una soglia di rifornimenti che renda il borgo davvero autosufficiente.
+      familyId: atlas.industry.food
+      tier: I
+    chapter_06.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Percorsi di servizio
+      description: Copri distanza utile per sostenere i movimenti che tengono viva la città.
+      familyId: atlas.civic.transport
+      tier: I
+    chapter_06.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Prime scoperte
+      description: Individua luoghi utili attorno alla città per ampliare il suo raggio d'azione.
+      familyId: atlas.frontier.structure
+      tier: I
+    chapter_06.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Punti di appoggio
+      description: Costruisci elementi funzionali che rendano più stabile la rete esterna.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_06.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Deposito di transito
+      description: Convoglia risorse nella città per sostenere i primi flussi logistici.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_06.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Rotta consolidata
+      description: Completa una soglia di espansione che renda il territorio vicino parte della vita cittadina.
+      familyId: atlas.frontier.structure
+      tier: I
+    chapter_07.task_1:
+      type: TASK
+      proofType: STOCKPILE
+      title: Oro operativo
+      description: Estrai il metallo che apre nuove filiere e rafforza la riserva cittadina.
+      familyId: atlas.extract.gold
+      tier: I
+    chapter_07.task_2:
+      type: TASK
+      proofType: STOCKPILE
+      title: Polvere di circuito
+      description: Raccogli redstone per preparare la città a lavori più tecnici.
+      familyId: atlas.extract.redstone
+      tier: I
+    chapter_07.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Rifornimento minerario
+      description: Convoglia materiali nel deposito comune per farne una forza condivisa.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_07.milestone:
+      type: MILESTONE
+      proofType: STOCKPILE
+      title: Lapislazzuli civico
+      description: Aggiungi una risorsa più rara alle scorte della città e amplia il suo margine operativo.
+      familyId: atlas.extract.lapis
+      tier: I
+    chapter_07.proof:
+      type: PROOF
+      proofType: STOCKPILE
+      title: Primi diamanti
+      description: Raccogli il materiale simbolo del salto di qualità della città.
+      familyId: atlas.extract.diamond
+      tier: I
+    chapter_08.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Brigata contro i nidi
+      description: Elimina le minacce che infestano i dintorni e ostacolano la crescita della città.
+      familyId: atlas.combat.spider
+      tier: I
+    chapter_08.task_2:
+      type: TASK
+      proofType: DEFENSE
+      title: Contenimento dei sabotatori
+      description: Abbati i nemici che mettono a rischio i lavori e la stabilità del centro cittadino.
+      familyId: atlas.combat.creeper
+      tier: I
+    chapter_08.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Preparativi da spedizione
+      description: Prepara supporti utili per rendere la città pronta a operazioni più difficili.
+      familyId: atlas.industry.potion
+      tier: I
+    chapter_08.milestone:
+      type: MILESTONE
+      proofType: DEFENSE
+      title: Segnalazioni rare
+      description: Individua e abbatti bersagli meno comuni per affinare la risposta cittadina.
+      familyId: atlas.combat.rare
+      tier: I
+    chapter_08.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Battuta di caccia cittadina
+      description: Completa una soglia di abbattimenti rari che confermi la maturità della difesa attiva.
+      familyId: atlas.combat.rare
+      tier: I
+    chapter_09.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Cassa cittadina
+      description: Versa risorse comuni per dare stabilità ai bisogni ordinari del villaggio.
+      familyId: atlas.civic.contribution
+      tier: I
+    chapter_09.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Lavori di mantenimento
+      description: Costruisci e rinnova le strutture utili che mantengono il villaggio efficiente.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_09.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Dispensa giornaliera
+      description: Prepara cibo per sostenere il ritmo ordinario della città.
+      familyId: atlas.industry.food
+      tier: I
+    chapter_09.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Servizi di quartiere
+      description: Muovi risorse nel territorio cittadino per rafforzare la vita del villaggio.
+      familyId: atlas.civic.transport
+      tier: I
+    chapter_09.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Consiglio del villaggio
+      description: Raggiungi una soglia di contributi che renda il villaggio davvero stabile.
+      familyId: atlas.civic.economy
+      tier: I
+    chapter_10.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Cantieri ordinati
+      description: Avanza nei lavori che danno alla città una base strutturale più seria.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_10.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Circuiti utili
+      description: Realizza automazioni semplici che rendano il lavoro cittadino più continuo.
+      familyId: atlas.industry.redstone
+      tier: I
+    chapter_10.task_3:
+      type: TASK
+      proofType: STOCKPILE
+      title: Metalli da lavoro
+      description: Estrai materiali che sostengano gli interventi strutturali della città.
+      familyId: atlas.extract.iron
+      tier: I
+    chapter_10.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Materiali da posa
+      description: Posa blocchi in modo coordinato per consolidare le opere condivise.
+      familyId: atlas.industry.construction
+      tier: I
+    chapter_10.proof:
+      type: PROOF
+      proofType: CONSTRUCTION
+      title: Opera portante
+      description: Completa un cantiere chiave che aumenti la capacità della città di crescere.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_11.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Grano in abbondanza
+      description: Raccogli il raccolto che ancora oggi resta la base dell'alimentazione cittadina.
+      familyId: atlas.agro.wheat
+      tier: II
+    chapter_11.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Colture robuste
+      description: Amplia la varietà del raccolto con radici e ortaggi da grande dispensa.
+      familyId: atlas.agro.roots
+      tier: II
+    chapter_11.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Stalle operative
+      description: Sostieni gli allevamenti che affiancano i campi nel nutrire la città.
+      familyId: atlas.agro.animals
+      tier: II
+    chapter_11.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Cucine del villaggio
+      description: Trasforma il raccolto in cibo pronto per il ritmo crescente della città.
+      familyId: atlas.industry.food
+      tier: II
+    chapter_11.proof:
+      type: PROOF
+      proofType: SUPPLY
+      title: Raccolto delle terre fertili
+      description: Completa una soglia agricola che faccia sentire la città davvero ben nutrita.
+      familyId: atlas.agro.melon_pumpkin
+      tier: II
+    chapter_12.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Botteghe operative
+      description: Produci oggetti utili che sostengano la città oltre il semplice necessario.
+      familyId: atlas.industry.craft_master
+      tier: II
+    chapter_12.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Automazioni da officina
+      description: Attiva sistemi che rendano il lavoro cittadino più continuo e coordinato.
+      familyId: atlas.industry.redstone
+      tier: II
+    chapter_12.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Commercio di banco
+      description: Fai crescere i rapporti con i villager per sostenere una produzione ordinata.
+      familyId: atlas.industry.villager_trade
+      tier: II
+    chapter_12.milestone:
+      type: MILESTONE
+      proofType: STOCKPILE
+      title: Energia mineraria
+      description: Porta in città materiali tecnici necessari al lavoro delle officine.
+      familyId: atlas.extract.redstone
+      tier: II
+    chapter_12.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Sistema d'officina
+      description: Completa un traguardo produttivo che trasformi le officine in una forza stabile della città.
+      familyId: atlas.industry.redstone
+      tier: II
+    chapter_13.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Ricognizioni esterne
+      description: Scopri luoghi utili attorno alla città per dare forma alla nuova frontiera.
+      familyId: atlas.frontier.structure
+      tier: II
+    chapter_13.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Tratte di collegamento
+      description: Copri distanza utile per collegare il centro ai nuovi punti di interesse.
+      familyId: atlas.civic.transport
+      tier: II
+    chapter_13.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Presidi esterni
+      description: Costruisci elementi funzionali che rendano la presenza cittadina più credibile.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_13.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Riserve di frontiera
+      description: Convoglia risorse nella città per sostenere i lavori oltre il nucleo principale.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_13.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Linea della frontiera
+      description: Completa una soglia di espansione che renda il territorio vicino parte della vita cittadina.
+      familyId: atlas.frontier.structure
+      tier: II
+    chapter_14.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Reparti contro gli incursori
+      description: Elimina minacce diffuse per mantenere sicure le zone abitate della città.
+      familyId: atlas.combat.zombie
+      tier: II
+    chapter_14.task_2:
+      type: TASK
+      proofType: DEFENSE
+      title: Controllo dei guastatori
+      description: Abbatti i nemici che mettono a rischio cantieri e infrastrutture.
+      familyId: atlas.combat.creeper
+      tier: II
+    chapter_14.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Scorte per la guardia
+      description: Prepara supporti utili per reggere una risposta difensiva più ampia.
+      familyId: atlas.industry.potion
+      tier: II
+    chapter_14.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Richiamo alla cittadinanza
+      description: Convoglia contributi comuni per sostenere la risposta difensiva della città.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_14.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Difesa del cuore civico
+      description: La città affronta una prova di difesa che mette alla prova coordinamento e tenuta.
+      defenseTier: L2
+    chapter_15.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Scambi cittadini
+      description: Rafforza l'economia avanzata che distingue una città emergente da un semplice villaggio.
+      familyId: atlas.civic.economy
+      tier: II
+    chapter_15.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Quartieri in crescita
+      description: Porta avanti lavori edilizi che rendano più ampia e leggibile la città.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_15.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Mercato affidabile
+      description: Sostieni gli scambi con i villager per dare stabilità alla rete commerciale cittadina.
+      familyId: atlas.industry.villager_trade
+      tier: II
+    chapter_15.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Vie tra i quartieri
+      description: Muovi risorse e materiali per servire una città che si espande.
+      familyId: atlas.civic.transport
+      tier: II
+    chapter_15.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Riconoscimento cittadino
+      description: Raggiungi una soglia di contributi che consacri la città come realtà emergente del territorio.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_16.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Distanze di servizio
+      description: Copri distanza utile per collegare depositi, fattorie e cantieri al cuore cittadino.
+      familyId: atlas.civic.transport
+      tier: II
+    chapter_16.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Pasti per la rete
+      description: Prepara cibo per sostenere il movimento continuo di lavoratori e spedizionieri.
+      familyId: atlas.industry.food
+      tier: II
+    chapter_16.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Carichi di allevamento
+      description: Sostieni la parte animale della filiera che mantiene stabile il rifornimento cittadino.
+      familyId: atlas.agro.animals
+      tier: II
+    chapter_16.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Depositi lungo tratta
+      description: Versa risorse comuni per rinforzare la continuità della rete logistica cittadina.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_16.proof:
+      type: PROOF
+      proofType: SUPPLY
+      title: Linea di rifornimento
+      description: Completa una soglia logistica che renda la città capace di sostenere una scala più ampia.
+      familyId: atlas.civic.transport
+      tier: II
+    chapter_17.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Scambi avanzati
+      description: Sostieni l'economia cittadina con attività che riflettano una città ormai organizzata.
+      familyId: atlas.civic.economy
+      tier: II
+    chapter_17.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Mercanti del centro
+      description: Rafforza i rapporti con i villager per stabilizzare il mercato cittadino.
+      familyId: atlas.industry.villager_trade
+      tier: II
+    chapter_17.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi del mercato
+      description: Convoglia risorse comuni affinché la crescita economica si traduca in forza per tutti.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_17.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Filiera del cibo
+      description: Prepara una produzione alimentare continua che sostenga il movimento economico cittadino.
+      familyId: atlas.industry.food
+      tier: II
+    chapter_17.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Bilancio della città
+      description: Raggiungi una soglia economica che dimostri la piena vitalità della città.
+      familyId: atlas.civic.economy
+      tier: II
+    chapter_18.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Bersagli rari
+      description: Abbatti minacce meno comuni per addestrare il nucleo specializzato della città.
+      familyId: atlas.combat.rare
+      tier: II
+    chapter_18.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Scorte di supporto
+      description: Prepara pozioni e supporti utili per missioni più complesse del normale.
+      familyId: atlas.industry.potion
+      tier: II
+    chapter_18.task_3:
+      type: TASK
+      proofType: DEFENSE
+      title: Contatto con l'ignoto
+      description: Affronta minacce elusive per rendere la città pronta a operazioni più tecniche.
+      familyId: atlas.combat.enderman
+      tier: II
+    chapter_18.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Equipaggiamenti dedicati
+      description: Produci strumenti e oggetti che rendano i reparti speciali più affidabili.
+      familyId: atlas.industry.craft_master
+      tier: II
+    chapter_18.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Prova del reparto speciale
+      description: Completa un abbattimento maggiore che certifichi la maturità offensiva della città.
+      familyId: atlas.frontier.boss
+      tier: II
+    chapter_19.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Nuovi quartieri
+      description: Avanza nei cantieri che espandono il tessuto urbano della città.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_19.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Posa urbana
+      description: Colloca blocchi per dare volume e continuità alla nuova espansione cittadina.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_19.task_3:
+      type: TASK
+      proofType: STOCKPILE
+      title: Metalli da struttura
+      description: Estrai materiali utili a sostenere opere più vaste e ordinate.
+      familyId: atlas.extract.iron
+      tier: II
+    chapter_19.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Cassa dei lavori
+      description: Convoglia risorse comuni per tenere in movimento l'espansione urbana.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_19.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Distretto completato
+      description: Concludi un grande passo costruttivo che faccia sentire la città decisamente più ampia.
+      familyId: atlas.industry.monument
+      tier: II
+    chapter_20.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Commercio di prestigio
+      description: Rafforza gli scambi che danno alla città reputazione e centralità.
+      familyId: atlas.industry.villager_trade
+      tier: II
+    chapter_20.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Economia d'immagine
+      description: Sostieni attività economiche avanzate che rendano la città più autorevole.
+      familyId: atlas.civic.economy
+      tier: II
+    chapter_20.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Lavori di rappresentanza
+      description: Porta avanti costruzioni che mostrino ordine, ambizione e capacità collettiva.
+      familyId: atlas.industry.monument
+      tier: II
+    chapter_20.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Ospitalità cittadina
+      description: Prepara cibo in quantità per sostenere il volto pubblico della città.
+      familyId: atlas.industry.food
+      tier: II
+    chapter_20.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Segno di prestigio
+      description: Completa un grande avanzamento costruttivo che renda la città riconoscibile e autorevole.
+      familyId: atlas.industry.monument
+      tier: II
+    chapter_21.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi del regno
+      description: Versa risorse comuni per sostenere una città che ormai guida più della propria sopravvivenza.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_21.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Trasporti di dominio
+      description: Copri grandi distanze utili a collegare il centro ai suoi interessi maggiori.
+      familyId: atlas.civic.transport
+      tier: II
+    chapter_21.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Opere di comando
+      description: Avanza in lavori che diano alla città una forma degna del suo nuovo rango.
+      familyId: atlas.industry.construction
+      tier: II
+    chapter_21.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Presenza territoriale
+      description: Scopri luoghi chiave che definiscano il raggio della nuova influenza cittadina.
+      familyId: atlas.frontier.structure
+      tier: II
+    chapter_21.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Soglia del regno
+      description: Raggiungi una grande soglia civica che segni il passaggio della città a forza territoriale.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_22.task_1:
+      type: TASK
+      proofType: STOCKPILE
+      title: Gemme di profondità
+      description: Estrai diamanti per rafforzare la capacità della città di affrontare il late midgame.
+      familyId: atlas.extract.diamond
+      tier: II
+    chapter_22.task_2:
+      type: TASK
+      proofType: STOCKPILE
+      title: Minerale di valore
+      description: Raccogli smeraldi che aumentino il peso economico e simbolico della città.
+      familyId: atlas.extract.emerald
+      tier: II
+    chapter_22.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Rete delle miniere
+      description: Versa in città parte del bottino estratto per trasformarlo in forza collettiva.
+      familyId: atlas.civic.contribution
+      tier: II
+    chapter_22.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Linea di sostegno minerario
+      description: Prepara oggetti utili a sostenere la continuità delle attività estrattive.
+      familyId: atlas.industry.craft_master
+      tier: II
+    chapter_22.proof:
+      type: PROOF
+      proofType: STOCKPILE
+      title: Tesoro della profondità
+      description: Raggiungi una soglia mineraria che dimostri la nuova capacità strategica della città.
+      familyId: atlas.extract.diamond
+      tier: II
+    chapter_23.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Disciplina sul campo
+      description: Elimina minacce ostili con costanza per affinare la prontezza della città.
+      familyId: atlas.combat.skeleton
+      tier: II
+    chapter_23.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Supporti da combattimento
+      description: Prepara pozioni e rifornimenti per rendere l'addestramento più completo.
+      familyId: atlas.industry.potion
+      tier: II
+    chapter_23.task_3:
+      type: TASK
+      proofType: DEFENSE
+      title: Pressione controllata
+      description: Affronta minacce insolite per abituare la città a obiettivi più impegnativi.
+      familyId: atlas.combat.rare
+      tier: II
+    chapter_23.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Forniture del reparto
+      description: Produci strumenti utili a sostenere la formazione militare della città.
+      familyId: atlas.industry.craft_master
+      tier: II
+    chapter_23.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Manovra del regno
+      description: Concludi una vittoria su incursione che certifichi la capacità offensiva della città.
+      familyId: atlas.frontier.raid
+      tier: II
+    chapter_24.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Linea dei campi
+      description: Raccogli colture che diano volume e continuità alla base alimentare della città.
+      familyId: atlas.agro.wheat
+      tier: II
+    chapter_24.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Filiera degli allevamenti
+      description: Sostieni la produzione animale che completa la grande dispensa cittadina.
+      familyId: atlas.agro.animals
+      tier: II
+    chapter_24.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Riserva di canna
+      description: Raccogli una coltura utile a più filiere e segno di agricoltura ormai matura.
+      familyId: atlas.agro.cane
+      tier: II
+    chapter_24.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Cucine del regno
+      description: Prepara cibo in quantità per sostenere una città ormai ampia e connessa.
+      familyId: atlas.industry.food
+      tier: II
+    chapter_24.proof:
+      type: PROOF
+      proofType: SUPPLY
+      title: Grande raccolto
+      description: Completa una soglia agricola che faccia sentire il regno cittadino ben sostenuto.
+      familyId: atlas.agro.melon_pumpkin
+      tier: II
+    chapter_25.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Pozioni da servizio
+      description: Prepara supporti alchemici per sostenere operazioni civiche, offensive e logistiche.
+      familyId: atlas.industry.potion
+      tier: III
+    chapter_25.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Manifatture speciali
+      description: Produci oggetti di qualità per rendere la città più pronta a sfide avanzate.
+      familyId: atlas.industry.craft_master
+      tier: III
+    chapter_25.task_3:
+      type: TASK
+      proofType: EXPANSION
+      title: Ingrediente del profondo
+      description: Sostieni le attività nel Nether per alimentare le nuove filiere di laboratorio.
+      familyId: atlas.combat.nether
+      tier: III
+    chapter_25.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Orti di laboratorio
+      description: Raccogli ciò che serve per far lavorare i laboratori con continuità.
+      familyId: atlas.agro.nether_wart
+      tier: III
+    chapter_25.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Sistema alchemico cittadino
+      description: Completa una grande soglia di supporto specialistico che rafforzi l'intera città.
+      familyId: atlas.industry.potion
+      tier: III
+    chapter_26.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Mercati in movimento
+      description: Sostieni l'economia avanzata che tiene insieme domanda, offerta e crescita urbana.
+      familyId: atlas.civic.economy
+      tier: III
+    chapter_26.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Contratti di scambio
+      description: Rafforza i rapporti commerciali con i villager per consolidare le vie del commercio.
+      familyId: atlas.industry.villager_trade
+      tier: III
+    chapter_26.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Trasporti mercantili
+      description: Copri distanza utile a tenere unito il sistema commerciale della città.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_26.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Tesoro cittadino
+      description: Versa risorse comuni per dare profondità e sicurezza al sistema commerciale urbano.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_26.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Rete del commercio
+      description: Completa una soglia economica che confermi la città come centro di scambi avanzati.
+      familyId: atlas.civic.economy
+      tier: III
+    chapter_27.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Presenza oltre confine
+      description: Scopri luoghi rilevanti per dare forma alla presenza della città nelle terre esterne.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_27.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Attraversamenti maggiori
+      description: Viaggia tra dimensioni e confini per estendere la portata della città.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_27.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Avamposti funzionali
+      description: Posa blocchi e strutture per stabilizzare la presenza cittadina fuori dal centro.
+      familyId: atlas.industry.construction
+      tier: III
+    chapter_27.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Linee verso l'esterno
+      description: Copri distanza utile per tenere le terre esterne davvero collegate alla città.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_27.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Confini allargati
+      description: Completa una soglia di espansione che faccia sentire le terre esterne parte del dominio cittadino.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_28.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi al comando
+      description: Versa risorse comuni per dare solidità alle decisioni e ai grandi piani della città.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_28.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Amministrazione economica
+      description: Sostieni la gestione avanzata delle risorse per rendere la città più coordinata.
+      familyId: atlas.civic.economy
+      tier: III
+    chapter_28.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Opere di governo
+      description: Avanza nei lavori che danno alla città spazi e strutture per governare una scala superiore.
+      familyId: atlas.industry.construction
+      tier: III
+    chapter_28.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Collegamenti di comando
+      description: Scopri luoghi chiave e punti di riferimento utili alla pianificazione territoriale.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_28.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Consiglio maggiore
+      description: Completa una soglia di contribuzione che certifichi la capacità di coordinamento della città.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_29.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Automazioni centrali
+      description: Attiva sistemi redstone che rendano la città più efficiente e continua.
+      familyId: atlas.industry.redstone
+      tier: III
+    chapter_29.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Produzione maestra
+      description: Realizza lavorazioni avanzate che esprimano la maturità industriale della città.
+      familyId: atlas.industry.craft_master
+      tier: III
+    chapter_29.task_3:
+      type: TASK
+      proofType: STOCKPILE
+      title: Raccolta tecnica
+      description: Estrai materiali chiave per sostenere il ritmo del cuore industriale.
+      familyId: atlas.extract.redstone
+      tier: III
+    chapter_29.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Cassa delle officine
+      description: Convoglia risorse nella città per tenere in moto il suo apparato produttivo.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_29.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Motore della città
+      description: Completa una grande soglia di automazione che renda il sistema industriale davvero centrale.
+      familyId: atlas.industry.redstone
+      tier: III
+    chapter_30.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Minacce del profondo
+      description: Affronta nemici ostili in contesti più difficili per temprate la forza cittadina.
+      familyId: atlas.combat.nether
+      tier: III
+    chapter_30.task_2:
+      type: TASK
+      proofType: DEFENSE
+      title: Bersagli scelti
+      description: Abbatti nemici rari per dimostrare l'efficacia delle guardie più esperte.
+      familyId: atlas.combat.rare
+      tier: III
+    chapter_30.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Rifornimenti da guarnigione
+      description: Prepara supporti utili a sostenere una risposta difensiva di livello regale.
+      familyId: atlas.industry.potion
+      tier: III
+    chapter_30.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Tesoreria della guardia
+      description: Convoglia risorse comuni per sostenere l'apparato difensivo della città.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_30.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Baluardo del regno
+      description: La città affronta una prova difensiva massima per dimostrare che il suo territorio è al sicuro.
+      defenseTier: L3
+    chapter_31.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Traversate di confine
+      description: Viaggia tra dimensioni e zone lontane per aprire la strada all'espansione remota.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_31.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Riconoscimenti lontani
+      description: Scopri strutture utili che diano alla città riferimenti oltre il proprio territorio immediato.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_31.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Linee verso il remoto
+      description: Copri distanza utile per collegare il cuore della città con le sue nuove mete.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_31.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Ricompense di spedizione
+      description: Apri vault di prova per dimostrare che la città sa trarre valore anche dalle spedizioni più complesse.
+      familyId: atlas.frontier.trial_vault
+      tier: III
+    chapter_31.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Avamposto remoto
+      description: Completa una soglia di esplorazione avanzata che faccia sentire remoto il raggio della città.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_32.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Camere di prova
+      description: Apri trial vault come segno della capacità cittadina di vincere spedizioni tecniche.
+      familyId: atlas.frontier.trial_vault
+      tier: III
+    chapter_32.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Resti riportati alla luce
+      description: Usa il brush su reperti antichi per trasformare l'esplorazione in conoscenza utile.
+      familyId: atlas.frontier.archaeology
+      tier: III
+    chapter_32.task_3:
+      type: TASK
+      proofType: EXPANSION
+      title: Ricognizioni di spedizione
+      description: Scopri strutture che rendano le spedizioni una fonte stabile di valore per la città.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_32.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Successi d'incursione
+      description: Concludi vittorie su raid per dimostrare che le spedizioni sanno anche imporre forza.
+      familyId: atlas.frontier.raid
+      tier: III
+    chapter_32.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Grande spedizione
+      description: Completa un traguardo spedizionario di alto valore che allarghi ancora il respiro della città.
+      familyId: atlas.frontier.trial_vault
+      tier: III
+    chapter_33.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Distanze di approvvigionamento
+      description: Copri grandi tratte per mantenere viva la circolazione tra depositi, campi e centro.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_33.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Cucine di sostegno
+      description: Prepara cibo in quantità per alimentare una città ormai vasta e stratificata.
+      familyId: atlas.industry.food
+      tier: III
+    chapter_33.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Pesca di supporto
+      description: Integra la dispensa cittadina con una fonte continua e affidabile di rifornimenti.
+      familyId: atlas.agro.fishing
+      tier: III
+    chapter_33.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Filiera animale completa
+      description: Sostieni la parte più stabile degli approvvigionamenti per dare profondità alla rete.
+      familyId: atlas.agro.animals
+      tier: III
+    chapter_33.proof:
+      type: PROOF
+      proofType: SUPPLY
+      title: Rifornimento del regno
+      description: Completa una soglia di supporto che faccia sentire la città pronta a sostenere tutto il proprio sistema.
+      familyId: atlas.industry.food
+      tier: III
+    chapter_34.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Cacce d'élite
+      description: Abbatti minacce rare per dimostrare il livello raggiunto dai migliori combattenti cittadini.
+      familyId: atlas.combat.rare
+      tier: III
+    chapter_34.task_2:
+      type: TASK
+      proofType: GRAND_PROJECT
+      title: Missioni estreme
+      description: Affronta obiettivi maggiori che richiedano preparazione e coordinamento superiore.
+      familyId: atlas.frontier.boss
+      tier: III
+    chapter_34.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Supporti d'assalto
+      description: Prepara pozioni e supporti utili per operazioni d'élite ad alto rischio.
+      familyId: atlas.industry.potion
+      tier: III
+    chapter_34.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Prove d'incursione
+      description: Concludi incursioni vinte per dimostrare tenuta, prontezza e disciplina del reparto.
+      familyId: atlas.frontier.raid
+      tier: III
+    chapter_34.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Abbattimento d'élite
+      description: Completa una grande prova offensiva che consacri i migliori combattenti della città.
+      familyId: atlas.frontier.boss
+      tier: III
+    chapter_35.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Cantieri monumentali
+      description: Avanza nei lavori che danno alla città una forma degna della sua storia.
+      familyId: atlas.industry.monument
+      tier: III
+    chapter_35.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Posa cerimoniale
+      description: Colloca blocchi per dare scala, presenza e compiutezza all'opera maggiore.
+      familyId: atlas.industry.monument
+      tier: III
+    chapter_35.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Materiali d'eccellenza
+      description: Produci elementi utili a completare finiture e parti distintive delle opere maggiori.
+      familyId: atlas.industry.craft_master
+      tier: III
+    chapter_35.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Macchina dei cantieri
+      description: Attiva automazioni utili a sostenere la grande scala delle opere cittadine.
+      familyId: atlas.industry.redstone
+      tier: III
+    chapter_35.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Opera dell'eredità
+      description: Completa il grande progetto monumentale che renda la città memorabile.
+      familyId: atlas.industry.monument
+      tier: III
+    chapter_36.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi di tutto il regno
+      description: Versa risorse comuni per dimostrare che l'intera città sa convergere verso un solo scopo.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_36.task_2:
+      type: TASK
+      proofType: DEFENSE
+      title: Bersagli di prova
+      description: Abbatti minacce rare per certificare la tenuta delle forze cittadine.
+      familyId: atlas.combat.rare
+      tier: III
+    chapter_36.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Rifornimenti del grande esame
+      description: Prepara cibo per sostenere una prova che coinvolge l'intera città.
+      familyId: atlas.industry.food
+      tier: III
+    chapter_36.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Attraversamenti del regno
+      description: Viaggia tra dimensioni e confini per dimostrare che il regno cittadino sa operare ovunque.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_36.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Esame del regno
+      description: Completa una vittoria significativa che dimostri la maturità complessiva della città.
+      familyId: atlas.frontier.raid
+      tier: III
+    chapter_37.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Riconoscimento del territorio
+      description: Scopri luoghi chiave che definiscano il raggio reale del dominio cittadino.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_37.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Presidi territoriali
+      description: Costruisci elementi funzionali che rendano stabile la presenza della città oltre il centro.
+      familyId: atlas.industry.construction
+      tier: III
+    chapter_37.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Ordine economico
+      description: Sostieni la gestione avanzata delle risorse per reggere il peso di un dominio più vasto.
+      familyId: atlas.civic.economy
+      tier: III
+    chapter_37.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Linee del territorio
+      description: Copri grandi distanze per tenere davvero unito ciò che la città considera suo.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_37.proof:
+      type: PROOF
+      proofType: EXPANSION
+      title: Territorio consolidato
+      description: Completa una soglia di espansione che faccia sentire la città come potere regionale.
+      familyId: atlas.frontier.structure
+      tier: III
+    chapter_38.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Tratte del crocevia
+      description: Copri distanza utile a tenere collegate le molte funzioni della grande città.
+      familyId: atlas.civic.transport
+      tier: III
+    chapter_38.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Scambi centrali
+      description: Rafforza il commercio che rende la città il cuore degli scambi regionali.
+      familyId: atlas.industry.villager_trade
+      tier: III
+    chapter_38.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Sistemi di snodo
+      description: Attiva automazioni utili a sostenere l'enorme flusso di una città crocevia.
+      familyId: atlas.industry.redstone
+      tier: III
+    chapter_38.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Convergenza civica
+      description: Convoglia contributi comuni per mantenere il crocevia saldo e centrale.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_38.proof:
+      type: PROOF
+      proofType: COUNCIL
+      title: Nodo del potere
+      description: Raggiungi una grande soglia economica che consacri la città come centro del territorio.
+      familyId: atlas.civic.economy
+      tier: III
+    chapter_39.task_1:
+      type: TASK
+      proofType: STOCKPILE
+      title: Materiali del limite
+      description: Estrai le risorse più impegnative per sostenere l'ultimo salto della città.
+      familyId: atlas.extract.debris
+      tier: III
+    chapter_39.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Supporti finali
+      description: Prepara pozioni utili ad affrontare la prova conclusiva del ciclo base.
+      familyId: atlas.industry.potion
+      tier: III
+    chapter_39.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Scorte da mobilitazione
+      description: Versa risorse comuni per far arrivare la città alla soglia finale pienamente pronta.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_39.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Provviste del gran finale
+      description: Prepara cibo in quantità per sostenere il grande sforzo conclusivo della città.
+      familyId: atlas.industry.food
+      tier: III
+    chapter_39.proof:
+      type: PROOF
+      proofType: STOCKPILE
+      title: Stockpile del sovrano
+      description: Raggiungi la riserva preparatoria che dimostra che la città è pronta alla consacrazione finale.
+      familyId: atlas.extract.debris
+      tier: III
+    chapter_40.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi della consacrazione
+      description: Versa risorse comuni per dimostrare che l'intera città sa convergere sul proprio destino.
+      familyId: atlas.civic.contribution
+      tier: III
+    chapter_40.task_2:
+      type: TASK
+      proofType: GRAND_PROJECT
+      title: Ultima minaccia
+      description: Affronta un bersaglio maggiore per dimostrare che la città sa difendere il proprio rango.
+      familyId: atlas.frontier.boss
+      tier: III
+    chapter_40.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Opera sovrana
+      description: Avanza nei lavori che incarnano il culmine della storia cittadina.
+      familyId: atlas.industry.monument
+      tier: III
+    chapter_40.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Attraversamento della soglia
+      description: Viaggia oltre i confini conosciuti per segnare il passaggio della città verso il rango successivo.
+      familyId: atlas.frontier.dimension
+      tier: III
+    chapter_40.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Consacrazione del regno
+      description: Completa il grande progetto finale che chiude il ciclo base e apre il cammino verso l'Elite.
+      familyId: atlas.industry.monument
+      tier: III
+    elite_01.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Fondazioni sovrane
+      description: Avanza nei cantieri che trasformano il centro cittadino in un complesso di rango assoluto.
+      familyId: atlas.industry.monument
+      tier: III
+    elite_01.task_2:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Posa delle grandi linee
+      description: Colloca blocchi su scala ampia per dare forma, volume e riconoscibilità alla nuova opera.
+      familyId: atlas.industry.monument
+      tier: III
+    elite_01.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Tesoro dei cantieri
+      description: Convoglia risorse comuni per sostenere i lavori che devono rappresentare tutta la città.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_01.milestone:
+      type: MILESTONE
+      proofType: STOCKPILE
+      title: Materiali d'eccellenza
+      description: Estrai risorse pregiate per sostenere finiture, simboli e dettagli degni dell'era Elite.
+      familyId: atlas.extract.diamond
+      tier: III
+    elite_01.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Prima opera dell'Elite
+      description: Completa il grande progetto che annuncia l'ingresso della città nel livello più alto di Story Mode.
+      familyId: atlas.industry.monument
+      tier: III
+    elite_02.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Pattuglie delle mura alte
+      description: Elimina minacce ostili per mantenere sicuro il perimetro della città d'élite.
+      familyId: atlas.combat.rare
+      tier: III
+    elite_02.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Scorte per la mobilitazione
+      description: Prepara supporti alchemici utili a una difesa cittadina di lunga durata.
+      familyId: atlas.industry.potion
+      tier: III
+    elite_02.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Cassa della guarnigione
+      description: Versa risorse comuni per sostenere il dispiegamento completo della difesa.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_02.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Barriere di crisi
+      description: Avanza in lavori di rinforzo che rendano la città pronta a sostenere pressione costante.
+      familyId: atlas.industry.construction
+      tier: III
+    elite_02.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Assedio della veglia
+      description: La città affronta una sessione completa di difesa per dimostrare che il suo prestigio può essere protetto.
+      defenseTier: L3
+    elite_03.task_1:
+      type: TASK
+      proofType: SUPPLY
+      title: Tratte del dominio
+      description: Copri grandi distanze per mantenere attivi collegamenti degni di una città ormai dominante.
+      familyId: atlas.civic.transport
+      tier: III
+    elite_03.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Riferimenti del territorio
+      description: Scopri strutture chiave che definiscano i punti di controllo della città oltre il suo centro.
+      familyId: atlas.frontier.structure
+      tier: III
+    elite_03.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Presidi delle grandi vie
+      description: Costruisci elementi funzionali che consolidino la presenza cittadina lungo le direttrici maggiori.
+      familyId: atlas.industry.construction
+      tier: III
+    elite_03.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Contributi di rete
+      description: Versa risorse comuni per sostenere la grande infrastruttura territoriale della città.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_03.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Maglia del dominio
+      description: Completa la grande soglia di espansione che consacra la città come centro delle vie del territorio.
+      familyId: atlas.civic.transport
+      tier: III
+    elite_04.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Camere di prova supreme
+      description: Apri trial vault come segno della capacità della città di vincere spedizioni di massimo livello.
+      familyId: atlas.frontier.trial_vault
+      tier: III
+    elite_04.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Traversate estreme
+      description: Viaggia tra dimensioni e soglie lontane per mantenere vive le grandi spedizioni cittadine.
+      familyId: atlas.frontier.dimension
+      tier: III
+    elite_04.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Supporti da spedizione
+      description: Prepara risorse e lavorazioni utili a sostenere missioni che richiedono piena coordinazione.
+      familyId: atlas.industry.craft_master
+      tier: III
+    elite_04.milestone:
+      type: MILESTONE
+      proofType: EXPANSION
+      title: Segni del passato remoto
+      description: Riporta alla luce tracce antiche per trasformare l'esplorazione estrema in valore permanente per la città.
+      familyId: atlas.frontier.archaeology
+      tier: III
+    elite_04.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Spedizione sovrana
+      description: Completa il grande traguardo di spedizione che dimostra che la città sa vincere anche ai limiti del mondo.
+      familyId: atlas.frontier.trial_vault
+      tier: III
+    elite_05.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi dell'alto consiglio
+      description: Versa risorse comuni per sostenere decisioni, priorità e grandi piani di scala Elite.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_05.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Ordine dei mercati
+      description: Rafforza l'economia avanzata che permette alla città di non interrompere mai il proprio slancio.
+      familyId: atlas.civic.economy
+      tier: III
+    elite_05.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Scambi di vertice
+      description: Sostieni il commercio con i villager per dare continuità politica ed economica alla città.
+      familyId: atlas.industry.villager_trade
+      tier: III
+    elite_05.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Rifornimenti del consiglio
+      description: Prepara cibo in quantità per mantenere attivi lavori, riunioni e operazioni su scala cittadina totale.
+      familyId: atlas.industry.food
+      tier: III
+    elite_05.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Delibera assoluta
+      description: Completa la grande soglia civica che prova che la città sa convergere come un solo organismo.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_06.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Minacce dei confini
+      description: Abbatti nemici rari nelle zone di massima pressione per mantenere sicuri i margini del dominio.
+      familyId: atlas.combat.rare
+      tier: III
+    elite_06.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Attività delle frontiere oscure
+      description: Affronta contenuti nel Nether per rendere le guarnigioni esterne pronte a pressioni superiori.
+      familyId: atlas.combat.nether
+      tier: III
+    elite_06.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Rinforzi dei bastioni
+      description: Avanza in lavori strutturali che rendano i presidi esterni davvero affidabili.
+      familyId: atlas.industry.construction
+      tier: III
+    elite_06.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Riserve della guarnigione
+      description: Prepara pozioni e supporti utili a una risposta territoriale di livello massimo.
+      familyId: atlas.industry.potion
+      tier: III
+    elite_06.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Crisi dei bastioni
+      description: La città affronta una grande prova di difesa per dimostrare che i suoi confini avanzati possono reggere l'urto.
+      defenseTier: L3
+    elite_07.task_1:
+      type: TASK
+      proofType: COUNCIL
+      title: Ricchezza regolata
+      description: Sostieni l'economia avanzata che rende la città non solo forte, ma duratura.
+      familyId: atlas.civic.economy
+      tier: III
+    elite_07.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Trattati di bottega
+      description: Rafforza il commercio con i villager per trasformare la prosperità in rete stabile.
+      familyId: atlas.industry.villager_trade
+      tier: III
+    elite_07.task_3:
+      type: TASK
+      proofType: SUPPLY
+      title: Dispensa dell'eredità
+      description: Prepara cibo in quantità per rendere visibile la capacità della città di sostenere il proprio futuro.
+      familyId: atlas.industry.food
+      tier: III
+    elite_07.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Riserva viva
+      description: Sostieni allevamenti e filiere di base che rendano la prosperità della città anche concreta e quotidiana.
+      familyId: atlas.agro.animals
+      tier: III
+    elite_07.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Patrimonio della città
+      description: Completa la grande soglia economica che consacra la città come modello di ricchezza stabile e condivisa.
+      familyId: atlas.civic.economy
+      tier: III
+    elite_08.task_1:
+      type: TASK
+      proofType: EXPANSION
+      title: Attraversamenti supremi
+      description: Viaggia tra dimensioni per mantenere attiva la rete più ampia mai costruita dalla città.
+      familyId: atlas.frontier.dimension
+      tier: III
+    elite_08.task_2:
+      type: TASK
+      proofType: EXPANSION
+      title: Punti cardinali del dominio
+      description: Scopri strutture chiave che definiscano i capisaldi della rete suprema cittadina.
+      familyId: atlas.frontier.structure
+      tier: III
+    elite_08.task_3:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Nodi della grande rete
+      description: Posa blocchi e opere utili a rendere la rete di collegamento tangibile e permanente.
+      familyId: atlas.industry.construction
+      tier: III
+    elite_08.milestone:
+      type: MILESTONE
+      proofType: SUPPLY
+      title: Trasporto intermedio
+      description: Copri grandissime distanze per dare continuità reale alla spina del mondo cittadina.
+      familyId: atlas.civic.transport
+      tier: III
+    elite_08.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Asse del mondo
+      description: Completa il grande progetto di connessione che rende la città il vero asse del proprio mondo.
+      familyId: atlas.frontier.dimension
+      tier: III
+    elite_09.task_1:
+      type: TASK
+      proofType: DEFENSE
+      title: Mobilitazione totale
+      description: Elimina minacce rare e persistenti per mantenere la città pronta a un conflitto di massima scala.
+      familyId: atlas.combat.rare
+      tier: III
+    elite_09.task_2:
+      type: TASK
+      proofType: SUPPLY
+      title: Supporti della crisi
+      description: Prepara grandi quantità di supporti alchemici per reggere una risposta cittadina totale.
+      familyId: atlas.industry.potion
+      tier: III
+    elite_09.task_3:
+      type: TASK
+      proofType: COUNCIL
+      title: Fondo di emergenza
+      description: Versa risorse comuni per sostenere la città nel momento di massima pressione.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_09.milestone:
+      type: MILESTONE
+      proofType: CONSTRUCTION
+      title: Rinforzo della capitale
+      description: Avanza in lavori difensivi e strutturali che preparino il cuore cittadino all'impatto finale.
+      familyId: atlas.industry.construction
+      tier: III
+    elite_09.proof:
+      type: PROOF
+      proofType: DEFENSE
+      title: Assedio della crisi finale
+      description: La città affronta la sessione di difesa che decide se il suo dominio è davvero saldo.
+      defenseTier: L3
+    elite_10.task_1:
+      type: TASK
+      proofType: CONSTRUCTION
+      title: Monumento dell'eternità
+      description: Avanza nei lavori del complesso finale che deve rappresentare tutto ciò che la città è diventata.
+      familyId: atlas.industry.monument
+      tier: III
+    elite_10.task_2:
+      type: TASK
+      proofType: COUNCIL
+      title: Contributi dell'ultima convergenza
+      description: Versa risorse comuni per dimostrare che l'intera città sa ancora unirsi verso un unico destino.
+      familyId: atlas.civic.contribution
+      tier: III
+    elite_10.task_3:
+      type: TASK
+      proofType: EXPANSION
+      title: Passaggi oltre il confine
+      description: Attraversa dimensioni e soglie remote per segnare che il dominio della città supera ormai ogni limite locale.
+      familyId: atlas.frontier.dimension
+      tier: III
+    elite_10.milestone:
+      type: MILESTONE
+      proofType: COUNCIL
+      title: Ordine perpetuo
+      description: Sostieni l'economia avanzata che permette all'opera finale di non essere solo grande, ma mantenibile nel tempo.
+      familyId: atlas.civic.economy
+      tier: III
+    elite_10.proof:
+      type: PROOF
+      proofType: GRAND_PROJECT
+      title: Consacrazione della città eterna
+      description: Completa il grande progetto supremo che chiude Story Mode e consacra la città come eredità permanente del mondo.
+      familyId: atlas.industry.monument
+      tier: III
+  chapters:
+    base:
+      chapter_01:
+        id: chapter_01
+        order: 1
+        title: Fondazione
+        act: I - Le Radici
+        minCityLevel: 1
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - EXTRACTION
+        - AGRONOMY
+        narrativeBeat: La città sceglie di durare e trasforma i primi sforzi sparsi in un inizio condiviso.
+        signatureGoal: Creare una base comune di risorse e di lavoro.
+        chapterProof: La città raccoglie il primo metallo che può reggere la sua crescita.
+        completionFantasy: Le prime case, le prime scorte e i primi contributi danno alla città una forma reale.
+        rewardProfile: story_early
+        tasks:
+        - chapter_01.task_1
+        - chapter_01.task_2
+        - chapter_01.task_3
+        milestone: chapter_01.milestone
+        proof: chapter_01.proof
+      chapter_02:
+        id: chapter_02
+        order: 2
+        title: Prime Scorte
+        act: I - Le Radici
+        minCityLevel: 6
+        primaryChapter: AGRONOMY
+        taskFamilies:
+        - AGRONOMY
+        - EXTRACTION
+        - CIVIC
+        narrativeBeat: 'La città capisce che sopravvivere non basta: servono riserve affidabili.'
+        signatureGoal: Riempire i primi magazzini comuni con cibo e materiali utili.
+        chapterProof: La città consolida una vera riserva condivisa.
+        completionFantasy: Il borgo non vive più alla giornata e inizia a prepararsi per i giorni che verranno.
+        rewardProfile: story_early
+        tasks:
+        - chapter_02.task_1
+        - chapter_02.task_2
+        - chapter_02.task_3
+        milestone: chapter_02.milestone
+        proof: chapter_02.proof
+      chapter_03:
+        id: chapter_03
+        order: 3
+        title: Crescita Iniziale
+        act: I - Le Radici
+        minCityLevel: 11
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - AGRONOMY
+        narrativeBeat: Il primo insediamento si organizza e inizia a crescere con intenzione.
+        signatureGoal: Trasformare il nucleo cittadino in un luogo costruito per restare.
+        chapterProof: La città completa un cantiere che ne cambia davvero la forma.
+        completionFantasy: Le strade iniziano a ordinarsi, i lavori si coordinano e la città prende un volto riconoscibile.
+        rewardProfile: story_early
+        tasks:
+        - chapter_03.task_1
+        - chapter_03.task_2
+        - chapter_03.task_3
+        milestone: chapter_03.milestone
+        proof: chapter_03.proof
+      chapter_04:
+        id: chapter_04
+        order: 4
+        title: Prime Difese
+        act: I - Le Radici
+        minCityLevel: 16
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: Quando la città comincia a contare, deve anche imparare a proteggersi.
+        signatureGoal: Passare dalla reazione disordinata a una difesa cittadina vera.
+        chapterProof: La città regge il suo primo test difensivo organizzato.
+        completionFantasy: Le mura non sono ancora grandi, ma gli abitanti sanno di poter resistere insieme.
+        rewardProfile: story_early
+        tasks:
+        - chapter_04.task_1
+        - chapter_04.task_2
+        - chapter_04.task_3
+        milestone: chapter_04.milestone
+        proof: chapter_04.proof
+      chapter_05:
+        id: chapter_05
+        order: 5
+        title: Borgo Attivo
+        act: I - Le Radici
+        minCityLevel: 21
+        primaryChapter: AGRONOMY
+        taskFamilies:
+        - AGRONOMY
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: Il borgo smette di dipendere dai soli bisogni urgenti e avvia il suo ritmo quotidiano.
+        signatureGoal: Rendere continua la produzione alimentare e artigianale della città.
+        chapterProof: La città dimostra di saper nutrire e sostenere il proprio ritmo.
+        completionFantasy: Il borgo vive di lavoro costante, con scorte, allevamenti e produzione che si rafforzano a vicenda.
+        rewardProfile: story_early
+        tasks:
+        - chapter_05.task_1
+        - chapter_05.task_2
+        - chapter_05.task_3
+        milestone: chapter_05.milestone
+        proof: chapter_05.proof
+      chapter_06:
+        id: chapter_06
+        order: 6
+        title: Nuove Rotte
+        act: I - Le Radici
+        minCityLevel: 26
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: 'Il territorio vicino non è più solo confine: diventa parte del respiro cittadino.'
+        signatureGoal: Aprire i primi collegamenti che sostengono approvvigionamenti e lavori.
+        chapterProof: La città dimostra di sapersi estendere oltre il proprio nucleo.
+        completionFantasy: Il borgo inizia a muoversi, collegando risorse, persone e luoghi in una rete più ampia.
+        rewardProfile: story_early
+        tasks:
+        - chapter_06.task_1
+        - chapter_06.task_2
+        - chapter_06.task_3
+        milestone: chapter_06.milestone
+        proof: chapter_06.proof
+      chapter_07:
+        id: chapter_07
+        order: 7
+        title: Risorse Preziose
+        act: I - Le Radici
+        minCityLevel: 31
+        primaryChapter: EXTRACTION
+        taskFamilies:
+        - EXTRACTION
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: Per crescere davvero, la città deve cercare risorse che cambiano il suo passo.
+        signatureGoal: Portare in città materiali più rari e più decisivi.
+        chapterProof: La città conquista una riserva di valore che la porta oltre la fase iniziale.
+        completionFantasy: Dalle miniere arrivano materiali che aprono possibilità nuove e più ambiziose.
+        rewardProfile: story_early
+        tasks:
+        - chapter_07.task_1
+        - chapter_07.task_2
+        - chapter_07.task_3
+        milestone: chapter_07.milestone
+        proof: chapter_07.proof
+      chapter_08:
+        id: chapter_08
+        order: 8
+        title: Caccia Organizzata
+        act: I - Le Radici
+        minCityLevel: 36
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: La città impara a trattare il pericolo come un compito da organizzare, non da subire.
+        signatureGoal: Formare una risposta offensiva coordinata contro minacce più insidiose.
+        chapterProof: La città completa una vera caccia cooperativa contro bersagli difficili.
+        completionFantasy: 'I difensori cittadino non pattugliano più soltanto: iniziano a dare sicurezza al territorio.'
+        rewardProfile: story_early
+        tasks:
+        - chapter_08.task_1
+        - chapter_08.task_2
+        - chapter_08.task_3
+        milestone: chapter_08.milestone
+        proof: chapter_08.proof
+      chapter_09:
+        id: chapter_09
+        order: 9
+        title: Villaggio Stabile
+        act: II - L'Ordine Civico
+        minCityLevel: 41
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - AGRONOMY
+        narrativeBeat: Il villaggio diventa un luogo affidabile in cui la cooperazione produce ordine.
+        signatureGoal: Rendere costanti i lavori civici che tengono insieme la città.
+        chapterProof: La città dimostra di saper sostenere il proprio equilibrio.
+        completionFantasy: 'Il villaggio non è più fragile: regge ritmi, bisogni e contributi con continuità.'
+        rewardProfile: story_growth
+        tasks:
+        - chapter_09.task_1
+        - chapter_09.task_2
+        - chapter_09.task_3
+        milestone: chapter_09.milestone
+        proof: chapter_09.proof
+      chapter_10:
+        id: chapter_10
+        order: 10
+        title: Infrastrutture
+        act: II - L'Ordine Civico
+        minCityLevel: 46
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - EXTRACTION
+        - CIVIC
+        narrativeBeat: La città capisce che la crescita richiede opere che sostengano tutti, non solo chi le costruisce.
+        signatureGoal: Avviare infrastrutture permanenti al servizio della città intera.
+        chapterProof: La città completa un'opera che cambia davvero la sua capacità operativa.
+        completionFantasy: Le strutture smettono di essere improvvisate e diventano parte di una visione urbana.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_10.task_1
+        - chapter_10.task_2
+        - chapter_10.task_3
+        milestone: chapter_10.milestone
+        proof: chapter_10.proof
+      chapter_11:
+        id: chapter_11
+        order: 11
+        title: Terre Fertili
+        act: II - L'Ordine Civico
+        minCityLevel: 51
+        primaryChapter: AGRONOMY
+        taskFamilies:
+        - AGRONOMY
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: La città non coltiva più solo per sfamarsi, ma per sostenere una crescita più ampia.
+        signatureGoal: Rendere forte e diversificata la base agricola cittadina.
+        chapterProof: La città raggiunge un livello di produzione alimentare che sostiene un futuro più grande.
+        completionFantasy: I campi si moltiplicano, gli allevamenti si organizzano e la città sente la propria abbondanza.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_11.task_1
+        - chapter_11.task_2
+        - chapter_11.task_3
+        milestone: chapter_11.milestone
+        proof: chapter_11.proof
+      chapter_12:
+        id: chapter_12
+        order: 12
+        title: Officine
+        act: II - L'Ordine Civico
+        minCityLevel: 56
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - EXTRACTION
+        - CIVIC
+        narrativeBeat: La città inizia a trasformare materia e competenza in produzione specializzata.
+        signatureGoal: Far lavorare le officine come un motore stabile della crescita urbana.
+        chapterProof: La città porta a termine una filiera tecnica che ne aumenta la qualità operativa.
+        completionFantasy: Tra banchi, meccanismi e laboratori, la città inizia a distinguersi per capacità e precisione.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_12.task_1
+        - chapter_12.task_2
+        - chapter_12.task_3
+        milestone: chapter_12.milestone
+        proof: chapter_12.proof
+      chapter_13:
+        id: chapter_13
+        order: 13
+        title: Frontiera Vicina
+        act: II - L'Ordine Civico
+        minCityLevel: 61
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: La città porta presenza nei dintorni e comincia a integrare il territorio vicino.
+        signatureGoal: Stabilizzare l'area attorno alla città con esplorazione e punti di appoggio.
+        chapterProof: La città consolida la sua prima vera zona di frontiera vicina.
+        completionFantasy: I confini si allargano e la città inizia a essere percepita anche oltre il proprio centro.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_13.task_1
+        - chapter_13.task_2
+        - chapter_13.task_3
+        milestone: chapter_13.milestone
+        proof: chapter_13.proof
+      chapter_14:
+        id: chapter_14
+        order: 14
+        title: Difesa Civica
+        act: II - L'Ordine Civico
+        minCityLevel: 66
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: La difesa smette di essere il lavoro di pochi e diventa un dovere della città intera.
+        signatureGoal: Organizzare la sicurezza cittadina come responsabilità condivisa.
+        chapterProof: La città supera una prova difensiva più seria e coordinata.
+        completionFantasy: Quartieri, ingressi e difensori iniziano a muoversi come un solo corpo.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_14.task_1
+        - chapter_14.task_2
+        - chapter_14.task_3
+        milestone: chapter_14.milestone
+        proof: chapter_14.proof
+      chapter_15:
+        id: chapter_15
+        order: 15
+        title: Città Emergente
+        act: II - L'Ordine Civico
+        minCityLevel: 71
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La città inizia a contare oltre i propri confini e a essere riconosciuta come presenza stabile.
+        signatureGoal: Combinare lavori civici, commercio e struttura in un'unica crescita visibile.
+        chapterProof: La città raggiunge una soglia di maturità che la rende un nodo vero del territorio.
+        completionFantasy: 'Le attività della città non sembrano più locali: iniziano a irradiare influenza.'
+        rewardProfile: story_growth
+        tasks:
+        - chapter_15.task_1
+        - chapter_15.task_2
+        - chapter_15.task_3
+        milestone: chapter_15.milestone
+        proof: chapter_15.proof
+      chapter_16:
+        id: chapter_16
+        order: 16
+        title: Rete Logistica
+        act: II - L'Ordine Civico
+        minCityLevel: 76
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - AGRONOMY
+        - FRONTIER
+        narrativeBeat: La forza della città passa dalla sua capacità di far muovere risorse, persone e lavoro.
+        signatureGoal: Stabilire una rete di rifornimento continua e riconoscibile.
+        chapterProof: La città dimostra di saper sostenere flussi logistici su scala maggiore.
+        completionFantasy: Le risorse iniziano a circolare con ordine e la città sembra più grande di quanto appaia.
+        rewardProfile: story_growth
+        tasks:
+        - chapter_16.task_1
+        - chapter_16.task_2
+        - chapter_16.task_3
+        milestone: chapter_16.milestone
+        proof: chapter_16.proof
+      chapter_17:
+        id: chapter_17
+        order: 17
+        title: Economia Viva
+        act: III - La Connessione
+        minCityLevel: 81
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - AGRONOMY
+        narrativeBeat: La città entra in una fase in cui produzione, scambio e contribuzione si alimentano a vicenda.
+        signatureGoal: Far vivere l'economia cittadina come sistema continuo e cooperativo.
+        chapterProof: La città dimostra di saper reggere un vero ciclo economico avanzato.
+        completionFantasy: Mercati, depositi e filiere iniziano a dare alla città un ritmo adulto e riconoscibile.
+        rewardProfile: story_mid
+        tasks:
+        - chapter_17.task_1
+        - chapter_17.task_2
+        - chapter_17.task_3
+        milestone: chapter_17.milestone
+        proof: chapter_17.proof
+      chapter_18:
+        id: chapter_18
+        order: 18
+        title: Reparti Speciali
+        act: III - La Connessione
+        minCityLevel: 86
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La città forma gruppi capaci di gestire obiettivi più difficili e più rischiosi.
+        signatureGoal: Specializzare una parte della forza cittadina per missioni d'élite.
+        chapterProof: La città supera una prova offensiva di livello superiore.
+        completionFantasy: 'I difensori non proteggono più solo la città: affrontano minacce che pochi possono reggere.'
+        rewardProfile: story_mid
+        tasks:
+        - chapter_18.task_1
+        - chapter_18.task_2
+        - chapter_18.task_3
+        milestone: chapter_18.milestone
+        proof: chapter_18.proof
+      chapter_19:
+        id: chapter_19
+        order: 19
+        title: Espansione Urbana
+        act: III - La Connessione
+        minCityLevel: 91
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - EXTRACTION
+        narrativeBeat: La città comincia a costruire pensando al domani e non solo al bisogno immediato.
+        signatureGoal: Ampliare gli spazi urbani con opere coordinate e durature.
+        chapterProof: La città completa un progetto edilizio che ne ridefinisce la scala.
+        completionFantasy: I quartieri si saldano, i cantieri si moltiplicano e la città appare finalmente vasta.
+        rewardProfile: story_mid
+        tasks:
+        - chapter_19.task_1
+        - chapter_19.task_2
+        - chapter_19.task_3
+        milestone: chapter_19.milestone
+        proof: chapter_19.proof
+      chapter_20:
+        id: chapter_20
+        order: 20
+        title: Prestigio Cittadino
+        act: III - La Connessione
+        minCityLevel: 96
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - AGRONOMY
+        narrativeBeat: 'La città non vuole più solo funzionare bene: vuole essere riconosciuta.'
+        signatureGoal: Tradurre la forza della città in opere e pratiche degne di prestigio.
+        chapterProof: La città compie un passo che la rende memorabile agli occhi del territorio.
+        completionFantasy: Le persone non vedono più soltanto una città efficiente, ma una città importante.
+        rewardProfile: story_mid
+        tasks:
+        - chapter_20.task_1
+        - chapter_20.task_2
+        - chapter_20.task_3
+        milestone: chapter_20.milestone
+        proof: chapter_20.proof
+      chapter_21:
+        id: chapter_21
+        order: 21
+        title: Regno Nascente
+        act: III - La Connessione
+        minCityLevel: 101
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La città smette di percepirsi come centro locale e inizia a pensarsi come guida di un territorio.
+        signatureGoal: Coordinare la crescita della città come nucleo di qualcosa di più grande.
+        chapterProof: La città raggiunge una soglia di coesione che la proietta nel rango superiore.
+        completionFantasy: Ogni contributo sembra servire non più un borgo, ma una realtà destinata a lasciare segno.
+        rewardProfile: story_mid
+        tasks:
+        - chapter_21.task_1
+        - chapter_21.task_2
+        - chapter_21.task_3
+        milestone: chapter_21.milestone
+        proof: chapter_21.proof
+      chapter_22:
+        id: chapter_22
+        order: 22
+        title: Miniere Profonde
+        act: III - La Connessione
+        minCityLevel: 106
+        primaryChapter: EXTRACTION
+        taskFamilies:
+        - EXTRACTION
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: La città scende oltre la superficie e accetta rischi maggiori per ottenere valore strategico.
+        signatureGoal: Portare in città i materiali che reggono il suo rango crescente.
+        chapterProof: La città conquista una riserva mineraria degna di una potenza stabile.
+        completionFantasy: Le miniere profonde alimentano la città con risorse che pochi centri sanno davvero sostenere.
+        rewardProfile: story_mid
+        tasks:
+        - chapter_22.task_1
+        - chapter_22.task_2
+        - chapter_22.task_3
+        milestone: chapter_22.milestone
+        proof: chapter_22.proof
+      chapter_23:
+        id: chapter_23
+        order: 23
+        title: Addestramento Reale
+        act: III - La Connessione
+        minCityLevel: 111
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La forza della città va disciplinata, messa alla prova e resa degna del suo nuovo rango.
+        signatureGoal: Addestrare la capacità militare della città per prove più complesse.
+        chapterProof: La città supera una prova offensiva che certifica il suo livello superiore.
+        completionFantasy: 'Le guardie non reagiscono più soltanto al pericolo: lo affrontano con metodo e autorità.'
+        rewardProfile: story_mid
+        tasks:
+        - chapter_23.task_1
+        - chapter_23.task_2
+        - chapter_23.task_3
+        milestone: chapter_23.milestone
+        proof: chapter_23.proof
+      chapter_24:
+        id: chapter_24
+        order: 24
+        title: Campi del Regno
+        act: III - La Connessione
+        minCityLevel: 116
+        primaryChapter: AGRONOMY
+        taskFamilies:
+        - AGRONOMY
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: La città ora coltiva e alleva per sostenere una scala di bisogni molto più ampia.
+        signatureGoal: Rendere agricolo e alimentare il passo del nuovo regno cittadino.
+        chapterProof: La città raggiunge una produzione di rifornimenti degna di una forza territoriale.
+        completionFantasy: 'I campi non nutrono più solo il centro: sembrano alimentare un intero dominio.'
+        rewardProfile: story_mid
+        tasks:
+        - chapter_24.task_1
+        - chapter_24.task_2
+        - chapter_24.task_3
+        milestone: chapter_24.milestone
+        proof: chapter_24.proof
+      chapter_25:
+        id: chapter_25
+        order: 25
+        title: Laboratori
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 121
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - AGRONOMY
+        - COMBAT
+        narrativeBeat: La città affina supporto, preparazione e lavorazioni specialistiche per reggere una scala superiore.
+        signatureGoal: Far funzionare i laboratori come centro di supporto avanzato della città.
+        chapterProof: La città completa una filiera specialistica che eleva tutto il suo apparato.
+        completionFantasy: Pozioni, materiali rari e lavorazioni raffinate fanno sentire la città davvero avanzata.
+        rewardProfile: story_late
+        tasks:
+        - chapter_25.task_1
+        - chapter_25.task_2
+        - chapter_25.task_3
+        milestone: chapter_25.milestone
+        proof: chapter_25.proof
+      chapter_26:
+        id: chapter_26
+        order: 26
+        title: Vie del Commercio
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 126
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - AGRONOMY
+        narrativeBeat: 'La città non scambia più solo per convenienza: organizza una vera economia di territorio.'
+        signatureGoal: Rendere il commercio un asse stabile del potere cittadino.
+        chapterProof: La città dimostra di saper sostenere flussi economici avanzati e duraturi.
+        completionFantasy: Le vie del commercio rendono la città un crocevia vivo, autorevole e ricco di scambi.
+        rewardProfile: story_late
+        tasks:
+        - chapter_26.task_1
+        - chapter_26.task_2
+        - chapter_26.task_3
+        milestone: chapter_26.milestone
+        proof: chapter_26.proof
+      chapter_27:
+        id: chapter_27
+        order: 27
+        title: Terre Esterne
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 131
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: La città opera fuori dal proprio nucleo con continuità e inizia a gestire spazi lontani.
+        signatureGoal: Integrare territori esterni nella sfera operativa della città.
+        chapterProof: La città conclude un'espansione che non riguarda più il solo entroterra.
+        completionFantasy: I confini perdono rigidità e la città sembra allungare la propria volontà nel territorio.
+        rewardProfile: story_late
+        tasks:
+        - chapter_27.task_1
+        - chapter_27.task_2
+        - chapter_27.task_3
+        milestone: chapter_27.milestone
+        proof: chapter_27.proof
+      chapter_28:
+        id: chapter_28
+        order: 28
+        title: Sala del Comando
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 136
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La città cresce al punto da richiedere coordinamento, priorità e convergenza di sforzi.
+        signatureGoal: Trasformare il contributo diffuso in potere organizzato.
+        chapterProof: La città raggiunge una soglia di coordinamento che la rende davvero governabile in grande.
+        completionFantasy: Il lavoro cittadino smette di essere disperso e comincia a convergere verso obiettivi comuni.
+        rewardProfile: story_late
+        tasks:
+        - chapter_28.task_1
+        - chapter_28.task_2
+        - chapter_28.task_3
+        milestone: chapter_28.milestone
+        proof: chapter_28.proof
+      chapter_29:
+        id: chapter_29
+        order: 29
+        title: Cuore Industriale
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 141
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - EXTRACTION
+        - CIVIC
+        narrativeBeat: La città raggiunge il punto in cui la produzione non è più supporto, ma potenza centrale.
+        signatureGoal: Far battere il motore industriale della città con continuità e scala.
+        chapterProof: La città porta a compimento un sistema produttivo che ne definisce la forza.
+        completionFantasy: Macchine, officine e cantieri lavorano come il cuore di una grande città.
+        rewardProfile: story_late
+        tasks:
+        - chapter_29.task_1
+        - chapter_29.task_2
+        - chapter_29.task_3
+        milestone: chapter_29.milestone
+        proof: chapter_29.proof
+      chapter_30:
+        id: chapter_30
+        order: 30
+        title: Guardie del Regno
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 146
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: La difesa della città diventa presidio di un territorio ormai vasto e ambizioso.
+        signatureGoal: Formare una forza capace di proteggere il regno cittadino su scala alta.
+        chapterProof: La città regge una prova difensiva d'élite che conferma il rango delle sue guardie.
+        completionFantasy: 'Le guardie del regno non difendono solo mura: difendono l''ordine costruito dalla città.'
+        rewardProfile: story_late
+        tasks:
+        - chapter_30.task_1
+        - chapter_30.task_2
+        - chapter_30.task_3
+        milestone: chapter_30.milestone
+        proof: chapter_30.proof
+      chapter_31:
+        id: chapter_31
+        order: 31
+        title: Espansione Remota
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 151
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: La città estende la propria volontà verso spazi lontani e difficili da sostenere.
+        signatureGoal: Portare presenza cittadina in luoghi remoti senza perdere coordinamento.
+        chapterProof: La città conclude una vera espansione fuori dal proprio raggio naturale.
+        completionFantasy: I confini della città sembrano lontani quanto i suoi progetti.
+        rewardProfile: story_late
+        tasks:
+        - chapter_31.task_1
+        - chapter_31.task_2
+        - chapter_31.task_3
+        milestone: chapter_31.milestone
+        proof: chapter_31.proof
+      chapter_32:
+        id: chapter_32
+        order: 32
+        title: Spedizioni
+        act: IV - Il Coordinamento del Potere
+        minCityLevel: 156
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: Le operazioni esterne diventano parte stabile del motore cittadino.
+        signatureGoal: Far rendere le spedizioni come uno strumento regolare della grande città.
+        chapterProof: La città conclude una spedizione di alto valore che ne conferma la maturità operativa.
+        completionFantasy: Le squadre rientrano con bottino, conoscenza e prestigio da territori sempre più duri.
+        rewardProfile: story_late
+        tasks:
+        - chapter_32.task_1
+        - chapter_32.task_2
+        - chapter_32.task_3
+        milestone: chapter_32.milestone
+        proof: chapter_32.proof
+      chapter_33:
+        id: chapter_33
+        order: 33
+        title: Linea di Rifornimento
+        act: V - Eredità e Ascesa
+        minCityLevel: 161
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - AGRONOMY
+        - INDUSTRY
+        narrativeBeat: Nessuna grande città regge senza continuità di supporto e capacità di nutrire il proprio sistema.
+        signatureGoal: Mantenere una linea di rifornimento larga, stabile e cooperativa.
+        chapterProof: La città dimostra di poter sostenere una rete di approvvigionamento di lunga durata.
+        completionFantasy: Ogni deposito, cucina e tratta lavora come parte di una stessa grande macchina civica.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_33.task_1
+        - chapter_33.task_2
+        - chapter_33.task_3
+        milestone: chapter_33.milestone
+        proof: chapter_33.proof
+      chapter_34:
+        id: chapter_34
+        order: 34
+        title: Reparti Elite
+        act: V - Eredità e Ascesa
+        minCityLevel: 166
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - FRONTIER
+        - INDUSTRY
+        narrativeBeat: Solo le squadre migliori affrontano le prove che decidono il prestigio militare della città.
+        signatureGoal: Portare la forza cittadina al livello delle sue prove più dure.
+        chapterProof: La città completa un abbattimento maggiore degno di un reparto d'élite.
+        completionFantasy: I reparti elite diventano il simbolo della parte più dura e preparata della città.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_34.task_1
+        - chapter_34.task_2
+        - chapter_34.task_3
+        milestone: chapter_34.milestone
+        proof: chapter_34.proof
+      chapter_35:
+        id: chapter_35
+        order: 35
+        title: Opere Maggiori
+        act: V - Eredità e Ascesa
+        minCityLevel: 171
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - EXTRACTION
+        narrativeBeat: La città costruisce qualcosa che la definisce oltre l'utilità immediata e oltre la sua generazione.
+        signatureGoal: Realizzare opere che esprimano potenza, ordine ed eredità.
+        chapterProof: La città conclude un progetto monumentale che la distingue per sempre.
+        completionFantasy: Le grandi opere fanno sentire la città come una realtà destinata a lasciare un segno duraturo.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_35.task_1
+        - chapter_35.task_2
+        - chapter_35.task_3
+        milestone: chapter_35.milestone
+        proof: chapter_35.proof
+      chapter_36:
+        id: chapter_36
+        order: 36
+        title: Prove del Regno
+        act: V - Eredità e Ascesa
+        minCityLevel: 176
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - COMBAT
+        - FRONTIER
+        narrativeBeat: La città viene misurata non in una sola specializzazione, ma nella sua interezza.
+        signatureGoal: Superare una serie di prove che richiedono cooperazione tra reparti diversi.
+        chapterProof: La città completa una prova mista degna del suo livello massimo base.
+        completionFantasy: Ogni reparto cittadino contribuisce e la città appare finalmente completa.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_36.task_1
+        - chapter_36.task_2
+        - chapter_36.task_3
+        milestone: chapter_36.milestone
+        proof: chapter_36.proof
+      chapter_37:
+        id: chapter_37
+        order: 37
+        title: Dominio Territoriale
+        act: V - Eredità e Ascesa
+        minCityLevel: 181
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: Il territorio riconosce la città come punto di equilibrio, supporto e direzione.
+        signatureGoal: Stabilizzare la presenza cittadina su scala territoriale estesa.
+        chapterProof: La città conclude un'espansione che la consacra come potere regionale.
+        completionFantasy: 'Il dominio territoriale non è più aspirazione: diventa percezione concreta.'
+        rewardProfile: story_peak
+        tasks:
+        - chapter_37.task_1
+        - chapter_37.task_2
+        - chapter_37.task_3
+        milestone: chapter_37.milestone
+        proof: chapter_37.proof
+      chapter_38:
+        id: chapter_38
+        order: 38
+        title: Crocevia del Potere
+        act: V - Eredità e Ascesa
+        minCityLevel: 186
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: 'Tutte le reti passano dalla città: trasporti, scambi, lavori e decisioni.'
+        signatureGoal: Coordinare flussi simultanei e mantenere la città al centro del territorio.
+        chapterProof: La città dimostra di saper reggere il peso di essere il nodo principale.
+        completionFantasy: La città si percepisce come centro di connessione, influenza e stabilità.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_38.task_1
+        - chapter_38.task_2
+        - chapter_38.task_3
+        milestone: chapter_38.milestone
+        proof: chapter_38.proof
+      chapter_39:
+        id: chapter_39
+        order: 39
+        title: Ultime Preparazioni
+        act: V - Eredità e Ascesa
+        minCityLevel: 191
+        primaryChapter: EXTRACTION
+        taskFamilies:
+        - EXTRACTION
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: Prima del salto finale, la città raccoglie tutto ciò che serve per affrontare la propria consacrazione.
+        signatureGoal: Accumularsi di materiali, supporti e contributi per la prova conclusiva del ciclo base.
+        chapterProof: La città completa il proprio grande stockpile preparatorio.
+        completionFantasy: Ogni deposito si riempie, ogni squadra si prepara e la città sente avvicinarsi il suo culmine.
+        rewardProfile: story_peak
+        tasks:
+        - chapter_39.task_1
+        - chapter_39.task_2
+        - chapter_39.task_3
+        milestone: chapter_39.milestone
+        proof: chapter_39.proof
+      chapter_40:
+        id: chapter_40
+        order: 40
+        title: Finale del Regno
+        act: V - Eredità e Ascesa
+        minCityLevel: 196
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - FRONTIER
+        narrativeBeat: La città conclude il suo primo grande ciclo storico e si presenta come realtà capace di lasciare eredità.
+        signatureGoal: Unire tutto ciò che la città è diventata in un'unica prova di consacrazione.
+        chapterProof: La città completa il grande progetto che chiude il ciclo base di Story Mode.
+        completionFantasy: 'La città non è più solo un luogo prospero: è una forza compiuta, pronta a entrare nell''Elite.'
+        rewardProfile: story_peak
+        tasks:
+        - chapter_40.task_1
+        - chapter_40.task_2
+        - chapter_40.task_3
+        milestone: chapter_40.milestone
+        proof: chapter_40.proof
+    elite:
+      elite_01:
+        id: elite_01
+        order: 41
+        title: Opere della Corona
+        act: Elite
+        elite: true
+        minCityLevel: 201
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - EXTRACTION
+        narrativeBeat: La città entra nell'Elite costruendo non per bisogno, ma per lasciare un segno che duri oltre il proprio tempo.
+        signatureGoal: Avviare le prime grandi opere endgame come simbolo di prestigio e capacità totale.
+        chapterProof: La città completa il primo grande progetto monumentale dell'era Elite.
+        completionFantasy: 'Le strutture della città non sembrano più semplici edifici: sembrano dichiarazioni di potere e continuità.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_01.task_1
+        - elite_01.task_2
+        - elite_01.task_3
+        milestone: elite_01.milestone
+        proof: elite_01.proof
+      elite_02:
+        id: elite_02
+        order: 42
+        title: Veglia d'Assedio
+        act: Elite
+        elite: true
+        minCityLevel: 206
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: Il prestigio richiama minacce più grandi, e la città deve dimostrare di saper difendere ciò che ha elevato.
+        signatureGoal: Preparare la città a una mobilitazione totale contro una minaccia di scala superiore.
+        chapterProof: La città regge il suo primo vero assedio Elite.
+        completionFantasy: 'La città non appare solo ricca e vasta: appare pronta a resistere quando tutto viene messo alla prova.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_02.task_1
+        - elite_02.task_2
+        - elite_02.task_3
+        milestone: elite_02.milestone
+        proof: elite_02.proof
+      elite_03:
+        id: elite_03
+        order: 43
+        title: Dominio delle Vie
+        act: Elite
+        elite: true
+        minCityLevel: 211
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - FRONTIER
+        - INDUSTRY
+        narrativeBeat: 'Una città d''élite non occupa soltanto spazio: tiene unite tratte, territori e interessi lontani.'
+        signatureGoal: Consolidare la rete territoriale che rende la città il nodo dominante del mondo circostante.
+        chapterProof: La città completa una grande espansione di collegamento e controllo.
+        completionFantasy: 'Le vie della città non servono più solo i suoi quartieri: sembrano reggere l''ordine di un intero territorio.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_03.task_1
+        - elite_03.task_2
+        - elite_03.task_3
+        milestone: elite_03.milestone
+        proof: elite_03.proof
+      elite_04:
+        id: elite_04
+        order: 44
+        title: Spedizioni Supreme
+        act: Elite
+        elite: true
+        minCityLevel: 216
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - COMBAT
+        - INDUSTRY
+        narrativeBeat: Solo le città più compiute trasformano le spedizioni estreme in una pratica stabile del proprio potere.
+        signatureGoal: Portare la capacità esplorativa e offensiva della città al livello delle sue missioni più lontane.
+        chapterProof: La città conclude una spedizione endgame che unisce rischio, recupero e supremazia.
+        completionFantasy: Le squadre cittadine tornano da luoghi remoti con bottino, prova e prestigio degni dell'Elite.
+        rewardProfile: story_elite
+        tasks:
+        - elite_04.task_1
+        - elite_04.task_2
+        - elite_04.task_3
+        milestone: elite_04.milestone
+        proof: elite_04.proof
+      elite_05:
+        id: elite_05
+        order: 45
+        title: Alto Consiglio
+        act: Elite
+        elite: true
+        minCityLevel: 221
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - AGRONOMY
+        narrativeBeat: Alla scala dell'Elite, governare significa orchestrare lavoro, risorse e stabilità senza sprechi né vuoti.
+        signatureGoal: Rendere il coordinamento cittadino capace di sostenere obiettivi simultanei e di lunga durata.
+        chapterProof: La città raggiunge una soglia di convergenza totale dei propri reparti.
+        completionFantasy: Ogni contributo sembra arrivare al posto giusto e nel momento giusto, come se l'intera città avesse un solo respiro.
+        rewardProfile: story_elite
+        tasks:
+        - elite_05.task_1
+        - elite_05.task_2
+        - elite_05.task_3
+        milestone: elite_05.milestone
+        proof: elite_05.proof
+      elite_06:
+        id: elite_06
+        order: 46
+        title: Bastioni Esterni
+        act: Elite
+        elite: true
+        minCityLevel: 226
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - FRONTIER
+        - INDUSTRY
+        narrativeBeat: Quando il dominio si allarga, la difesa non riguarda più il solo cuore della città ma tutto ciò che essa protegge.
+        signatureGoal: Rendere i bastioni esterni capaci di reggere una crisi territoriale completa.
+        chapterProof: La città supera una difesa Elite legata alla protezione delle proprie opere e dei propri confini avanzati.
+        completionFantasy: 'I limiti della città non sembrano più vulnerabili: sembrano trattenuti da una volontà organizzata e durissima.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_06.task_1
+        - elite_06.task_2
+        - elite_06.task_3
+        milestone: elite_06.milestone
+        proof: elite_06.proof
+      elite_07:
+        id: elite_07
+        order: 47
+        title: Mercato dell'Eredità
+        act: Elite
+        elite: true
+        minCityLevel: 231
+        primaryChapter: CIVIC
+        taskFamilies:
+        - CIVIC
+        - INDUSTRY
+        - AGRONOMY
+        narrativeBeat: 'Una città d''élite non accumula solo ricchezza: trasforma prosperità e stabilità in eredità duratura.'
+        signatureGoal: Consolidare un sistema economico che sostenga prestigio, abbondanza e continuità nel tempo.
+        chapterProof: La città raggiunge una forma di ricchezza organizzata che la rende modello stabile del territorio.
+        completionFantasy: Mercati, dispense e scambi sembrano capaci di alimentare la città senza cedimenti né improvvisazione.
+        rewardProfile: story_elite
+        tasks:
+        - elite_07.task_1
+        - elite_07.task_2
+        - elite_07.task_3
+        milestone: elite_07.milestone
+        proof: elite_07.proof
+      elite_08:
+        id: elite_08
+        order: 48
+        title: Spina del Mondo
+        act: Elite
+        elite: true
+        minCityLevel: 236
+        primaryChapter: FRONTIER
+        taskFamilies:
+        - FRONTIER
+        - INDUSTRY
+        - CIVIC
+        narrativeBeat: 'La città d''élite non collega più solo luoghi: collega livelli del mondo, rotte remote e poteri lontani.'
+        signatureGoal: Stabilire una rete suprema che unisca le grandi direttrici del dominio cittadino.
+        chapterProof: La città completa un progetto di connessione assoluta tra spazi, dimensioni e presidi.
+        completionFantasy: Le vie della città sembrano attraversare il mondo intero, e ogni distanza appare finalmente governabile.
+        rewardProfile: story_elite
+        tasks:
+        - elite_08.task_1
+        - elite_08.task_2
+        - elite_08.task_3
+        milestone: elite_08.milestone
+        proof: elite_08.proof
+      elite_09:
+        id: elite_09
+        order: 49
+        title: Ultima Crisi
+        act: Elite
+        elite: true
+        minCityLevel: 241
+        primaryChapter: COMBAT
+        taskFamilies:
+        - COMBAT
+        - CIVIC
+        - INDUSTRY
+        narrativeBeat: Prima del vertice assoluto, la città affronta la crisi che misura tutto ciò che ha costruito e difeso.
+        signatureGoal: Resistere alla massima pressione che il territorio possa scaricare contro la città.
+        chapterProof: La città supera la crisi finale che precede il proprio compimento assoluto.
+        completionFantasy: 'Dopo questa prova, la città non sembra più soltanto potente: sembra inevitabile.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_09.task_1
+        - elite_09.task_2
+        - elite_09.task_3
+        milestone: elite_09.milestone
+        proof: elite_09.proof
+      elite_10:
+        id: elite_10
+        order: 50
+        title: Città Eterna
+        act: Elite
+        elite: true
+        minCityLevel: 246
+        primaryChapter: INDUSTRY
+        taskFamilies:
+        - INDUSTRY
+        - CIVIC
+        - FRONTIER
+        narrativeBeat: La città raggiunge il vertice assoluto di Story Mode e costruisce la propria forma definitiva di eredità.
+        signatureGoal: Unire opera, dominio e volontà collettiva nel capitolo che consacra per sempre la città.
+        chapterProof: La città completa il progetto supremo che chiude l'intera progressione permanente di Story Mode.
+        completionFantasy: 'La città non appare più come un centro tra gli altri: appare come una realtà destinata a restare.'
+        rewardProfile: story_elite
+        tasks:
+        - elite_10.task_1
+        - elite_10.task_2
+        - elite_10.task_3
+        milestone: elite_10.milestone
+        proof: elite_10.proof

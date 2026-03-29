@@ -1,0 +1,29 @@
+id: variant_imperial_plate
+weight: 2
+namePrefix: "<gold>Imperiale</gold>"
+tags:
+  - throne
+  - imperial
+equipment:
+  helmet:
+    material: GOLDEN_HELMET
+    enchants:
+      protection: 4
+      unbreaking: 2
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      protection: 4
+      mending: 1
+  leggings:
+    material: IRON_LEGGINGS
+    enchants:
+      blast_protection: 3
+      unbreaking: 2
+  boots:
+    material: GOLDEN_BOOTS
+    enchants:
+      projectile_protection: 3
+      binding_curse: 1
+addAbilities: []
+removeAbilities: []

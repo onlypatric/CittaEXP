@@ -1,0 +1,28 @@
+id: variant_deepguard
+weight: 1
+namePrefix: "<aqua>di Fondale</aqua>"
+tags:
+  - omen
+  - deepguard
+equipment:
+  helmet:
+    material: TURTLE_HELMET
+    enchants:
+      protection: 3
+      unbreaking: 2
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      projectile_protection: 4
+      mending: 1
+  leggings:
+    material: IRON_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: CHAINMAIL_BOOTS
+    enchants:
+      projectile_protection: 3
+      unbreaking: 2
+addAbilities: []
+removeAbilities: []

@@ -1,0 +1,13 @@
+id: defense_spawn_presence
+trigger: ON_SPAWN
+cooldownTicks: 0
+targeting:
+  type: SELF
+actions:
+  - type: particles
+    particle: SMOKE
+    count: 10
+  - type: sound
+    sound: ENTITY_ZOMBIE_AMBIENT
+    volume: 0.8
+    pitch: 0.9

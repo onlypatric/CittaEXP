@@ -53,7 +53,12 @@ public final class CityLevelRepository {
                         town_id INTEGER PRIMARY KEY,
                         xp_scaled INTEGER NOT NULL,
                         city_level INTEGER NOT NULL,
+                        unlocked_level INTEGER NOT NULL DEFAULT 1,
                         stage TEXT NOT NULL,
+                        stage_seals_earned INTEGER NOT NULL DEFAULT 0,
+                        stage_seals_required INTEGER NOT NULL DEFAULT 6,
+                        stage_completed_at TEXT,
+                        subtier_completed_at TEXT,
                         updated_at TEXT NOT NULL
                     )
                     """);
@@ -178,6 +183,12 @@ public final class CityLevelRepository {
                         updated_at TEXT NOT NULL
                     )
                     """);
+            ensureColumn(connection, "town_progression", "stage_seals_earned", "INTEGER NOT NULL DEFAULT 0");
+            ensureColumn(connection, "town_progression", "stage_seals_required", "INTEGER NOT NULL DEFAULT 6");
+            ensureColumn(connection, "town_progression", "stage_completed_at", "TEXT");
+            ensureColumn(connection, "town_progression", "subtier_completed_at", "TEXT");
+            ensureColumn(connection, "town_progression", "unlocked_level", "INTEGER NOT NULL DEFAULT 1");
+            statement.executeUpdate("UPDATE town_progression SET unlocked_level = city_level WHERE unlocked_level IS NULL OR unlocked_level <= 0");
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossibile inizializzare levels.db", exception);
         }
@@ -253,14 +264,22 @@ public final class CityLevelRepository {
         Map<Integer, TownProgression> result = new HashMap<>();
         try (Connection connection = openConnection();
              PreparedStatement statement = connection.prepareStatement(
-                     "SELECT town_id, xp_scaled, city_level, stage, updated_at FROM town_progression");
+                     """
+                     SELECT town_id, xp_scaled, unlocked_level, stage, stage_seals_earned, stage_seals_required,
+                            stage_completed_at, subtier_completed_at, updated_at
+                     FROM town_progression
+                     """);
              ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 TownProgression progression = new TownProgression(
                         rs.getInt("town_id"),
                         rs.getLong("xp_scaled"),
-                        rs.getInt("city_level"),
+                        rs.getInt("unlocked_level"),
                         TownStage.fromDbValue(rs.getString("stage")),
+                        rs.getInt("stage_seals_earned"),
+                        rs.getInt("stage_seals_required"),
+                        parseInstantNullable(rs.getString("stage_completed_at")),
+                        parseInstantNullable(rs.getString("subtier_completed_at")),
                         parseInstant(rs.getString("updated_at"))
                 );
                 result.put(progression.townId(), progression);
@@ -353,22 +372,45 @@ public final class CityLevelRepository {
         try (Connection connection = openConnection();
              PreparedStatement statement = connection.prepareStatement(
                      """
-                             INSERT INTO town_progression(town_id, xp_scaled, city_level, stage, updated_at)
-                             VALUES(?, ?, ?, ?, ?)
+                             INSERT INTO town_progression(town_id, xp_scaled, city_level, unlocked_level, stage, stage_seals_earned, stage_seals_required,
+                                                          stage_completed_at, subtier_completed_at, updated_at)
+                             VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                              ON CONFLICT(town_id) DO UPDATE SET
                                  xp_scaled = excluded.xp_scaled,
                                  city_level = excluded.city_level,
+                                 unlocked_level = excluded.unlocked_level,
                                  stage = excluded.stage,
+                                 stage_seals_earned = excluded.stage_seals_earned,
+                                 stage_seals_required = excluded.stage_seals_required,
+                                 stage_completed_at = excluded.stage_completed_at,
+                                 subtier_completed_at = excluded.subtier_completed_at,
                                  updated_at = excluded.updated_at
                              """)) {
             statement.setInt(1, progression.townId());
             statement.setLong(2, progression.xpScaled());
             statement.setInt(3, progression.cityLevel());
-            statement.setString(4, progression.stage().name());
-            statement.setString(5, progression.updatedAt().toString());
+            statement.setInt(4, progression.cityLevel());
+            statement.setString(5, progression.stage().name());
+            statement.setInt(6, progression.stageSealsEarned());
+            statement.setInt(7, progression.stageSealsRequired());
+            statement.setString(8, progression.stageCompletedAt() == null ? null : progression.stageCompletedAt().toString());
+            statement.setString(9, progression.subTierCompletedAt() == null ? null : progression.subTierCompletedAt().toString());
+            statement.setString(10, progression.updatedAt().toString());
             statement.executeUpdate();
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossibile upsert progression town=" + progression.townId(), exception);
+        }
+    }
+
+    public synchronized void resetForM1Cutover() {
+        try (Connection connection = openConnection(); Statement statement = connection.createStatement()) {
+            statement.execute("DELETE FROM town_progression");
+            statement.execute("DELETE FROM town_level_requests");
+            statement.execute("DELETE FROM staff_approval_requests");
+            statement.execute("DELETE FROM staff_approval_events");
+            statement.execute("DELETE FROM sync_outbox");
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossibile eseguire reset cutover M1", exception);
         }
     }
 
@@ -653,6 +695,27 @@ public final class CityLevelRepository {
 
     private Connection openConnection() throws SQLException {
         return DriverManager.getConnection(jdbcUrl);
+    }
+
+    private void ensureColumn(Connection connection, String table, String column, String ddl) throws SQLException {
+        if (hasColumn(connection, table, column)) {
+            return;
+        }
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE " + table + " ADD COLUMN " + column + " " + ddl);
+        }
+    }
+
+    private boolean hasColumn(Connection connection, String table, String column) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("PRAGMA table_info(" + table + ")");
+             ResultSet rs = statement.executeQuery()) {
+            while (rs.next()) {
+                if (column.equalsIgnoreCase(rs.getString("name"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private Instant parseInstant(String raw) {

@@ -1,0 +1,1391 @@
+enabled: true
+timezone: Europe/Rome
+procedural:
+  signature:
+    townDays: 30
+    globalDays: 7
+  context:
+    biomeChance: 0.0
+    dimensionChance: 0.45
+    biomeFamilies:
+      PLAINS:
+        displayName: Pianure
+        exact:
+        - minecraft:plains
+        contains:
+        - PLAINS
+        - FIELD
+        - GRASSLAND
+      FOREST:
+        displayName: Foreste
+        exact:
+        - minecraft:forest
+        - minecraft:flower_forest
+        - minecraft:dark_forest
+        - minecraft:birch_forest
+        - minecraft:pale_garden
+        - terraformgenerator:scarlet_forest
+        contains:
+        - FOREST
+        - WOODLAND
+        - WOODS
+      TAIGA:
+        displayName: Taiga
+        exact:
+        - minecraft:taiga
+        - minecraft:snowy_taiga
+        contains:
+        - TAIGA
+        - PINE
+        - SPRUCE
+        - CONIFER
+        - REDWOOD
+      JUNGLE:
+        displayName: Giungla
+        exact:
+        - minecraft:jungle
+        - minecraft:sparse_jungle
+        - minecraft:bamboo_jungle
+        contains:
+        - JUNGLE
+        - BAMBOO
+        - RAINFOREST
+      SAVANNA:
+        displayName: Savana
+        exact:
+        - minecraft:savanna
+        - minecraft:savanna_plateau
+        contains:
+        - SAVANNA
+        - STEPPE
+        - BAOBAB
+      DESERT:
+        displayName: Deserto
+        exact:
+        - minecraft:desert
+        contains:
+        - DESERT
+        - DUNE
+        - OASIS
+      BADLANDS:
+        displayName: Badlands
+        exact:
+        - minecraft:badlands
+        - minecraft:eroded_badlands
+        contains:
+        - BADLAND
+        - MESA
+        - CANYON
+      SWAMP:
+        displayName: Paludi
+        exact:
+        - minecraft:swamp
+        - minecraft:mangrove_swamp
+        - terraformgenerator:muddy_bog
+        contains:
+        - SWAMP
+        - MARSH
+        - BOG
+        - FEN
+        - MANGROVE
+      SNOW:
+        displayName: Biomi innevati
+        exact:
+        - minecraft:snowy_beach
+        - minecraft:snowy_slopes
+        - minecraft:ice_spikes
+        - minecraft:snowy_plains
+        contains:
+        - SNOW
+        - FROZEN
+        - ICY
+        - GLACIER
+        - TUNDRA
+      MOUNTAIN:
+        displayName: Montagne
+        exact:
+        - minecraft:jagged_peaks
+        - minecraft:stony_shore
+        contains:
+        - MOUNTAIN
+        - PEAK
+        - CLIFF
+        - HIGHLAND
+      CAVES:
+        displayName: Grotte
+        exact:
+        - terraformgenerator:crystalline_cluster
+        contains:
+        - CAVE
+        - CAVERN
+        - UNDERGROUND
+        - DEEP_DARK
+        - DRIPSTONE
+        - LUSH
+        - CRYSTAL
+      RIVER:
+        displayName: Fiumi
+        exact:
+        - minecraft:river
+        - minecraft:frozen_river
+        contains:
+        - RIVER
+        - STREAM
+      OCEAN:
+        displayName: Oceani
+        exact:
+        - minecraft:ocean
+        - minecraft:deep_ocean
+        - minecraft:cold_ocean
+        - minecraft:deep_cold_ocean
+        - minecraft:frozen_ocean
+        - minecraft:deep_frozen_ocean
+        - minecraft:lukewarm_ocean
+        - minecraft:deep_lukewarm_ocean
+        - minecraft:warm_ocean
+        contains:
+        - OCEAN
+        - SEA
+      BEACH:
+        displayName: Spiagge
+        exact:
+        - minecraft:beach
+        contains:
+        - BEACH
+        - SHORE
+        - COAST
+      MEADOW:
+        displayName: Praterie
+        exact:
+        - minecraft:meadow
+        - terraformgenerator:cherry_grove
+        contains:
+        - MEADOW
+        - GROVE
+        - CHERRY
+      MUSHROOM:
+        displayName: Campi fungini
+        exact:
+        - minecraft:mushroom_fields
+        contains:
+        - MUSHROOM
+        - FUNGI
+  boundaries:
+    block_mine:
+      min: 24
+      max: 60
+      step: 4
+      weight: 12
+    mob_kill:
+      min: 12
+      max: 36
+      step: 4
+      weight: 10
+    crop_harvest:
+      min: 16
+      max: 48
+      step: 4
+      weight: 9
+    fish_catch:
+      min: 4
+      max: 16
+      step: 2
+      weight: 7
+    food_craft:
+      min: 24
+      max: 72
+      step: 8
+      weight: 8
+    brew_potion:
+      min: 2
+      max: 10
+      step: 1
+      weight: 7
+    item_craft:
+      min: 4
+      max: 24
+      step: 2
+      weight: 8
+    nether_activity:
+      min: 2
+      max: 8
+      step: 1
+      weight: 7
+    ocean_activity:
+      min: 2
+      max: 8
+      step: 1
+      weight: 7
+    place_block:
+      min: 4000
+      max: 10000
+      step: 500
+      weight: 4
+    secret_quest:
+      min: 3
+      max: 3
+      step: 1
+      weight: 1
+    transport_distance:
+      min: 40
+      max: 160
+      step: 20
+      weight: 8
+    playtime_minutes:
+      min: 10
+      max: 30
+      step: 5
+      weight: 6
+    xp_pickup:
+      min: 20
+      max: 100
+      step: 10
+      weight: 8
+    structure_discovery:
+      min: 1
+      max: 2
+      step: 1
+      weight: 4
+    structure_loot:
+      min: 1
+      max: 4
+      step: 1
+      weight: 6
+    trial_vault_open:
+      min: 1
+      max: 4
+      step: 1
+      weight: 5
+    raid_win:
+      min: 1
+      max: 1
+      step: 1
+      weight: 4
+scheduler:
+  tickSeconds: 20
+playtime:
+  tickMinutes: 1
+daily:
+  standardCount: 8
+  raceWindows:
+  - '18:30'
+  - '21:30'
+weekly:
+  standardCount: 18
+  rolloverAt: 00:10
+monthly:
+  standardCount: 18
+  rolloverAt: 00:15
+m6:
+  boardLocks:
+    dailyStandard: 8
+    weeklyStandard: 18
+  firstCompletion:
+    daily:
+      enabled: true
+      maxClaims: 2
+      reward:
+        city:
+          xpCity: 10.0
+          vaultItems:
+            IRON_INGOT: 8
+    weekly:
+      enabled: true
+      reward:
+        city:
+          xpCity: 18.0
+          vaultItems:
+            LAPIS_LAZULI: 16
+seasonal:
+  rolloverAt: 00:20
+  acts:
+    actI: 6
+    actII: 6
+    actIII: 5
+    elite: 0
+    hiddenRelic: 3
+  secretHardCap: 8
+events:
+  questCount: 26
+monthlyEvents:
+  enabled: false
+  countPerWindow: 0
+  windowA:
+    startAt: 00:15
+  windowB:
+    startAt: 00:15
+streak:
+  enabled: true
+  bonusLadder:
+    '1': 0.0
+    '2': 0.05
+    '3': 0.1
+    '4': 0.2
+eventRewards:
+  top1:
+    enabled: true
+    reward:
+      xpCity: 320.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - event_top_1_broadcast
+      vaultItems:
+        DIAMOND_BLOCK: 1
+  top2:
+    enabled: true
+    reward:
+      xpCity: 220.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - event_top_2_broadcast
+      vaultItems:
+        EMERALD_BLOCK: 1
+  top3:
+    enabled: true
+    reward:
+      xpCity: 140.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - event_top_3_broadcast
+      vaultItems:
+        GOLD_BLOCK: 2
+  threshold:
+    enabled: true
+    targetProgress: 1500
+    reward:
+      xpCity: 90.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - event_threshold_broadcast
+      vaultItems:
+        IRON_BLOCK: 8
+templateFormatter:
+  randomRange:
+    enabled: true
+    minAllowed: 0
+    maxAllowed: 1000000
+difficultyResolver:
+  thresholds:
+    daily:
+      normalTarget: 250
+      hardTarget: 500
+    weekly:
+      normalTarget: 900
+      hardTarget: 1800
+    monthly:
+      normalTarget: 3000
+      hardTarget: 6000
+  multipliers:
+    easy: 1.0
+    normal: 1.25
+    hard: 1.5
+specificVariants:
+  targetScaling:
+    common: 1.0
+    uncommon: 0.8
+    rare: 0.6
+scaling:
+  cityMembersBrackets:
+    b1:
+      min: 1
+      max: 2
+      multiplier: 0.6
+    b2:
+      min: 3
+      max: 5
+      multiplier: 0.8
+    b3:
+      min: 6
+      max: 9
+      multiplier: 1.0
+    b4:
+      min: 10
+      max: 13
+      multiplier: 1.2
+    b5:
+      min: 14
+      max: 19
+      multiplier: 1.45
+    b6:
+      min: 20
+      max: 999999
+      multiplier: 1.7
+  serverWideOnline:
+    enabled: true
+    minFactor: 0.85
+    maxFactor: 2.0
+    baseFactor: 0.7
+    playersDivisor: 30.0
+xpRangesByCycle:
+  dailyCompletion:
+    min: 12
+    max: 28
+  dailyRaceWinner:
+    min: 35
+    max: 60
+  weeklyCompletion:
+    min: 30
+    max: 85
+  monthlyCompletion:
+    min: 90
+    max: 140
+  monthlyEventCompletion:
+    min: 110
+    max: 190
+  excellenceRatio: 0.35
+  excellenceMin: 6
+fairness:
+  activeContributorsWindowDays: 7
+  brackets:
+    bracket1:
+      min: 1
+      max: 5
+      multiplier: 0.7
+    bracket2:
+      min: 6
+      max: 10
+      multiplier: 1.0
+    bracket3:
+      min: 11
+      max: 20
+      multiplier: 1.35
+    bracket4:
+      min: 21
+      max: 999999
+      multiplier: 1.65
+dualThreshold:
+  excellenceMultiplier: 1.4
+rewardPolicy:
+  defaults:
+    xp_city: true
+    money_city: true
+    material: true
+    command_console: true
+personalRewards:
+  minContributionRatio: 0.05
+  thresholdContributionAbsolute: 0
+raceRewards:
+  top1:
+    enabled: true
+    reward:
+      xpCity: 48.0
+      moneyCity: 900.0
+  top2:
+    enabled: true
+    reward:
+      xpCity: 20.0
+      moneyCity: 550.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_top_2_broadcast
+  top3:
+    enabled: true
+    reward:
+      xpCity: 12.0
+      moneyCity: 350.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_top_3_broadcast
+  threshold:
+    enabled: true
+    targetProgress: 1
+    reward:
+      xpCity: 6.0
+      moneyCity: 150.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_threshold_broadcast
+curation:
+  cooldown:
+    definitionCycles: 2
+    categoryCycles: 2
+    focusCycles: 2
+    familyCycles: 2
+  bundle:
+    daily:
+      slotA: easy
+      slotB: medium
+      slotC: off_routine
+    race:
+      slotA: combat
+      slotB: mining
+      slotC: farming
+    weekly:
+      slotA: production
+      slotB: combat_exploration
+      slotC: social_economy
+    monthly:
+      slotA: epic
+      slotB: support
+      slotC: support
+boardGenerator:
+  targetFormula:
+    stageMultipliers:
+      AVAMPOSTO: 1.0
+      BORGO: 1.35
+      VILLAGGIO: 1.75
+      CITTADINA: 2.25
+      CITTA: 2.8
+      REGNO: 3.5
+    cycleMultipliers:
+      daily: 1.0
+      race: 3.0
+      weekly: 7.0
+      monthly: 25.0
+      seasonal: 50.0
+    exceptions:
+      structure_discovery:
+        daily:
+          min: 1
+          max: 1
+          step: 1
+        weekly:
+          min: 1
+          max: 2
+          step: 1
+        monthlySide:
+          min: 2
+          max: 4
+          step: 1
+        monthlyGrand:
+          min: 3
+          max: 6
+          step: 1
+        race:
+          min: 1
+          max: 1
+          step: 1
+      trial_vault_open:
+        daily:
+          min: 1
+          max: 1
+          step: 1
+        weekly:
+          min: 1
+          max: 3
+          step: 1
+        monthlySide:
+          min: 2
+          max: 6
+          step: 1
+        monthlyGrand:
+          min: 3
+          max: 8
+          step: 1
+        race:
+          min: 1
+          max: 2
+          step: 1
+      raid_win:
+        daily:
+          min: 1
+          max: 1
+          step: 1
+        weekly:
+          min: 1
+          max: 2
+          step: 1
+        monthlySide:
+          min: 1
+          max: 3
+          step: 1
+        monthlyGrand:
+          min: 2
+          max: 4
+          step: 1
+        race:
+          min: 1
+          max: 1
+          step: 1
+      boss_kill:
+        daily:
+          min: 1
+          max: 1
+          step: 1
+        weekly:
+          min: 1
+          max: 1
+          step: 1
+        monthlySide:
+          min: 1
+          max: 2
+          step: 1
+        monthlyGrand:
+          min: 2
+          max: 3
+          step: 1
+        race:
+          min: 1
+          max: 1
+          step: 1
+  weights:
+    seasonThemeWeight: 0.5
+    atlasLowestWeight: 0.3
+    cityAffinity14dWeight: 0.2
+  hardRules:
+    noConsecutiveFamily: true
+    maxPassivePerBoard: 1
+    minSkillfulPerBoard: 1
+    banDailyPlaytimeXpPair: true
+    excludeEconomyFromRace: true
+    resourceContributionWindowDays: 7
+    resourceContributionMaxInWindow: 1
+  seasonThemes:
+    SPRING:
+      preferredChapters:
+      - AGRONOMY
+      - CIVIC
+      preferredFamilies:
+      - farming
+      - social_coop
+    SUMMER:
+      preferredChapters:
+      - EXTRACTION
+      - FRONTIER
+      preferredFamilies:
+      - resource_grind
+      - exploration
+    AUTUMN:
+      preferredChapters:
+      - INDUSTRY
+      - COMBAT
+      preferredFamilies:
+      - builder
+      - mob_combat
+    WINTER:
+      preferredChapters:
+      - COMBAT
+      - FRONTIER
+      preferredFamilies:
+      - mob_combat
+      - exploration
+taxonomyPolicies:
+  playtime_minutes:
+    progressionRole: SUPPORT
+    allowedModes:
+    - DAILY_STANDARD
+    raceEligible: false
+    cityXpEnabled: true
+  xp_pickup:
+    progressionRole: SUPPORT
+    allowedModes:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    raceEligible: false
+    cityXpEnabled: true
+  economy_advanced:
+    progressionRole: SUPPORT
+    allowedModes:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    raceEligible: false
+    cityXpEnabled: true
+  resource_contribution:
+    progressionRole: SUPPORT
+    allowedModes:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    raceEligible: false
+    cityXpEnabled: true
+  vault_delivery:
+    progressionRole: SUPPORT
+    allowedModes:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    raceEligible: false
+    cityXpEnabled: true
+governance:
+  rerollWeekly:
+    enabled: true
+    maxPerCycle: 1
+  seasonalVeto:
+    enabled: true
+    maxCategories: 1
+    immutablePerSeason: true
+milestones:
+  weekly:
+    m1At: 1
+    m2At: 2
+    m3At: 3
+  seasonal:
+    finalAt: 6
+  rewards:
+    weekly1:
+      xpCity: 35.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - milestone_weekly_1
+      vaultItems:
+        GOLD_INGOT: 16
+    weekly2:
+      xpCity: 60.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - milestone_weekly_2
+      vaultItems:
+        IRON_BLOCK: 4
+    weekly3:
+      xpCity: 95.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - milestone_weekly_3
+      vaultItems:
+        DIAMOND: 4
+    seasonFinal:
+      xpCity: 220.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - milestone_season_final
+      vaultItems:
+        NETHERITE_INGOT: 1
+definitions:
+  resources_contribution:
+    enabled: true
+    category: 1
+    name: Contributo Risorse
+    objective: resource_contribution
+    target: 320
+    targetRange:
+      min: 220
+      max: 520
+      step: 20
+    weight: 9
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_crop
+  mining_global:
+    enabled: true
+    category: 2
+    name: Mining Globale
+    objective: block_mine
+    target: 350
+    targetRange:
+      min: 260
+      max: 700
+      step: 20
+    weight: 12
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_mine
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+        MONTHLY_STANDARD: 0.4
+      focusType: MATERIAL
+      focusPool:
+      - key: COAL_ORE
+        label: Minerale di carbone
+        rarity: COMMON
+      - key: IRON_ORE
+        label: Minerale di ferro
+        rarity: COMMON
+      - key: COPPER_ORE
+        label: Minerale di rame
+        rarity: COMMON
+      - key: REDSTONE_ORE
+        label: Minerale di redstone
+        rarity: UNCOMMON
+      - key: LAPIS_ORE
+        label: Minerale di lapislazzuli
+        rarity: UNCOMMON
+      - key: GOLD_ORE
+        label: Minerale d'oro
+        rarity: UNCOMMON
+      - key: DIAMOND_ORE
+        label: Minerale di diamante
+        rarity: RARE
+      - key: EMERALD_ORE
+        label: Minerale di smeraldo
+        rarity: RARE
+      - key: ANCIENT_DEBRIS
+        label: Ancient Debris
+        rarity: RARE
+  mob_hunt:
+    enabled: true
+    category: 3
+    name: Caccia ai Mob
+    objective: mob_kill
+    target: 120
+    targetRange:
+      min: 80
+      max: 220
+      step: 10
+    weight: 10
+    cycles:
+    - DAILY_STANDARD
+    - DAILY_RACE_1600
+    - DAILY_RACE_2100
+    - WEEKLY_STANDARD
+    rewardBundle: std_mob
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        DAILY_RACE_1600: 0.55
+        DAILY_RACE_2100: 0.55
+        WEEKLY_STANDARD: 0.45
+      focusType: ENTITY_TYPE
+      focusPool:
+      - key: ZOMBIE
+        label: Zombie
+        rarity: COMMON
+      - key: SKELETON
+        label: Scheletro
+        rarity: COMMON
+      - key: SPIDER
+        label: Ragno
+        rarity: COMMON
+      - key: CREEPER
+        label: Creeper
+        rarity: UNCOMMON
+      - key: ENDERMAN
+        label: Enderman
+        rarity: UNCOMMON
+      - key: WITCH
+        label: Strega
+        rarity: UNCOMMON
+      - key: BLAZE
+        label: Blaze
+        rarity: UNCOMMON
+      - key: WITHER_SKELETON
+        label: Wither Skeleton
+        rarity: RARE
+  farming_global:
+    enabled: true
+    category: 4
+    name: Raccolta Campi
+    objective: crop_harvest
+    target: 220
+    targetRange:
+      min: 150
+      max: 420
+      step: 15
+    weight: 9
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_crop
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+      focusType: MATERIAL
+      focusPool:
+      - key: WHEAT
+        label: Grano
+        rarity: COMMON
+      - key: CARROTS
+        label: Carote
+        rarity: COMMON
+      - key: POTATOES
+        label: Patate
+        rarity: COMMON
+      - key: BEETROOTS
+        label: Barbabietole
+        rarity: UNCOMMON
+      - key: NETHER_WART
+        label: Verruche del Nether
+        rarity: UNCOMMON
+  boss_challenge:
+    enabled: true
+    category: 5
+    name: Sfida Boss
+    objective: boss_kill
+    target: 2
+    weight: 4
+    cycles:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    - MONTHLY_EVENT_A
+    - MONTHLY_EVENT_B
+    rewardBundle: std_mob
+  trade_challenge:
+    enabled: true
+    category: 6
+    name: Scambi coi villager
+    objective: villager_trade
+    target: 80
+    targetRange:
+      min: 50
+      max: 180
+      step: 10
+    weight: 7
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_playtime
+  exploration_challenge:
+    enabled: true
+    category: 7
+    name: Esplorazione Strutture
+    objective: structure_discovery
+    target: 3
+    weight: 5
+    cycles:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_xp
+  archaeology_challenge:
+    enabled: true
+    category: 8
+    name: Archeologia
+    objective: archaeology_brush
+    target: 50
+    targetRange:
+      min: 25
+      max: 90
+      step: 5
+    weight: 4
+    cycles:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_xp
+  structure_loot:
+    enabled: true
+    category: 9
+    name: Loot Strutture
+    objective: structure_loot
+    target: 45
+    targetRange:
+      min: 25
+      max: 90
+      step: 5
+    weight: 5
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_xp
+  rare_mob_encounter:
+    enabled: true
+    category: 10
+    name: Incontro con mob rari
+    objective: rare_mob_kill
+    target: 18
+    targetRange:
+      min: 8
+      max: 28
+      step: 2
+    weight: 5
+    cycles:
+    - DAILY_STANDARD
+    - DAILY_RACE_1600
+    - DAILY_RACE_2100
+    - WEEKLY_STANDARD
+    rewardBundle: std_mob
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        DAILY_RACE_1600: 0.55
+        DAILY_RACE_2100: 0.55
+        WEEKLY_STANDARD: 0.45
+      focusType: ENTITY_TYPE
+      focusPool:
+      - key: BREEZE
+        label: Breeze
+        rarity: UNCOMMON
+      - key: PIGLIN_BRUTE
+        label: Piglin Brute
+        rarity: UNCOMMON
+      - key: SHULKER
+        label: Shulker
+        rarity: UNCOMMON
+      - key: ELDER_GUARDIAN
+        label: Elder Guardian
+        rarity: RARE
+      - key: WARDEN
+        label: Warden
+        rarity: RARE
+  transport_challenge:
+    enabled: true
+    category: 11
+    name: Sfida Trasporto
+    objective: transport_distance
+    target: 250
+    targetRange:
+      min: 250
+      max: 1000
+      step: 50
+    weight: 6
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_playtime
+  dimension_challenge:
+    enabled: true
+    category: 12
+    name: Sfida Dimensioni
+    objective: dimension_travel
+    target: 35
+    targetRange:
+      min: 20
+      max: 60
+      step: 5
+    weight: 6
+    cycles:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_xp
+  farming_ecosystem:
+    enabled: true
+    category: 13
+    name: Ecosistema Farming
+    objective: farming_ecosystem
+    target: 120
+    targetRange:
+      min: 80
+      max: 240
+      step: 10
+    weight: 6
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_crop
+  fishing_challenge:
+    enabled: true
+    category: 14
+    name: Sfida di pesca
+    objective: fish_catch
+    target: 80
+    targetRange:
+      min: 50
+      max: 180
+      step: 10
+    weight: 5
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_playtime
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+      focusType: ENTITY_TYPE
+      focusPool:
+      - key: COD
+        label: Merluzzo
+        rarity: COMMON
+      - key: SALMON
+        label: Salmone
+        rarity: COMMON
+      - key: PUFFERFISH
+        label: Pesce palla
+        rarity: UNCOMMON
+      - key: TROPICAL_FISH
+        label: Pesce tropicale
+        rarity: UNCOMMON
+  animal_interaction:
+    enabled: true
+    category: 15
+    name: Interazione Animali
+    objective: animal_interaction
+    target: 70
+    targetRange:
+      min: 40
+      max: 150
+      step: 10
+    weight: 5
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    rewardBundle: std_crop
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+      focusType: ENTITY_TYPE
+      focusPool:
+      - key: COW
+        label: Mucca
+        rarity: COMMON
+      - key: SHEEP
+        label: Pecora
+        rarity: COMMON
+      - key: PIG
+        label: Maiale
+        rarity: COMMON
+      - key: CHICKEN
+        label: Gallina
+        rarity: COMMON
+      - key: HORSE
+        label: Cavallo
+        rarity: UNCOMMON
+      - key: WOLF
+        label: Lupo
+        rarity: UNCOMMON
+  economy_advanced:
+    enabled: true
+    category: 16
+    name: Economia Avanzata
+    objective: economy_advanced
+    target: 120
+    targetRange:
+      min: 80
+      max: 220
+      step: 10
+    weight: 6
+    cycles:
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_playtime
+  construction_challenge:
+    enabled: true
+    category: 17
+    name: Sfida costruzione
+    objective: construction
+    target: 260
+    targetRange:
+      min: 180
+      max: 520
+      step: 20
+    weight: 7
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    - MONTHLY_EVENT_A
+    - MONTHLY_EVENT_B
+    rewardBundle: std_mine
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+        MONTHLY_STANDARD: 0.4
+        MONTHLY_EVENT_A: 0.45
+        MONTHLY_EVENT_B: 0.45
+      focusType: MATERIAL
+      focusPool:
+      - key: STONE_BRICKS
+        label: Mattoni di pietra
+        rarity: COMMON
+      - key: BRICKS
+        label: Mattoni
+        rarity: COMMON
+      - key: OAK_PLANKS
+        label: Assi di quercia
+        rarity: COMMON
+      - key: DEEPSLATE_BRICKS
+        label: Mattoni di deepslate
+        rarity: UNCOMMON
+      - key: QUARTZ_BLOCK
+        label: Blocco di quarzo
+        rarity: UNCOMMON
+      - key: POLISHED_BLACKSTONE_BRICKS
+        label: Mattoni di blackstone
+        rarity: UNCOMMON
+  redstone_challenge:
+    enabled: true
+    category: 18
+    name: Automazione redstone
+    objective: redstone_automation
+    target: 85
+    targetRange:
+      min: 50
+      max: 180
+      step: 10
+    weight: 5
+    cycles:
+    - DAILY_STANDARD
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    - MONTHLY_EVENT_A
+    - MONTHLY_EVENT_B
+    rewardBundle: std_xp
+    variant:
+      mode: MIXED
+      specificChance: 0.5
+      specificChanceByCycle:
+        WEEKLY_STANDARD: 0.45
+        MONTHLY_STANDARD: 0.4
+        MONTHLY_EVENT_A: 0.45
+        MONTHLY_EVENT_B: 0.45
+      focusType: MATERIAL
+      focusPool:
+      - key: REDSTONE
+        label: Polvere di redstone
+        rarity: COMMON
+      - key: REDSTONE_TORCH
+        label: Torcia di redstone
+        rarity: COMMON
+      - key: REPEATER
+        label: Repeater
+        rarity: UNCOMMON
+      - key: COMPARATOR
+        label: Comparator
+        rarity: UNCOMMON
+      - key: OBSERVER
+        label: Observer
+        rarity: UNCOMMON
+      - key: PISTON
+        label: Pistone
+        rarity: UNCOMMON
+      - key: HOPPER
+        label: Hopper
+        rarity: UNCOMMON
+  xp_pickup:
+    enabled: true
+    category: 6
+    name: Energia Arcana
+    objective: xp_pickup
+    target: 400
+    targetRange:
+      min: 250
+      max: 900
+      step: 25
+    weight: 8
+    cycles:
+    - DAILY_STANDARD
+    - DAILY_RACE_1600
+    - DAILY_RACE_2100
+    - WEEKLY_STANDARD
+    rewardBundle: std_xp
+  playtime:
+    enabled: true
+    category: 6
+    name: Presenza Cittadina
+    objective: playtime_minutes
+    target: 90
+    targetRange:
+      min: 60
+      max: 180
+      step: 10
+    weight: 7
+    cycles:
+    - DAILY_STANDARD
+    - DAILY_RACE_1600
+    - DAILY_RACE_2100
+    - WEEKLY_STANDARD
+    - MONTHLY_STANDARD
+    rewardBundle: std_playtime
+antiAbuse:
+  throttleMs: 500
+  playerContributionCapRatio: 0.35
+  afkIdleSeconds: 120
+  sampledObjectives:
+  - playtime_minutes
+  - transport_distance
+  - villager_trade
+  - economy_advanced
+  denyMobSpawnReasons:
+  - SPAWNER
+  - SPAWN_EGG
+  - CUSTOM
+  placedBlockTtlHours: 24
+  placedBlockMaxEntries: 250000
+  dailyTownCategoryCapEnabled: true
+  dailyTownCategoryCapRatio: 2.0
+  denyOnGuardError: true
+  structureLoot:
+    allowLootTablePrefixes:
+    - minecraft:chests/
+  exploration:
+    advancementFallbackEnabled: false
+    allowedStructures:
+    - minecraft:fortress
+    - minecraft:bastion_remnant
+    - minecraft:end_city
+    - minecraft:ancient_city
+    - minecraft:jungle_pyramid
+    - minecraft:desert_pyramid
+    - minecraft:stronghold
+    - minecraft:mansion
+    - minecraft:monument
+    - minecraft:trial_chambers
+    - minecraft:trail_ruins
+    - minecraft:shipwreck
+    - minecraft:ruined_portal
+    - minecraft:village_plains
+    - minecraft:village_desert
+    - minecraft:village_savanna
+    - minecraft:village_snowy
+    - minecraft:village_taiga
+  profiles:
+    resource_grind:
+      throttleMs: 500
+      softCapRatio: 0.26
+      hardCapRatio: 0.35
+      clampRatio: 0.5
+      denySources:
+      - SPAWNER
+      - SPAWN_EGG
+      - CUSTOM
+      suspicionOnThrottle: 1
+      suspicionOnDenySource: 2
+      suspicionOnCap: 2
+      suspicionOnSoftClamp: 1
+      suspicionOnDedupe: 1
+    mob_combat:
+      throttleMs: 500
+      softCapRatio: 0.28
+      hardCapRatio: 0.35
+      clampRatio: 0.6
+      denySources:
+      - SPAWNER
+      - SPAWN_EGG
+      - CUSTOM
+      suspicionOnThrottle: 1
+      suspicionOnDenySource: 2
+      suspicionOnCap: 2
+      suspicionOnSoftClamp: 1
+      suspicionOnDedupe: 1
+    structure_loot:
+      throttleMs: 500
+      softCapRatio: 0.24
+      hardCapRatio: 0.31
+      clampRatio: 0.5
+      denySources: []
+      suspicionOnThrottle: 1
+      suspicionOnDenySource: 1
+      suspicionOnCap: 2
+      suspicionOnSoftClamp: 1
+      suspicionOnDedupe: 2
+    sampled_passive:
+      throttleMs: 500
+      softCapRatio: 0.22
+      hardCapRatio: 0.3
+      clampRatio: 0.5
+      denySources: []
+      suspicionOnThrottle: 1
+      suspicionOnDenySource: 1
+      suspicionOnCap: 2
+      suspicionOnSoftClamp: 1
+      suspicionOnDedupe: 1
+    social_coop:
+      throttleMs: 500
+      softCapRatio: 0.31
+      hardCapRatio: 0.35
+      clampRatio: 0.7
+      denySources: []
+      suspicionOnThrottle: 1
+      suspicionOnDenySource: 1
+      suspicionOnCap: 1
+      suspicionOnSoftClamp: 1
+      suspicionOnDedupe: 1
+  suspicion:
+    enabled: true
+    warningThreshold: 8
+    clampThreshold: 15
+    reviewThreshold: 25
+    decayIntervalMinutes: 30
+    decayAmount: 1

@@ -1,0 +1,24 @@
+id: defense_ritual_burst
+trigger: ON_IDLE
+cooldownTicks: 140
+targeting:
+  type: PLAYERS_IN_RADIUS
+  radius: 7
+  maxTargets: 4
+conditions:
+  - type: waveAtLeast
+    wave: 2
+actions:
+  - type: particles
+    particle: SOUL
+    count: 16
+  - type: sound
+    sound: ENTITY_EVOKER_CAST_SPELL
+    volume: 1.0
+    pitch: 0.8
+  - type: directDamage
+    amount: 4.0
+  - type: applyPotion
+    effect: BLINDNESS
+    durationTicks: 40
+    amplifier: 0

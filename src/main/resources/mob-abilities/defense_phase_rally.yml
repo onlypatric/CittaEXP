@@ -1,0 +1,24 @@
+id: defense_phase_rally
+trigger: ON_HURT
+cooldownTicks: 200
+targeting:
+  type: SELF
+conditions:
+  - type: hpBelow
+    ratio: 0.60
+actions:
+  - type: particles
+    particle: CRIT
+    count: 18
+  - type: sound
+    sound: ENTITY_PIGLIN_BRUTE_ANGRY
+    volume: 1.1
+    pitch: 0.8
+  - type: applyPotionToSelf
+    effect: DAMAGE_RESISTANCE
+    durationTicks: 100
+    amplifier: 1
+  - type: applyPotionToSelf
+    effect: INCREASE_DAMAGE
+    durationTicks: 100
+    amplifier: 0

@@ -1,0 +1,9 @@
+id: trait_leaper
+nameSuffix: "Balzatore"
+stats:
+  GENERIC_MOVEMENT_SPEED: 0.03
+tags:
+  - leaper
+addAbilities:
+  - defense_leaper_charge
+removeAbilities: []

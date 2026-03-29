@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "cittaexp_gui:item/golem_guard_sword"
+  }
+}

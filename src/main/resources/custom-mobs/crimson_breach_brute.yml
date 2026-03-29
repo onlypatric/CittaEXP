@@ -1,0 +1,45 @@
+id: crimson_breach_brute
+type: PIGLIN_BRUTE
+name: "<dark_red>Bruto della Breccia</dark_red>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: breach
+pools:
+  - defense
+  - miniboss
+themes:
+  - breach
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 150.0
+  GENERIC_ATTACK_DAMAGE: 12.0
+  GENERIC_MOVEMENT_SPEED: 0.31
+equipment:
+  helmet: GOLDEN_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: CHAINMAIL_LEGGINGS
+  boots: GOLDEN_BOOTS
+  mainHand: GOLDEN_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - breach
+  - miniboss
+mainAbilities:
+  - defense_breach_slam
+  - defense_guardian_sunder
+  - defense_phase_rally
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_leaper
+  - trait_runner_frenzied
+variants:
+  - variant_breach_lancer
+  - variant_scorched
+  - variant_ironclad
+  - variant_breach_plated

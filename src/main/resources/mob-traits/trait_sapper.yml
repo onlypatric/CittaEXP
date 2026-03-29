@@ -1,0 +1,7 @@
+id: trait_sapper
+nameSuffix: "Demolitore"
+tags:
+  - sapper
+addAbilities:
+  - defense_sapper_blast
+removeAbilities: []

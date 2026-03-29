@@ -1,0 +1,19 @@
+id: defense_runner_surge
+trigger: ON_IDLE
+cooldownTicks: 90
+targeting:
+  type: SELF
+conditions:
+  - type: targetExists
+actions:
+  - type: particles
+    particle: DUST
+    count: 8
+  - type: sound
+    sound: ENTITY_HUSK_AMBIENT
+    volume: 0.85
+    pitch: 1.2
+  - type: applyPotionToSelf
+    effect: SPEED
+    durationTicks: 60
+    amplifier: 0

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cittaexp_gui:item/golem_guard_helmet"
+  }
+}

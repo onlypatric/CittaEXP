@@ -1,8 +1,11 @@
 package it.patric.cittaexp.levels;
 
+import it.patric.cittaexp.defense.CityDefenseTier;
+import java.util.ArrayList;
 import java.io.File;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bukkit.Material;
@@ -13,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 public final class CityLevelSettings {
 
     private final int xpPerLevel;
+    private final double curveExponent;
     private final int levelCap;
     private final int regnoExtraClaimMaxLevel;
     private final int xpScale;
@@ -25,6 +29,7 @@ public final class CityLevelSettings {
     private final Set<Material> allowedContainers;
     private final Map<Material, Long> materialXpScaled;
     private final Map<TownStage, StageSpec> stageSpecs;
+    private final Map<Integer, LevelSpec> levelSpecs;
     private final SpawnPrivacyPolicy spawnPrivacyPolicy;
     private final StoreSettings storeSettings;
     private final MySqlSettings mySqlSettings;
@@ -35,9 +40,34 @@ public final class CityLevelSettings {
             int claimCap,
             int memberCap,
             int spawnerCap,
+            int shopCap,
             double monthlyTax,
             boolean staffApprovalRequired,
-            int huskTownLevel
+            int huskTownLevel,
+            CityDefenseTier requiredDefenseTier
+    ) {
+    }
+
+    public enum LevelRequirementType {
+        XP_REACHED,
+        BANK_BALANCE_MIN,
+        TOWN_SPAWN_REQUIRED,
+        DEFENSE_TIER_COMPLETED,
+        STAFF_APPROVAL_REQUIRED
+    }
+
+    public record LevelRequirementSpec(
+            LevelRequirementType type,
+            double amount,
+            CityDefenseTier defenseTier,
+            boolean required
+    ) {
+    }
+
+    public record LevelSpec(
+            int level,
+            boolean confirmationRequired,
+            List<LevelRequirementSpec> requirements
     ) {
     }
 
@@ -72,6 +102,7 @@ public final class CityLevelSettings {
 
     private CityLevelSettings(
             int xpPerLevel,
+            double curveExponent,
             int levelCap,
             int regnoExtraClaimMaxLevel,
             int xpScale,
@@ -84,11 +115,13 @@ public final class CityLevelSettings {
             Set<Material> allowedContainers,
             Map<Material, Long> materialXpScaled,
             Map<TownStage, StageSpec> stageSpecs,
+            Map<Integer, LevelSpec> levelSpecs,
             SpawnPrivacyPolicy spawnPrivacyPolicy,
             StoreSettings storeSettings,
             MySqlSettings mySqlSettings
     ) {
         this.xpPerLevel = xpPerLevel;
+        this.curveExponent = curveExponent;
         this.levelCap = levelCap;
         this.regnoExtraClaimMaxLevel = regnoExtraClaimMaxLevel;
         this.xpScale = xpScale;
@@ -101,6 +134,7 @@ public final class CityLevelSettings {
         this.allowedContainers = allowedContainers;
         this.materialXpScaled = materialXpScaled;
         this.stageSpecs = stageSpecs;
+        this.levelSpecs = levelSpecs;
         this.spawnPrivacyPolicy = spawnPrivacyPolicy;
         this.storeSettings = storeSettings;
         this.mySqlSettings = mySqlSettings;
@@ -117,6 +151,7 @@ public final class CityLevelSettings {
         YamlConfiguration materials = YamlConfiguration.loadConfiguration(materialsFile);
 
         int xpPerLevel = Math.max(1, levels.getInt("progression.xpPerLevel", 100));
+        double curveExponent = Math.max(0.1D, levels.getDouble("progression.curveExponent", 1.30D));
         int levelCap = Math.max(250, levels.getInt("progression.levelCap", 250));
         int regnoExtraClaimMaxLevel = Math.max(
                 250,
@@ -128,7 +163,7 @@ public final class CityLevelSettings {
         String taxTimezone = levels.getString("tax.timezone", "Europe/Rome");
         int taxRunHour = clamp(levels.getInt("tax.runHour", 0), 0, 23);
         int taxRunMinute = clamp(levels.getInt("tax.runMinute", 5), 0, 59);
-        double upgradeBalanceMultiplier = Math.max(1.0D, levels.getDouble("upgrade.requiredBalanceMultiplier", 2.0D));
+        double upgradeBalanceMultiplier = Math.max(1.0D, levels.getDouble("upgrade.requiredBalanceMultiplier", 1.5D));
 
         Set<Material> containers = EnumSet.noneOf(Material.class);
         for (String raw : levels.getStringList("scan.allowedContainers")) {
@@ -165,23 +200,76 @@ public final class CityLevelSettings {
         }
 
         Map<TownStage, StageSpec> stageSpecs = new EnumMap<>(TownStage.class);
+        boolean hasM1StageConfig = levels.isConfigurationSection("stages.AVAMPOSTO_I");
         for (TownStage stage : TownStage.values()) {
-            String base = "stages." + stage.name();
-            int configuredMemberCap = levels.getInt(base + ".memberCap", stage.memberCap());
-            int memberCap = stage == TownStage.REGNO_I
-                    ? Math.max(50, configuredMemberCap)
-                    : Math.max(1, configuredMemberCap);
-            StageSpec spec = new StageSpec(
-                    Math.max(1, levels.getInt(base + ".requiredLevel", stage.requiredLevel())),
-                    Math.max(0.0D, levels.getDouble(base + ".upgradeCost", stage.upgradeCost())),
-                    Math.max(1, levels.getInt(base + ".claimCap", stage.claimCap())),
-                    memberCap,
-                    Math.max(0, levels.getInt(base + ".spawnerCap", stage.spawnerCap())),
-                    Math.max(0.0D, levels.getDouble(base + ".monthlyTax", stage.monthlyTax())),
-                    levels.getBoolean(base + ".staffApprovalRequired", stage.staffApprovalRequired()),
-                    Math.max(1, levels.getInt(base + ".huskTownLevel", stage.huskTownLevel()))
-            );
+            StageSpec spec;
+            if (!hasM1StageConfig) {
+                int memberCap = stage.principalStage() == PrincipalStage.REGNO
+                        ? Math.max(50, stage.memberCap())
+                        : Math.max(1, stage.memberCap());
+                spec = new StageSpec(
+                        stage.requiredLevel(),
+                        Math.max(0.0D, stage.upgradeCost()),
+                        Math.max(1, stage.claimCap()),
+                        memberCap,
+                        Math.max(0, stage.spawnerCap()),
+                        Math.max(0, stage.shopCap()),
+                        Math.max(0.0D, stage.monthlyTax()),
+                        stage.staffApprovalRequired(),
+                        Math.max(1, stage.huskTownLevel()),
+                        null
+                );
+            } else {
+                String base = "stages." + stage.name();
+                int configuredMemberCap = levels.getInt(base + ".memberCap", stage.memberCap());
+                int memberCap = stage.principalStage() == PrincipalStage.REGNO
+                        ? Math.max(50, configuredMemberCap)
+                        : Math.max(1, configuredMemberCap);
+                CityDefenseTier requiredDefenseTier = parseDefenseTier(levels.getString(base + ".requiredDefenseTier", null));
+                spec = new StageSpec(
+                        Math.max(1, levels.getInt(base + ".requiredLevel", stage.requiredLevel())),
+                        Math.max(0.0D, levels.getDouble(base + ".upgradeCost", stage.upgradeCost())),
+                        Math.max(1, levels.getInt(base + ".claimCap", stage.claimCap())),
+                        memberCap,
+                        Math.max(0, levels.getInt(base + ".spawnerCap", stage.spawnerCap())),
+                        Math.max(0, levels.getInt(base + ".shopCap", stage.shopCap())),
+                        Math.max(0.0D, levels.getDouble(base + ".monthlyTax", stage.monthlyTax())),
+                        levels.getBoolean(base + ".staffApprovalRequired", stage.staffApprovalRequired()),
+                        Math.max(1, levels.getInt(base + ".huskTownLevel", stage.huskTownLevel())),
+                        requiredDefenseTier
+                );
+            }
             stageSpecs.put(stage, spec);
+        }
+
+        Map<Integer, LevelSpec> levelSpecs = new java.util.HashMap<>();
+        ConfigurationSection levelsSection = levels.getConfigurationSection("progression.levels");
+        if (levelsSection != null) {
+            for (String key : levelsSection.getKeys(false)) {
+                int level;
+                try {
+                    level = Integer.parseInt(key.trim());
+                } catch (NumberFormatException ignored) {
+                    plugin.getLogger().warning("[levels] livello non valido in progression.levels: " + key);
+                    continue;
+                }
+                if (level < 1 || level > levelCap) {
+                    continue;
+                }
+                String base = "progression.levels." + key;
+                boolean confirmationRequired = levels.getBoolean(base + ".confirmationRequired", true);
+                List<LevelRequirementSpec> requirements = new ArrayList<>();
+                List<?> rawRequirements = levels.getList(base + ".requirements");
+                if (rawRequirements != null) {
+                    for (Object rawRequirement : rawRequirements) {
+                        LevelRequirementSpec requirement = parseRequirement(rawRequirement);
+                        if (requirement != null) {
+                            requirements.add(requirement);
+                        }
+                    }
+                }
+                levelSpecs.put(level, new LevelSpec(level, confirmationRequired, List.copyOf(requirements)));
+            }
         }
 
         TownStage configuredForcePublicStage = TownStage.fromDbValue(
@@ -218,6 +306,7 @@ public final class CityLevelSettings {
 
         return new CityLevelSettings(
                 xpPerLevel,
+                curveExponent,
                 levelCap,
                 regnoExtraClaimMaxLevel,
                 xpScale,
@@ -230,6 +319,7 @@ public final class CityLevelSettings {
                 containers,
                 materialXpScaled,
                 stageSpecs,
+                Map.copyOf(levelSpecs),
                 spawnPrivacyPolicy,
                 storeSettings,
                 mySqlSettings
@@ -238,6 +328,10 @@ public final class CityLevelSettings {
 
     public int xpPerLevel() {
         return xpPerLevel;
+    }
+
+    public double curveExponent() {
+        return curveExponent;
     }
 
     public int levelCap() {
@@ -291,14 +385,20 @@ public final class CityLevelSettings {
                 stage.claimCap(),
                 stage.memberCap(),
                 stage.spawnerCap(),
+                stage.shopCap(),
                 stage.monthlyTax(),
                 stage.staffApprovalRequired(),
-                stage.huskTownLevel()
+                stage.huskTownLevel(),
+                null
         ));
     }
 
     public SpawnPrivacyPolicy spawnPrivacyPolicy() {
         return spawnPrivacyPolicy;
+    }
+
+    public LevelSpec levelSpec(int level) {
+        return levelSpecs.getOrDefault(level, new LevelSpec(level, true, List.of()));
     }
 
     public int storeFlushSeconds() {
@@ -341,5 +441,66 @@ public final class CityLevelSettings {
             return max;
         }
         return value;
+    }
+
+    private static CityDefenseTier parseDefenseTier(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return CityDefenseTier.valueOf(raw.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    private static LevelRequirementSpec parseRequirement(Object raw) {
+        if (raw instanceof String rawString) {
+            LevelRequirementType type = parseRequirementType(rawString);
+            if (type == null) {
+                return null;
+            }
+            return new LevelRequirementSpec(type, 0.0D, null, true);
+        }
+        if (!(raw instanceof Map<?, ?> rawMap)) {
+            return null;
+        }
+        Object typeRaw = rawMap.get("type");
+        LevelRequirementType type = parseRequirementType(typeRaw == null ? null : String.valueOf(typeRaw));
+        if (type == null) {
+            return null;
+        }
+        double amount = parseDouble(rawMap.get("amount"));
+        if (amount <= 0.0D) {
+            amount = parseDouble(rawMap.get("value"));
+        }
+        CityDefenseTier defenseTier = parseDefenseTier(rawMap.get("tier") == null ? null : String.valueOf(rawMap.get("tier")));
+        boolean required = rawMap.get("required") == null || Boolean.parseBoolean(String.valueOf(rawMap.get("required")));
+        return new LevelRequirementSpec(type, amount, defenseTier, required);
+    }
+
+    private static LevelRequirementType parseRequirementType(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return LevelRequirementType.valueOf(raw.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
+    private static double parseDouble(Object raw) {
+        if (raw == null) {
+            return 0.0D;
+        }
+        if (raw instanceof Number number) {
+            return number.doubleValue();
+        }
+        try {
+            return Double.parseDouble(String.valueOf(raw));
+        } catch (NumberFormatException ignored) {
+            return 0.0D;
+        }
     }
 }

@@ -1,0 +1,29 @@
+id: variant_blackguard
+weight: 1
+nameSuffix: "della Fine"
+tags:
+  - throne
+  - blackguard
+equipment:
+  helmet:
+    material: NETHERITE_HELMET
+    enchants:
+      protection: 4
+      unbreaking: 3
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      projectile_protection: 4
+      mending: 1
+  leggings:
+    material: DIAMOND_LEGGINGS
+    enchants:
+      blast_protection: 4
+      unbreaking: 3
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+      binding_curse: 1
+addAbilities: []
+removeAbilities: []

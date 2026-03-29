@@ -1,0 +1,31 @@
+enabled: true
+minCityLevel: 25
+maxCityLevelDifference: 50
+singleActiveWarGlobal: true
+gui:
+  pageSize: 27
+rollback:
+  enabled: true
+  trackBurn: true
+  suppressBlockDrops: true
+trophy:
+  enabled: true
+  material: TOTEM_OF_UNDYING
+  itemsAdderItemId: cittaexp_gui:war_win_token
+payout:
+  enabled: true
+  feePercent: 0.10
+  applyFeeOnTimeout: false
+xpRewards:
+  enabled: true
+  awardOn:
+    attackerWin: true
+    defenderWin: true
+    timeout: false
+  baseXp:
+    attackerWin: 200
+    defenderWin: 240
+    timeout: 0
+  wagerBonusMultiplier: 0.01
+  wagerBonusCap: 400
+  rounding: ceil

@@ -1,0 +1,33 @@
+id: variant_breach_lancer
+weight: 1
+namePrefix: "<red>Picchiere</red>"
+tags:
+  - breach
+  - lancer
+equipment:
+  helmet:
+    material: IRON_HELMET
+    enchants:
+      blast_protection: 3
+      unbreaking: 2
+  chestplate:
+    material: IRON_CHESTPLATE
+    enchants:
+      protection: 3
+      unbreaking: 2
+  leggings:
+    material: IRON_LEGGINGS
+    enchants:
+      blast_protection: 2
+  boots:
+    material: GOLDEN_BOOTS
+    enchants:
+      protection: 2
+      mending: 1
+  mainHand:
+    material: DIAMOND_SPEAR
+    enchants:
+      lunge: 2
+      unbreaking: 2
+addAbilities: []
+removeAbilities: []

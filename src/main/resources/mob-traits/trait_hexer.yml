@@ -1,0 +1,7 @@
+id: trait_hexer
+nameSuffix: "delle Nebbie"
+tags:
+  - hexer
+addAbilities:
+  - defense_hex_fog
+removeAbilities: []

@@ -1,0 +1,41 @@
+id: ash_cultist
+type: SKELETON
+name: "<dark_gray>Cultista di Cenere</dark_gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: ash
+pools:
+  - defense
+  - regular
+themes:
+  - ash
+  - ritual
+stats:
+  GENERIC_MAX_HEALTH: 40.0
+  GENERIC_ATTACK_DAMAGE: 6.0
+  GENERIC_MOVEMENT_SPEED: 0.26
+equipment:
+  helmet: LEATHER_HELMET
+  chestplate: CHAINMAIL_CHESTPLATE
+  leggings: LEATHER_LEGGINGS
+  boots: CHAINMAIL_BOOTS
+  mainHand: BOW
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - ash
+  - ritual
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_ritualist
+  - trait_runner
+variants:
+  - variant_ashen
+  - variant_ritual_vestment
+  - variant_cinder_plate

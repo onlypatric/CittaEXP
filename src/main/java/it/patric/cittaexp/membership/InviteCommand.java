@@ -4,18 +4,24 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
+import it.patric.cittaexp.discord.DiscordCommandService;
 import it.patric.cittaexp.levels.CityLevelService;
-import it.patric.cittaexp.utils.CommandBridgeUtils;
 import it.patric.cittaexp.utils.CommandGuards;
 import it.patric.cittaexp.utils.FeedbackUtils;
 import it.patric.cittaexp.utils.PluginConfigUtils;
 import it.patric.cittaexp.utils.TownMemberGuards;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import net.william278.husktowns.town.Member;
 import net.william278.husktowns.town.Privilege;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -30,20 +36,24 @@ public final class InviteCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> create(
             Plugin plugin,
             HuskTownsApiHook huskTownsApiHook,
-            CityLevelService cityLevelService
+            CityLevelService cityLevelService,
+            DiscordCommandService discordCommandService
     ) {
         PluginConfigUtils cfg = new PluginConfigUtils(plugin);
         return Commands.literal("invite")
                 .executes(ctx -> usage(ctx.getSource().getSender()))
                 .then(Commands.literal("accept")
-                        .executes(ctx -> inviteDecision(ctx, plugin, "accept", false))
+                        .executes(ctx -> inviteDecision(ctx, huskTownsApiHook, discordCommandService, "accept", false))
                         .then(Commands.argument("player", StringArgumentType.greedyString())
-                                .executes(ctx -> inviteDecision(ctx, plugin, "accept", true))))
+                                .suggests((ctx, builder) -> suggestInviterNames(ctx, builder))
+                                .executes(ctx -> inviteDecision(ctx, huskTownsApiHook, discordCommandService, "accept", true))))
                 .then(Commands.literal("decline")
-                        .executes(ctx -> inviteDecision(ctx, plugin, "decline", false))
+                        .executes(ctx -> inviteDecision(ctx, huskTownsApiHook, discordCommandService, "decline", false))
                         .then(Commands.argument("player", StringArgumentType.greedyString())
-                                .executes(ctx -> inviteDecision(ctx, plugin, "decline", true))))
+                                .suggests((ctx, builder) -> suggestInviterNames(ctx, builder))
+                                .executes(ctx -> inviteDecision(ctx, huskTownsApiHook, discordCommandService, "decline", true))))
                 .then(Commands.argument("player", StringArgumentType.greedyString())
+                        .suggests((ctx, builder) -> suggestInviteTargets(ctx, builder, huskTownsApiHook))
                         .executes(ctx -> invitePlayer(ctx, plugin, huskTownsApiHook, cityLevelService, cfg)));
     }
 
@@ -91,12 +101,14 @@ public final class InviteCommand {
             player.sendMessage(USAGE);
             return Command.SINGLE_SUCCESS;
         }
-        return CommandBridgeUtils.dispatchTownCommand(plugin, player, "invite", target);
+        huskTownsApiHook.inviteMember(player, target);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int inviteDecision(
             CommandContext<CommandSourceStack> ctx,
-            Plugin plugin,
+            HuskTownsApiHook huskTownsApiHook,
+            DiscordCommandService discordCommandService,
             String action,
             boolean withInviterArg
     ) {
@@ -104,19 +116,72 @@ public final class InviteCommand {
         if (player == null) {
             return Command.SINGLE_SUCCESS;
         }
-        if (!withInviterArg) {
-            return CommandBridgeUtils.dispatchTownCommand(plugin, player, "invite " + action);
+        if ("accept".equalsIgnoreCase(action)
+                && !discordCommandService.requireVerified(player, "/city invite accept")) {
+            return Command.SINGLE_SUCCESS;
         }
-        String inviter = StringArgumentType.getString(ctx, "player").trim();
-        if (inviter.isBlank()) {
-            return CommandBridgeUtils.dispatchTownCommand(plugin, player, "invite " + action);
+        String inviter = null;
+        if (withInviterArg) {
+            inviter = StringArgumentType.getString(ctx, "player").trim();
+            if (inviter.isBlank()) {
+                inviter = null;
+            }
         }
-        return CommandBridgeUtils.dispatchTownCommand(plugin, player, "invite " + action, inviter);
+        huskTownsApiHook.handleInviteReply(player, "accept".equalsIgnoreCase(action), inviter);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int usage(CommandSender sender) {
         sender.sendMessage(USAGE);
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static CompletableFuture<Suggestions> suggestInviteTargets(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder,
+            HuskTownsApiHook huskTownsApiHook
+    ) {
+        Player player = CommandGuards.cityPlayer(ctx);
+        if (player == null) {
+            return builder.buildFuture();
+        }
+        String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
+        Optional<Member> member = huskTownsApiHook.getUserTown(player);
+        int townId = member.map(value -> value.town().getId()).orElse(-1);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getUniqueId().equals(player.getUniqueId())) {
+                continue;
+            }
+            if (!online.getName().toLowerCase(Locale.ROOT).startsWith(remaining)) {
+                continue;
+            }
+            Optional<Member> targetTown = huskTownsApiHook.getUserTown(online);
+            if (targetTown.isPresent() && targetTown.get().town().getId() == townId) {
+                continue;
+            }
+            builder.suggest(online.getName());
+        }
+        return builder.buildFuture();
+    }
+
+    private static CompletableFuture<Suggestions> suggestInviterNames(
+            CommandContext<CommandSourceStack> ctx,
+            SuggestionsBuilder builder
+    ) {
+        Player player = CommandGuards.cityPlayer(ctx);
+        if (player == null) {
+            return builder.buildFuture();
+        }
+        String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getUniqueId().equals(player.getUniqueId())) {
+                continue;
+            }
+            if (online.getName().toLowerCase(Locale.ROOT).startsWith(remaining)) {
+                builder.suggest(online.getName());
+            }
+        }
+        return builder.buildFuture();
     }
 
 }

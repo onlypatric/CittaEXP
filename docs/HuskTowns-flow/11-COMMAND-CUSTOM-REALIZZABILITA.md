@@ -14,7 +14,7 @@ Legenda:
 
 | Comando | Mapping HuskTowns | Tipo | Stato |
 |---|---|---|---|
-| `/city` | apre GUI principale membri/azioni città | custom overlay | completato |
+| `/city` | apre `City Hub` 9x6 (Crescita/Missioni/Territori/Membri/Tesoro/Centro comando) | custom overlay | completato |
 | `/city create` | `createTown(player, name)` + metadata/tag CittaEXP | custom API | completato |
 | `/city list` | apre browser città GUI (ordinamenti + warp click) | custom overlay + API | completato |
 | `/city invite <player>` | bridge `town invite <player>` con precheck membership/privilegio/cap membri | bridge + precheck | completato |
@@ -22,9 +22,6 @@ Legenda:
 | `/city invite decline [player]` | bridge `town invite decline [player]` | bridge | completato |
 | `/city section` | apre claim map GUI 9x6 (claim/unclaim/edit type) | custom overlay + API | completato |
 | `/city chat [message]` | bridge `town chat [message]` con precheck `CHAT` | bridge + precheck | completato |
-| `/city level` | stato progression custom L8 | custom overlay | completato |
-| `/city level upgrade` | upgrade stage custom + update town HuskTowns | custom overlay + API | completato |
-| `/city level request` | crea request staff locale per stage staff-gated | custom overlay | completato |
 | `/city setwarp` | `editTown(...): setSpawn(...)` con validazione inside-claim | custom API | completato |
 | `/city warp [town]` | teleport spawn via manager HuskTowns | custom API | completato |
 
@@ -41,6 +38,9 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 - `/city deposit`
 - `/city withdraw`
 - `/city nearby`
+- `/city level`
+- `/city level upgrade`
+- `/city level request`
 
 ### 1.2 Staff/Ops (`/cittaexp`)
 
@@ -54,13 +54,25 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 
 ### 1.3 Policy comandi nativi HuskTowns
 
-- `/town level` bloccato ai player: usare `/city level`.
+- `/town level` bloccato ai player: usare `/city` -> Azioni -> Livelli.
 - `/town privacy` bloccato ai player: usare GUI `/city`.
 - `/town` resta backbone autoritativo, ma UX player primaria è `/city`.
 
 ## 2) Cosa fa oggi la GUI `/city` (feature operative)
 
-### 2.1 GUI membri + moderazione
+### 2.1 City Hub root (`/city`)
+
+| Feature GUI `/city` | Mapping HuskTowns | Stato |
+|---|---|---|
+| Home hub 9x6 | orchestrazione overlay CittaEXP | completato |
+| Crescita | apre Progression Hub | completato |
+| Missioni | apre GUI Missioni (top 6 card) | completato |
+| Territori | gateway (mappa + regole territori + info) | completato |
+| Membri | apre GUI membri town | completato |
+| Tesoro | macro-sezione banca + item vault + reward path missioni | completato |
+| Centro comando | diplomazia + regole territori + edit + danger layer | completato |
+
+### 2.2 GUI membri + moderazione
 
 | Feature GUI `/city` | Mapping HuskTowns | Stato |
 |---|---|---|
@@ -70,17 +82,19 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 | Leave città | bridge `town leave` con dialog conferma | completato |
 | Edit città | Dialog root + `setBio/setGreeting/setFarewell/setTextColor` + rename flow | completato |
 
-### 2.2 Azioni città (sottomenu)
+### 2.3 Azioni città legacy (secondario)
 
 | Voce Azioni | Mapping | Stato |
 |---|---|---|
 | Banca città | saldo + dialog importo -> bridge `town deposit/withdraw` | completato |
+| Relazioni città | apre GUI relazioni (lista + set ally/enemy/neutral) | completato |
+| Livelli città | percorso primario migrato in Crescita/Progression Hub | completato |
 | Lista città | apre `/city list` GUI | completato |
 | Gestione territori | apre `/city section` claim map GUI | completato |
 | Impostazioni claim | sottomenu dedicato (privacy + claim rules) | completato |
 | Elimina città | apre dialog disband e bridge `town disband confirm` | completato |
 
-### 2.3 Nuovo flow “Impostazioni claim”
+### 2.4 Nuovo flow “Impostazioni claim”
 
 | Feature | Dettaglio | Stato |
 |---|---|---|
@@ -89,13 +103,14 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 | Flag source | dinamico da `HuskTownsAPI.getFlagSet()` | completato |
 | Save batch | apply regole claim type in unica mutazione `editTown(...)` | completato |
 
-### 2.4 Claim map GUI (`/city section`)
+### 2.5 Claim map GUI (`/city section`)
 
 | Feature | Dettaglio | Stato |
 |---|---|---|
 | Mappa 9x6 chunk | viewport navigabile | completato |
-| LMB | claim/unclaim | completato |
-| RMB | ciclo tipo claim `CLAIM -> FARM -> PLOT` | completato |
+| Modalità `Claim` | click = claim/unclaim | completato |
+| Modalità `Tipo terreno` | click = ciclo tipo claim `CLAIM -> FARM -> PLOT` | completato |
+| Modalità `Info` | click = dettaglio chunk in chat | completato |
 | Overlay HuskClaims | chunk bloccati evidenziati e non claimabili | completato |
 | Guard anti-overlap HuskClaims↔HuskTowns | hook nativo preferito + fallback event-driven CittaEXP (create/resize) | completato |
 | Regole extra | range max, adiacenza claim (eccetto primo), cap stage, protezione spawn-claim | completato |
@@ -117,9 +132,10 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 | `town spawn [town]` | completato | via `/city warp [town]` |
 | `town setspawn` | completato | via `/city setwarp` |
 | `town privacy` | parziale | policy GUI-first, comando nativo bloccato ai player |
-| `town level` | parziale | sostituito da `/city level` custom |
+| `town level` | parziale | migrato in GUI `/city` -> Azioni -> Livelli |
 | `town chat` | completato | via `/city chat` |
 | `town list` | completato | via `/city list` GUI |
+| `town relations ...` | completato | migrato in GUI `/city` -> Azioni -> Relazioni |
 
 ### 3.2 `/town` non ancora esposti nel wrapper
 
@@ -132,7 +148,6 @@ Comandi testuali rimossi dal player (hard-cut, migrati in GUI):
 | `/town player <player>` | non implementato |
 | `/town deeds` | non implementato |
 | `/town census` | non implementato (coperto solo in parte via GUI membri) |
-| `/town relations ...` | non implementato |
 | `/town war ...` | non implementato |
 | `/town log` | non implementato |
 

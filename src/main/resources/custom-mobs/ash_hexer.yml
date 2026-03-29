@@ -1,0 +1,35 @@
+id: ash_hexer
+type: WITCH
+name: "<dark_gray>Esegeta di Cenere</dark_gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: ash
+pools:
+  - defense
+  - regular
+themes:
+  - ash
+  - ritual
+stats:
+  GENERIC_MAX_HEALTH: 38.0
+  GENERIC_ATTACK_DAMAGE: 5.0
+  GENERIC_MOVEMENT_SPEED: 0.25
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - ash
+  - support
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_hexer
+  - trait_ritualist
+variants:
+  - variant_ashen
+  - variant_ritual_vestment

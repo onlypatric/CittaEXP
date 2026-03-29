@@ -1,14 +1,21 @@
 package it.patric.cittaexp.levels;
 
+import it.patric.cittaexp.challenges.ChallengeBroadcastFormatter;
+import it.patric.cittaexp.defense.CityDefenseService;
+import it.patric.cittaexp.defense.CityDefenseTier;
+import it.patric.cittaexp.economy.EconomyBalanceCategory;
+import it.patric.cittaexp.economy.EconomyValueService;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
+import it.patric.cittaexp.text.MiniMessageHelper;
+import it.patric.cittaexp.text.TimedTitleHelper;
 import it.patric.cittaexp.utils.PluginConfigUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.IntConsumer;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.title.Title;
 import net.william278.husktowns.town.Member;
 import net.william278.husktowns.town.Town;
 import org.bukkit.Bukkit;
@@ -24,19 +31,58 @@ public final class CityLevelService {
             long xpScaled,
             double xp,
             int level,
+            int earnedLevel,
             TownStage stage,
+            PrincipalStage principalStage,
+            SubTier subTier,
+            int stageSealsEarned,
+            int stageSealsRequired,
+            int stageClaimCap,
+            int adminClaimBonus,
             int claimCap,
             int memberCap,
             int spawnerCap,
+            int shopCap,
+            double currentBalance,
             TownStage nextStage,
             int nextRequiredLevel,
             double requiredBalance,
             double upgradeCost,
-            boolean staffApprovalRequired
+            double nextMonthlyTax,
+            boolean staffApprovalRequired,
+            double nextRequiredXp
     ) {
     }
 
     public record UpgradeAttempt(boolean success, String reason, TownStage upgradedStage, LevelStatus status) {
+    }
+
+    public record LevelUnlockCheck(
+            int townId,
+            String townName,
+            int currentLevel,
+            int earnedLevel,
+            int targetLevel,
+            double currentXp,
+            double requiredXp,
+            double currentBalance,
+            boolean checkpoint,
+            TownStage checkpointStage,
+            boolean confirmationRequired,
+            boolean staffApprovalRequired,
+            double requiredBalance,
+            double upgradeCost,
+            double monthlyTax,
+            boolean spawnRequired,
+            boolean spawnPresent,
+            CityDefenseTier requiredDefenseTier,
+            boolean defenseTierCompleted,
+            boolean xpReached,
+            boolean bankBalanceSatisfied,
+            boolean canRequestStaffApproval,
+            boolean canUnlockNow,
+            String blockingReason
+    ) {
     }
 
     public record SpawnPrivacyToggleResult(boolean success, String reason, Boolean isPublic) {
@@ -47,21 +93,33 @@ public final class CityLevelService {
     private final CityLevelStore store;
     private final CityLevelSettings settings;
     private final CityXpScanService scanService;
+    private final EconomyValueService economyValueService;
     private final PluginConfigUtils configUtils;
+    private final AdminClaimBonusService adminClaimBonusService;
+    private CityDefenseService cityDefenseService;
+    private IntConsumer upgradeAvailabilityListener;
 
     public CityLevelService(
             Plugin plugin,
             HuskTownsApiHook huskTownsApiHook,
             CityLevelStore store,
             CityLevelSettings settings,
-            CityXpScanService scanService
+            CityXpScanService scanService,
+            EconomyValueService economyValueService,
+            AdminClaimBonusService adminClaimBonusService
     ) {
         this.plugin = plugin;
         this.huskTownsApiHook = huskTownsApiHook;
         this.store = store;
         this.settings = settings;
         this.scanService = scanService;
+        this.economyValueService = economyValueService;
         this.configUtils = new PluginConfigUtils(plugin);
+        this.adminClaimBonusService = adminClaimBonusService;
+    }
+
+    public void setDefenseService(CityDefenseService cityDefenseService) {
+        this.cityDefenseService = cityDefenseService;
     }
 
     public Optional<LevelStatus> statusForPlayer(Player player, boolean runScan) {
@@ -77,29 +135,52 @@ public final class CityLevelService {
             applyScanAndNotify(townId);
         }
         TownProgression progression = store.getOrCreateProgression(townId);
+        int earnedLevel = earnedLevelForXp(progression.xpScaled());
         Optional<Town> town = huskTownsApiHook.getTownById(townId);
         String townName = town.map(Town::getName).orElse("Sconosciuta");
-        int claimCap = resolveClaimCap(progression.stage(), progression.cityLevel());
+        double currentBalance = town.map(value -> value.getMoney().doubleValue()).orElse(0.0D);
+        int stageClaimCap = resolveClaimCap(progression.stage(), progression.cityLevel());
+        int adminClaimBonus = adminClaimBonusService.getBonus(townId);
+        int claimCap = stageClaimCap + adminClaimBonus;
         int memberCap = resolveMemberCap(progression.stage());
         int spawnerCap = resolveSpawnerCap(progression.stage());
-        TownStage next = progression.stage().next().orElse(null);
+        int shopCap = resolveShopCap(progression.stage());
+        int nextLevel = progression.cityLevel() >= settings.levelCap() ? 0 : progression.cityLevel() + 1;
+        TownStage next = checkpointStageAtLevel(nextLevel);
         CityLevelSettings.StageSpec nextSpec = next == null ? null : settings.spec(next);
-        double requiredBalance = nextSpec == null ? 0.0D : nextSpec.upgradeCost() * settings.upgradeBalanceMultiplier();
+        double requiredBalance = next == null ? 0.0D : effectiveRequiredBalance(next);
+        double nextRequiredXp = nextLevel <= 0 ? toXp(progression.xpScaled()) : toXp(CityLevelCurve.requiredXpScaledForLevel(
+                nextLevel,
+                settings.xpPerLevel(),
+                settings.xpScale(),
+                settings.curveExponent()
+        ));
         return new LevelStatus(
                 townId,
                 townName,
                 progression.xpScaled(),
                 toXp(progression.xpScaled()),
                 progression.cityLevel(),
+                earnedLevel,
                 progression.stage(),
+                progression.stage().principalStage(),
+                progression.stage().subTier(),
+                progression.stageSealsEarned(),
+                progression.stageSealsRequired(),
+                stageClaimCap,
+                adminClaimBonus,
                 claimCap,
                 memberCap,
                 spawnerCap,
+                shopCap,
+                currentBalance,
                 next,
                 nextSpec == null ? 0 : nextSpec.requiredLevel(),
                 requiredBalance,
-                nextSpec == null ? 0.0D : nextSpec.upgradeCost(),
-                nextSpec != null && nextSpec.staffApprovalRequired()
+                next == null ? 0.0D : effectiveUpgradeCost(next),
+                next == null ? 0.0D : effectiveMonthlyTax(next),
+                nextSpec != null && nextSpec.staffApprovalRequired(),
+                nextRequiredXp
         );
     }
 
@@ -114,32 +195,26 @@ public final class CityLevelService {
         }
 
         applyScanAndNotify(town.getId());
+        LevelUnlockCheck check = nextUnlockCheck(town.getId(), false);
         LevelStatus status = statusForTown(town.getId(), false);
-        TownStage next = status.nextStage();
-        if (next == null) {
-            return new UpgradeAttempt(false, "already-max-stage", null, status);
+        if (check.targetLevel() <= 0) {
+            return new UpgradeAttempt(false, check.blockingReason(), null, status);
         }
-        CityLevelSettings.StageSpec nextSpec = settings.spec(next);
-        if (status.level() < nextSpec.requiredLevel()) {
-            return new UpgradeAttempt(false, "level-too-low", null, status);
-        }
-        if (requiresTownSpawn(next) && town.getSpawn().isEmpty()) {
-            return new UpgradeAttempt(false, "town-spawn-required", null, status);
-        }
-
-        double townMoney = town.getMoney().doubleValue();
-        if (townMoney < status.requiredBalance()) {
-            return new UpgradeAttempt(false, "insufficient-balance-requirement", null, status);
-        }
-        if (nextSpec.staffApprovalRequired()) {
+        if (check.staffApprovalRequired()) {
             return new UpgradeAttempt(false, "staff-approval-required", null, status);
         }
-
-        UpgradeAttempt applied = applyStageUpgrade(player, town.getId(), next, "manual-upgrade");
-        if (!applied.success()) {
-            return applied;
+        if (!check.canUnlockNow()) {
+            return new UpgradeAttempt(false, check.blockingReason(), null, status);
         }
-        return new UpgradeAttempt(true, "upgraded", next, statusForTown(town.getId(), false));
+        if (check.checkpoint() && check.checkpointStage() != null) {
+            return applyStageUpgrade(player, town.getId(), check.checkpointStage(), "manual-upgrade");
+        }
+        store.unlockLevel(town.getId(), check.targetLevel());
+        syncTownCaps(town.getId());
+        enforceSpawnPrivacyPolicy(town.getId());
+        broadcastLevelUps(town.getId(), check.currentLevel(), check.targetLevel());
+        notifyUpgradeAvailabilityChanged(town.getId());
+        return new UpgradeAttempt(true, "upgraded", null, statusForTown(town.getId(), false));
     }
 
     public UpgradeAttempt applyStageUpgrade(Player actor, int townId, TownStage targetStage, String source) {
@@ -150,34 +225,37 @@ public final class CityLevelService {
         Town town = townOptional.get();
 
         TownProgression progression = store.getOrCreateProgression(townId);
-        Optional<TownStage> expectedNext = progression.stage().next();
-        if (expectedNext.isEmpty() || expectedNext.get() != targetStage) {
+        int targetLevel = settings.spec(targetStage).requiredLevel();
+        if (progression.cityLevel() + 1 != targetLevel || checkpointStageAtLevel(targetLevel) != targetStage) {
             return new UpgradeAttempt(false, "invalid-stage-transition", null, statusForTown(townId, false));
         }
-        CityLevelSettings.StageSpec targetSpec = settings.spec(targetStage);
-        if (progression.cityLevel() < targetSpec.requiredLevel()) {
+        LevelUnlockCheck check = checkLevelUnlock(townId, targetLevel, false);
+        if (!check.checkpoint()) {
+            return new UpgradeAttempt(false, "invalid-stage-transition", null, statusForTown(townId, false));
+        }
+        if (!check.xpReached()) {
             return new UpgradeAttempt(false, "level-too-low", null, statusForTown(townId, false));
         }
-        if (requiresTownSpawn(targetStage) && town.getSpawn().isEmpty()) {
+        if (!check.spawnPresent()) {
             return new UpgradeAttempt(false, "town-spawn-required", null, statusForTown(townId, false));
         }
-
-        double requiredBalance = targetSpec.upgradeCost() * settings.upgradeBalanceMultiplier();
-        double currentMoney = town.getMoney().doubleValue();
-        if (currentMoney < requiredBalance) {
+        if (!check.defenseTierCompleted()) {
+            return new UpgradeAttempt(false, "defense-tier-required", null, statusForTown(townId, false));
+        }
+        if (!check.bankBalanceSatisfied()) {
             return new UpgradeAttempt(false, "insufficient-balance-requirement", null, statusForTown(townId, false));
         }
 
         try {
             huskTownsApiHook.editTown(actor, townId, mutableTown -> {
                 BigDecimal money = mutableTown.getMoney();
-                BigDecimal cost = BigDecimal.valueOf(targetSpec.upgradeCost());
-                if (money.compareTo(BigDecimal.valueOf(requiredBalance)) < 0) {
+                BigDecimal cost = BigDecimal.valueOf(check.upgradeCost());
+                if (money.compareTo(BigDecimal.valueOf(check.requiredBalance())) < 0) {
                     throw new IllegalStateException("insufficient-balance-requirement");
                 }
                 mutableTown.setMoney(money.subtract(cost));
-                mutableTown.setLevel(targetSpec.huskTownLevel());
-                int targetClaimCap = resolveClaimCap(targetStage, progression.cityLevel());
+                mutableTown.setLevel(settings.spec(targetStage).huskTownLevel());
+                int targetClaimCap = resolveClaimCap(targetStage, targetLevel);
                 int targetMemberCap = resolveMemberCap(targetStage);
                 applyTownCaps(mutableTown, targetClaimCap, targetMemberCap);
             });
@@ -189,10 +267,12 @@ public final class CityLevelService {
             return new UpgradeAttempt(false, "town-update-failed", null, statusForTown(townId, false));
         }
 
-        store.updateStage(townId, targetStage);
+        store.unlockLevelAndStage(townId, targetLevel, targetStage);
         syncTownCaps(townId);
         enforceSpawnPrivacyPolicy(townId);
+        broadcastLevelUps(townId, progression.cityLevel(), targetLevel);
         broadcastStageUpgrade(townId, targetStage);
+        notifyUpgradeAvailabilityChanged(townId);
         return new UpgradeAttempt(true, "upgraded", targetStage, statusForTown(townId, false));
     }
 
@@ -203,9 +283,7 @@ public final class CityLevelService {
         }
         syncTownCaps(townId);
         enforceSpawnPrivacyPolicy(townId);
-        if (scan.currentLevel() > scan.previousLevel()) {
-            broadcastLevelUps(townId, scan.previousLevel(), scan.currentLevel());
-        }
+        notifyUpgradeAvailabilityChanged(townId);
         return scan;
     }
 
@@ -225,15 +303,241 @@ public final class CityLevelService {
                 actor,
                 reason == null ? "staff-xp-bonus" : reason
         );
-        if (result.currentLevel() > result.previousLevel()) {
-            broadcastLevelUps(townId, result.previousLevel(), result.currentLevel());
-        }
+        notifyUpgradeAvailabilityChanged(townId);
         return result;
+    }
+
+    public LevelStatus setTownXp(int townId, long targetXpScaled, UUID actor, String reason) {
+        TownProgression before = store.getOrCreateProgression(townId);
+        TownProgression updated = store.setXpScaled(
+                townId,
+                targetXpScaled,
+                "xp_admin_set",
+                actor,
+                reason == null ? "admin-xp-set" : reason
+        );
+        syncTownCaps(townId);
+        enforceSpawnPrivacyPolicy(townId);
+        notifyUpgradeAvailabilityChanged(townId);
+        return statusForTown(townId, false);
+    }
+
+    public LevelStatus addTownXp(int townId, long deltaXpScaled, UUID actor, String reason) {
+        grantXpBonus(townId, deltaXpScaled, actor, reason == null ? "admin-xp-add" : reason);
+        return statusForTown(townId, false);
+    }
+
+    public LevelStatus takeTownXp(int townId, long deltaXpScaled, UUID actor, String reason) {
+        TownProgression current = store.getOrCreateProgression(townId);
+        long target = Math.max(0L, current.xpScaled() - Math.max(0L, deltaXpScaled));
+        return setTownXp(townId, target, actor, reason == null ? "admin-xp-take" : reason);
+    }
+
+    public LevelUnlockCheck nextUnlockCheck(int townId, boolean runScan) {
+        LevelStatus status = statusForTown(townId, runScan);
+        if (status.level() >= settings.levelCap()) {
+            return new LevelUnlockCheck(
+                    status.townId(),
+                    status.townName(),
+                    status.level(),
+                    status.earnedLevel(),
+                    0,
+                    status.xp(),
+                    status.nextRequiredXp(),
+                    status.currentBalance(),
+                    false,
+                    null,
+                    false,
+                    false,
+                    0.0D,
+                    0.0D,
+                    0.0D,
+                    false,
+                    true,
+                    null,
+                    true,
+                    true,
+                    true,
+                    false,
+                    false,
+                    "already-max-level"
+            );
+        }
+        return checkLevelUnlock(townId, status.level() + 1, false);
+    }
+
+    public LevelUnlockCheck checkLevelUnlock(int townId, int targetLevel, boolean runScan) {
+        LevelStatus status = statusForTown(townId, runScan);
+        Optional<Town> townOptional = huskTownsApiHook.getTownById(townId);
+        double currentBalance = townOptional.map(value -> value.getMoney().doubleValue()).orElse(0.0D);
+        if (targetLevel <= 0 || targetLevel > settings.levelCap()) {
+            return new LevelUnlockCheck(
+                    status.townId(), status.townName(), status.level(), status.earnedLevel(), targetLevel,
+                    status.xp(), 0.0D, currentBalance, false, null, false, false,
+                    0.0D, 0.0D, 0.0D, false, true, null, true, false, false, false, false, "invalid-level-target"
+            );
+        }
+        if (targetLevel != status.level() + 1) {
+            return new LevelUnlockCheck(
+                    status.townId(), status.townName(), status.level(), status.earnedLevel(), targetLevel,
+                    status.xp(), requiredXpForLevel(targetLevel), currentBalance, checkpointStageAtLevel(targetLevel) != null,
+                    checkpointStageAtLevel(targetLevel), true, false, 0.0D, 0.0D, 0.0D, false, true, null,
+                    status.earnedLevel() >= targetLevel, true, false, false, false, "unlock-previous-level-first"
+            );
+        }
+
+        TownStage checkpointStage = checkpointStageAtLevel(targetLevel);
+        CityLevelSettings.StageSpec stageSpec = checkpointStage == null ? null : settings.spec(checkpointStage);
+        CityLevelSettings.LevelSpec levelSpec = settings.levelSpec(targetLevel);
+        double requiredXp = requiredXpForLevel(targetLevel);
+        boolean xpReached = status.earnedLevel() >= targetLevel;
+
+        double requiredBalance = checkpointStage == null ? 0.0D : effectiveRequiredBalance(checkpointStage);
+        boolean spawnRequired = checkpointStage != null && requiresTownSpawn(checkpointStage);
+        boolean staffApprovalRequired = checkpointStage != null && stageSpec.staffApprovalRequired();
+        CityDefenseTier requiredDefenseTier = checkpointStage == null ? null : stageSpec.requiredDefenseTier();
+
+        for (CityLevelSettings.LevelRequirementSpec requirement : levelSpec.requirements()) {
+            if (requirement == null || !requirement.required()) {
+                continue;
+            }
+            switch (requirement.type()) {
+                case BANK_BALANCE_MIN -> requiredBalance = Math.max(requiredBalance, requirement.amount());
+                case TOWN_SPAWN_REQUIRED -> spawnRequired = true;
+                case DEFENSE_TIER_COMPLETED -> {
+                    if (requiredDefenseTier == null && requirement.defenseTier() != null) {
+                        requiredDefenseTier = requirement.defenseTier();
+                    }
+                }
+                case STAFF_APPROVAL_REQUIRED -> staffApprovalRequired = true;
+                case XP_REACHED -> {
+                    // always enforced
+                }
+            }
+        }
+
+        boolean spawnPresent = !spawnRequired || townOptional.flatMap(Town::getSpawn).isPresent();
+        boolean defenseCompleted = requiredDefenseTier == null
+                || (cityDefenseService != null && cityDefenseService.hasCompletedTier(townId, requiredDefenseTier));
+        boolean bankSatisfied = currentBalance >= requiredBalance;
+        String blockingReason = null;
+        if (!xpReached) {
+            blockingReason = "level-too-low";
+        } else if (!spawnPresent) {
+            blockingReason = "town-spawn-required";
+        } else if (!defenseCompleted) {
+            blockingReason = "defense-tier-required";
+        } else if (!bankSatisfied) {
+            blockingReason = "insufficient-balance-requirement";
+        }
+
+        boolean canRequestStaffApproval = blockingReason == null && staffApprovalRequired;
+        boolean canUnlockNow = blockingReason == null && !staffApprovalRequired;
+
+        return new LevelUnlockCheck(
+                status.townId(),
+                status.townName(),
+                status.level(),
+                status.earnedLevel(),
+                targetLevel,
+                status.xp(),
+                requiredXp,
+                currentBalance,
+                checkpointStage != null,
+                checkpointStage,
+                levelSpec.confirmationRequired(),
+                staffApprovalRequired,
+                requiredBalance,
+                checkpointStage == null ? 0.0D : effectiveUpgradeCost(checkpointStage),
+                checkpointStage == null ? 0.0D : effectiveMonthlyTax(checkpointStage),
+                spawnRequired,
+                spawnPresent,
+                requiredDefenseTier,
+                defenseCompleted,
+                xpReached,
+                bankSatisfied,
+                canRequestStaffApproval,
+                canUnlockNow,
+                blockingReason
+        );
+    }
+
+    public double effectiveUpgradeCost(TownStage stage) {
+        if (stage == null) {
+            return 0.0D;
+        }
+        CityLevelSettings.StageSpec spec = settings.spec(stage);
+        return economyValueService.effectiveAmount(EconomyBalanceCategory.TOWN_STAGE_UPGRADE, spec.upgradeCost());
+    }
+
+    public double effectiveMonthlyTax(TownStage stage) {
+        if (stage == null) {
+            return 0.0D;
+        }
+        CityLevelSettings.StageSpec spec = settings.spec(stage);
+        return economyValueService.effectiveAmount(EconomyBalanceCategory.TOWN_MONTHLY_TAX, spec.monthlyTax());
+    }
+
+    public double effectiveRequiredBalance(TownStage stage) {
+        if (stage == null) {
+            return 0.0D;
+        }
+        double nominal = settings.spec(stage).upgradeCost() * settings.upgradeBalanceMultiplier();
+        return economyValueService.effectiveAmount(EconomyBalanceCategory.TOWN_STAGE_REQUIRED_BALANCE, nominal);
     }
 
     public int claimCapForTown(int townId) {
         TownProgression progression = store.getOrCreateProgression(townId);
+        return resolveClaimCap(progression.stage(), progression.cityLevel()) + adminClaimBonusService.getBonus(townId);
+    }
+
+    public int baseClaimCapForTown(int townId) {
+        TownProgression progression = store.getOrCreateProgression(townId);
         return resolveClaimCap(progression.stage(), progression.cityLevel());
+    }
+
+    public int adminClaimBonusForTown(int townId) {
+        return adminClaimBonusService.getBonus(townId);
+    }
+
+    public Optional<ClaimCapSnapshot> claimCapSnapshot(int townId) {
+        Optional<Town> town = huskTownsApiHook.getTownById(townId);
+        if (town.isEmpty()) {
+            return Optional.empty();
+        }
+        LevelStatus status = statusForTown(townId, false);
+        return Optional.of(new ClaimCapSnapshot(
+                townId,
+                town.get().getName(),
+                town.get().getClaimCount(),
+                status.stageClaimCap(),
+                status.adminClaimBonus(),
+                status.claimCap()
+        ));
+    }
+
+    public Optional<ClaimCapSnapshot> setAdminClaimBonus(int townId, int amount) {
+        adminClaimBonusService.setBonus(townId, amount);
+        syncTownCaps(townId);
+        return claimCapSnapshot(townId);
+    }
+
+    public Optional<ClaimCapSnapshot> giveAdminClaimBonus(int townId, int amount) {
+        adminClaimBonusService.addBonus(townId, amount);
+        syncTownCaps(townId);
+        return claimCapSnapshot(townId);
+    }
+
+    public Optional<ClaimCapSnapshot> takeAdminClaimBonus(int townId, int amount) {
+        adminClaimBonusService.takeBonus(townId, amount);
+        syncTownCaps(townId);
+        return claimCapSnapshot(townId);
+    }
+
+    public void syncAllTownCaps() {
+        for (Town town : huskTownsApiHook.getTowns()) {
+            syncTownCaps(town.getId());
+        }
     }
 
     public int memberCapForTown(int townId) {
@@ -246,25 +550,17 @@ public final class CityLevelService {
         return resolveSpawnerCap(progression.stage());
     }
 
+    public int shopCapForTown(int townId) {
+        TownProgression progression = store.getOrCreateProgression(townId);
+        return resolveShopCap(progression.stage());
+    }
+
     public boolean canToggleSpawnPrivacy(int townId) {
-        CityLevelSettings.SpawnPrivacyPolicy policy = settings.spawnPrivacyPolicy();
-        if (!policy.enabled()) {
-            return true;
-        }
-        if (!policy.allowBorgoToggle()) {
-            return false;
-        }
-        TownStage stage = store.getOrCreateProgression(townId).stage();
-        return stage.ordinal() < policy.forcePublicFromStage().ordinal();
+        return false;
     }
 
     public boolean shouldForcePublicSpawnPrivacy(int townId) {
-        CityLevelSettings.SpawnPrivacyPolicy policy = settings.spawnPrivacyPolicy();
-        if (!policy.enabled()) {
-            return false;
-        }
-        TownStage stage = store.getOrCreateProgression(townId).stage();
-        return stage.ordinal() >= policy.forcePublicFromStage().ordinal();
+        return true;
     }
 
     public SpawnPrivacyToggleResult toggleSpawnPrivacy(Player actor) {
@@ -272,20 +568,16 @@ public final class CityLevelService {
         if (member.isEmpty()) {
             return new SpawnPrivacyToggleResult(false, "no-town", null);
         }
-        int townId = member.get().town().getId();
-        if (shouldForcePublicSpawnPrivacy(townId) || !canToggleSpawnPrivacy(townId)) {
-            return new SpawnPrivacyToggleResult(false, "privacy-policy-locked", true);
-        }
         if (member.get().town().getSpawn().isEmpty()) {
             return new SpawnPrivacyToggleResult(false, "town-spawn-required", null);
         }
-        if (!huskTownsApiHook.hasPrivilege(actor, net.william278.husktowns.town.Privilege.SPAWN_PRIVACY)) {
-            return new SpawnPrivacyToggleResult(false, "no-privacy-permission", null);
+        int townId = member.get().town().getId();
+        if (member.get().town().getSpawn().get().isPublic()) {
+            return new SpawnPrivacyToggleResult(true, "already-public", true);
         }
-        boolean target = !member.get().town().getSpawn().get().isPublic();
         try {
-            huskTownsApiHook.setSpawnPrivacy(actor, target);
-            return new SpawnPrivacyToggleResult(true, "updated", target);
+            huskTownsApiHook.setSpawnPrivacy(actor, true);
+            return new SpawnPrivacyToggleResult(true, "updated", true);
         } catch (RuntimeException ex) {
             plugin.getLogger().warning("[levels] spawn privacy toggle failed town=" + townId
                     + " actor=" + actor.getUniqueId()
@@ -332,7 +624,7 @@ public final class CityLevelService {
         }
         Town town = townOptional.get();
         TownProgression progression = store.getOrCreateProgression(townId);
-        int targetClaimCap = resolveClaimCap(progression.stage(), progression.cityLevel());
+        int targetClaimCap = resolveClaimCap(progression.stage(), progression.cityLevel()) + adminClaimBonusService.getBonus(townId);
         int targetMemberCap = resolveMemberCap(progression.stage());
         int currentClaimCap = town.getMaxClaims(huskTownsApiHook.plugin());
         int currentMemberCap = town.getMaxMembers(huskTownsApiHook.plugin());
@@ -340,11 +632,13 @@ public final class CityLevelService {
             return;
         }
         Optional<UUID> actorId = resolveActor(town);
-        if (actorId.isEmpty()) {
-            return;
-        }
         try {
-            huskTownsApiHook.editTown(actorId.get(), townId, mutableTown -> applyTownCaps(mutableTown, targetClaimCap, targetMemberCap));
+            if (actorId.isPresent()) {
+                huskTownsApiHook.editTown(actorId.get(), townId, mutableTown -> applyTownCaps(mutableTown, targetClaimCap, targetMemberCap));
+            } else {
+                applyTownCaps(town, targetClaimCap, targetMemberCap);
+                huskTownsApiHook.updateTownDirect(town);
+            }
         } catch (RuntimeException exception) {
             plugin.getLogger().warning("[levels] cap sync failed town=" + townId + " reason=" + exception.getMessage());
         }
@@ -361,14 +655,14 @@ public final class CityLevelService {
 
     private int resolveClaimCap(TownStage stage, int cityLevel) {
         CityLevelSettings.StageSpec spec = settings.spec(stage);
-        if (stage != TownStage.REGNO_I) {
+        if (!(stage.principalStage() == PrincipalStage.REGNO && stage.subTier() == SubTier.III)) {
             return spec.claimCap();
         }
         int extraUntilLevel = Math.min(
                 settings.levelCap(),
                 Math.min(settings.regnoExtraClaimMaxLevel(), REGNO_EXTRA_CLAIM_HARD_MAX_LEVEL)
         );
-        int extraLevels = Math.max(0, Math.min(cityLevel, extraUntilLevel) - TownStage.REGNO_I.requiredLevel());
+        int extraLevels = Math.max(0, Math.min(cityLevel, extraUntilLevel) - TownStage.REGNO_III.requiredLevel());
         return spec.claimCap() + extraLevels;
     }
 
@@ -380,8 +674,71 @@ public final class CityLevelService {
         return settings.spec(stage).spawnerCap();
     }
 
+    private int resolveShopCap(TownStage stage) {
+        return settings.spec(stage).shopCap();
+    }
+
+    private int earnedLevelForXp(long xpScaled) {
+        return CityLevelCurve.levelFromXpScaled(
+                xpScaled,
+                settings.levelCap(),
+                settings.xpPerLevel(),
+                settings.xpScale(),
+                settings.curveExponent()
+        );
+    }
+
+    private double requiredXpForLevel(int level) {
+        return toXp(CityLevelCurve.requiredXpScaledForLevel(
+                level,
+                settings.xpPerLevel(),
+                settings.xpScale(),
+                settings.curveExponent()
+        ));
+    }
+
+    private TownStage checkpointStageAtLevel(int level) {
+        if (level <= 0) {
+            return null;
+        }
+        for (TownStage stage : TownStage.values()) {
+            if (settings.spec(stage).requiredLevel() == level) {
+                return stage;
+            }
+        }
+        return null;
+    }
+
     private boolean requiresTownSpawn(TownStage targetStage) {
-        return targetStage == TownStage.VILLAGGIO_I;
+        return targetStage.principalStage() == PrincipalStage.VILLAGGIO && targetStage.subTier() == SubTier.I;
+    }
+
+    public boolean grantSealMilestone(int townId, String milestoneKey) {
+        if (milestoneKey == null || milestoneKey.isBlank()) {
+            return false;
+        }
+        if (store.hasSealMilestone(townId, milestoneKey)) {
+            return false;
+        }
+        TownProgression before = store.getOrCreateProgression(townId);
+        TownProgression updated = store.addStageSeals(townId, 1, milestoneKey);
+        if (updated.stageSealsEarned() > before.stageSealsEarned()) {
+            syncTownCaps(townId);
+            enforceSpawnPrivacyPolicy(townId);
+            return true;
+        }
+        return false;
+    }
+
+    public TownProgression syncStageSealsFromAtlas(int townId, int seals) {
+        TownProgression before = store.getOrCreateProgression(townId);
+        TownProgression updated = store.setStageSeals(townId, seals, true);
+        if (updated.stageSealsEarned() != before.stageSealsEarned()) {
+            syncTownCaps(townId);
+            enforceSpawnPrivacyPolicy(townId);
+            notifyUpgradeAvailabilityChanged(townId);
+        }
+        return updated;
     }
 
     private void broadcastLevelUps(int townId, int fromExclusive, int toInclusive) {
@@ -389,6 +746,7 @@ public final class CityLevelService {
         if (town.isEmpty()) {
             return;
         }
+        String townName = town.get().getName();
 
         for (int level = fromExclusive + 1; level <= toInclusive; level++) {
             for (UUID memberId : town.get().getMembers().keySet()) {
@@ -396,26 +754,21 @@ public final class CityLevelService {
                 if (online == null) {
                     continue;
                 }
-                online.sendMessage(configUtils.msg(
-                        "city.level.notifications.level_up",
-                        "<green>La tua citta e salita al livello</green> <yellow>{level}</yellow>.",
-                        Placeholder.unparsed("level", Integer.toString(level))
+                online.sendMessage(MiniMessageHelper.parse(
+                        ChallengeBroadcastFormatter.renderCityLevelUp(townName, level)
                 ));
-                if (level % 5 == 0) {
-                    Title title = Title.title(
-                            configUtils.msg(
-                                    "city.level.notifications.title_every_5.title",
-                                    "<gold>Citta Livello {level}</gold>",
-                                    Placeholder.unparsed("level", Integer.toString(level))
-                            ),
-                            configUtils.msg(
-                                    "city.level.notifications.title_every_5.subtitle",
-                                    "<yellow>Traguardo raggiunto!</yellow>",
-                                    Placeholder.unparsed("level", Integer.toString(level))
-                            )
-                    );
-                    online.showTitle(title);
-                }
+                TimedTitleHelper.show(
+                        online,
+                        configUtils.msg(
+                                "city.level.notifications.level_up.title",
+                                "<gold><bold>Citta salita di livello</bold></gold>"
+                        ),
+                        configUtils.msg(
+                                "city.level.notifications.level_up.subtitle",
+                                "<yellow>Nuovo livello: {level}</yellow>",
+                                Placeholder.unparsed("level", Integer.toString(level))
+                        )
+                );
             }
         }
     }
@@ -425,15 +778,14 @@ public final class CityLevelService {
         if (town.isEmpty()) {
             return;
         }
+        String townName = town.get().getName();
         for (UUID memberId : town.get().getMembers().keySet()) {
             Player online = Bukkit.getPlayer(memberId);
             if (online == null) {
                 continue;
             }
-            online.sendMessage(configUtils.msg(
-                    "city.level.notifications.stage_upgraded",
-                    "<gold>Upgrade citta completato:</gold> <yellow>{stage}</yellow>",
-                    Placeholder.unparsed("stage", stage.displayName())
+            online.sendMessage(MiniMessageHelper.parse(
+                    ChallengeBroadcastFormatter.renderStageUpgrade(townName, stage)
             ));
         }
     }
@@ -444,8 +796,32 @@ public final class CityLevelService {
                 .doubleValue();
     }
 
+    public long toScaledXp(double xp) {
+        if (xp <= 0.0D) {
+            return 0L;
+        }
+        return BigDecimal.valueOf(xp)
+                .multiply(BigDecimal.valueOf(settings.xpScale()))
+                .setScale(0, RoundingMode.HALF_UP)
+                .longValue();
+    }
+
     public CityLevelSettings settings() {
         return settings;
+    }
+
+    public void setUpgradeAvailabilityListener(IntConsumer upgradeAvailabilityListener) {
+        this.upgradeAvailabilityListener = upgradeAvailabilityListener;
+    }
+
+    public record ClaimCapSnapshot(
+            int townId,
+            String townName,
+            int currentClaims,
+            int stageClaimCap,
+            int adminClaimBonus,
+            int effectiveClaimCap
+    ) {
     }
 
     private Optional<UUID> resolveActor(Town town) {
@@ -458,5 +834,12 @@ public final class CityLevelService {
         return Bukkit.getOnlinePlayers().stream()
                 .findFirst()
                 .map(Player::getUniqueId);
+    }
+
+    private void notifyUpgradeAvailabilityChanged(int townId) {
+        IntConsumer listener = this.upgradeAvailabilityListener;
+        if (listener != null && townId > 0) {
+            listener.accept(townId);
+        }
     }
 }

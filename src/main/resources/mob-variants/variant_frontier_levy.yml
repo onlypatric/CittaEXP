@@ -1,0 +1,13 @@
+id: variant_frontier_levy
+weight: 2
+namePrefix: "<gray>di Leva</gray>"
+tags:
+  - frontier
+  - levy
+equipment:
+  helmet: LEATHER_HELMET
+  chestplate: LEATHER_CHESTPLATE
+  leggings: CHAINMAIL_LEGGINGS
+  boots: LEATHER_BOOTS
+addAbilities: []
+removeAbilities: []

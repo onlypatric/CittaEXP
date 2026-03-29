@@ -1,0 +1,19 @@
+id: defense_sapper_blast
+trigger: ON_DEATH
+cooldownTicks: 0
+targeting:
+  type: PLAYERS_IN_RADIUS
+  radius: 4
+  maxTargets: 6
+actions:
+  - type: particles
+    particle: EXPLOSION
+    count: 8
+  - type: sound
+    sound: ENTITY_GENERIC_EXPLODE
+    volume: 1.1
+    pitch: 1.0
+  - type: directDamage
+    amount: 6.0
+  - type: push
+    strength: 1.2

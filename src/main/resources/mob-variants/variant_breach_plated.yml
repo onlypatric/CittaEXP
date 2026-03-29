@@ -1,0 +1,28 @@
+id: variant_breach_plated
+weight: 2
+namePrefix: "<red>Ferrato</red>"
+tags:
+  - breach
+  - plated
+equipment:
+  helmet:
+    material: IRON_HELMET
+    enchants:
+      blast_protection: 3
+      unbreaking: 2
+  chestplate:
+    material: IRON_CHESTPLATE
+    enchants:
+      blast_protection: 4
+      mending: 1
+  leggings:
+    material: IRON_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: IRON_BOOTS
+    enchants:
+      blast_protection: 2
+      unbreaking: 2
+addAbilities: []
+removeAbilities: []

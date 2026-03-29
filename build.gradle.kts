@@ -39,6 +39,16 @@ val huskTownsCommonApiJarPath = providers.gradleProperty("huskTownsCommonApiJar"
 val huskTownsBukkitApiJarPath = providers.gradleProperty("huskTownsBukkitApiJar").orElse(defaultHuskTownsBukkitApiJar)
 val huskTownsCommonApiJar = file(huskTownsCommonApiJarPath.get())
 val huskTownsBukkitApiJar = file(huskTownsBukkitApiJarPath.get())
+val vaultApiJar = file(
+    providers.gradleProperty("vaultApiJar")
+        .orElse("../EXTERNAL-LIBS/Vault.jar")
+        .get()
+)
+val itemsAdderApiJar = file(
+    providers.gradleProperty("itemsAdderApiJar")
+        .orElse("../EXTERNAL-LIBS/ItemsAdder_4.0.16-beta-11.jar")
+        .get()
+)
 
 repositories {
     mavenLocal()
@@ -51,6 +61,14 @@ dependencies {
     compileOnly(paperApiCoordinate)
     compileOnly(files(huskTownsCommonApiJar))
     compileOnly(files(huskTownsBukkitApiJar))
+    compileOnly(files(vaultApiJar))
+    implementation("net.dv8tion:JDA:5.2.2") {
+        exclude(module = "opus-java")
+    }
+    implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    if (itemsAdderApiJar.exists()) {
+        compileOnly(files(itemsAdderApiJar))
+    }
     compileOnly("net.william278.huskclaims:huskclaims-bukkit:1.5.3")
     compileOnly("net.william278.cloplib:cloplib-common:2.0.11")
 
@@ -122,6 +140,12 @@ tasks.register("verifyHuskTownsApiJars") {
             throw GradleException(
                 "HuskTowns Bukkit API jar non trovato: ${huskTownsBukkitApiJar.absolutePath}. " +
                     "Compila HuskTowns/bukkit o passa -PhuskTownsBukkitApiJar=/path/HuskTowns-Bukkit.jar"
+            )
+        }
+        if (!vaultApiJar.exists()) {
+            throw GradleException(
+                "Vault API jar non trovato: ${vaultApiJar.absolutePath}. " +
+                    "Aggiungi ../EXTERNAL-LIBS/Vault.jar o passa -PvaultApiJar=/path/Vault.jar"
             )
         }
     }

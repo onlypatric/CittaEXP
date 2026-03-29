@@ -1,0 +1,33 @@
+id: variant_frontier_lancer
+weight: 1
+nameSuffix: "del Picco"
+tags:
+  - frontier
+  - lancer
+equipment:
+  helmet:
+    material: CHAINMAIL_HELMET
+    enchants:
+      protection: 2
+      unbreaking: 1
+  chestplate:
+    material: IRON_CHESTPLATE
+    enchants:
+      projectile_protection: 2
+      unbreaking: 2
+  leggings:
+    material: CHAINMAIL_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: IRON_BOOTS
+    enchants:
+      projectile_protection: 2
+      binding_curse: 1
+  mainHand:
+    material: IRON_SPEAR
+    enchants:
+      lunge: 1
+      unbreaking: 2
+addAbilities: []
+removeAbilities: []

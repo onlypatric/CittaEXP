@@ -1,0 +1,35 @@
+id: omen_tidebreaker
+type: RAVAGER
+name: "<dark_aqua>Frangimarea del Presagio</dark_aqua>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: omen
+pools:
+  - defense
+  - miniboss
+themes:
+  - omen
+  - tide
+stats:
+  GENERIC_MAX_HEALTH: 220.0
+  GENERIC_ATTACK_DAMAGE: 14.0
+  GENERIC_MOVEMENT_SPEED: 0.32
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - omen
+  - miniboss
+mainAbilities:
+  - defense_dragnet_pull
+  - defense_guardian_sunder
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_breacher
+variants:
+  - variant_abyssal

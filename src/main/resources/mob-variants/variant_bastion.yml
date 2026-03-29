@@ -1,0 +1,6 @@
+id: variant_bastion
+nameSuffix: "del Bastione"
+tags:
+  - bastion
+addAbilities: []
+removeAbilities: []

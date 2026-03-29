@@ -1,0 +1,43 @@
+id: omen_channeler
+type: DROWNED
+name: "<gold>Canalizzatore del Presagio</gold>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: omen
+pools:
+  - defense
+  - elite
+themes:
+  - omen
+  - tide
+stats:
+  GENERIC_MAX_HEALTH: 64.0
+  GENERIC_ATTACK_DAMAGE: 8.0
+  GENERIC_MOVEMENT_SPEED: 0.28
+equipment:
+  helmet: TURTLE_HELMET
+  chestplate: DIAMOND_CHESTPLATE
+  leggings: CHAINMAIL_LEGGINGS
+  boots: DIAMOND_BOOTS
+  mainHand: TRIDENT
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - omen
+  - elite
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_breacher
+  - trait_hexer
+  - trait_tidecaller
+  - trait_runner
+variants:
+  - variant_abyssal
+  - variant_ironclad
+  - variant_deepguard

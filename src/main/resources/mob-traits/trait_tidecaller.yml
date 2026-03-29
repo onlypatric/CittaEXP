@@ -1,0 +1,7 @@
+id: trait_tidecaller
+nameSuffix: "della Corrente"
+tags:
+  - tidecaller
+addAbilities:
+  - defense_dragnet_pull
+removeAbilities: []

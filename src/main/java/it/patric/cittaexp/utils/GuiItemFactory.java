@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +33,7 @@ public final class GuiItemFactory {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         editor.accept(meta);
+        sanitizeItalic(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -46,6 +48,7 @@ public final class GuiItemFactory {
             skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(playerId));
         }
         editor.accept(skullMeta);
+        sanitizeItalic(skullMeta);
         head.setItemMeta(skullMeta);
         return head;
     }
@@ -58,6 +61,7 @@ public final class GuiItemFactory {
         }
         applyTexture(skullMeta, textureBase64);
         editor.accept(skullMeta);
+        sanitizeItalic(skullMeta);
         head.setItemMeta(skullMeta);
         return head;
     }
@@ -78,7 +82,7 @@ public final class GuiItemFactory {
     }
 
     public static ItemStack fillerPane() {
-        return item(Material.BLACK_STAINED_GLASS_PANE, Component.empty());
+        return new ItemStack(Material.AIR);
     }
 
     private static void applyTexture(SkullMeta skullMeta, String textureBase64) {
@@ -92,5 +96,24 @@ public final class GuiItemFactory {
         } catch (Exception ignored) {
             // keep default head if texture parsing fails
         }
+    }
+
+    private static void sanitizeItalic(ItemMeta meta) {
+        if (meta == null) {
+            return;
+        }
+        Component displayName = meta.displayName();
+        if (displayName != null) {
+            meta.displayName(noItalic(displayName));
+        }
+        List<Component> lore = meta.lore();
+        if (lore == null || lore.isEmpty()) {
+            return;
+        }
+        meta.lore(lore.stream().map(GuiItemFactory::noItalic).toList());
+    }
+
+    private static Component noItalic(Component component) {
+        return component.decoration(TextDecoration.ITALIC, TextDecoration.State.FALSE);
     }
 }

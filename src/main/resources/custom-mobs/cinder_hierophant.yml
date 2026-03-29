@@ -1,0 +1,80 @@
+id: cinder_hierophant
+type: EVOKER
+name: "<dark_red>Ierofante Cinerico</dark_red>"
+showName: true
+boss: true
+packId: cittaexp_defense_v3
+arc: ash
+pools:
+  - defense
+  - boss
+themes:
+  - ash
+  - ritual
+stats:
+  GENERIC_MAX_HEALTH: 320.0
+  GENERIC_ATTACK_DAMAGE: 8.0
+  GENERIC_MOVEMENT_SPEED: 0.30
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - ash
+  - boss
+mainAbilities:
+  - defense_ritual_burst
+  - defense_hex_fog
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_ashen
+bossbar:
+  enabled: true
+  title: "<dark_red><bold>{boss}</bold></dark_red> <gray>•</gray> <light_purple>{phase}</light_purple>"
+  color: PURPLE
+  overlay: PROGRESS
+localBroadcasts:
+  spawn: "<dark_red>❖ L'Ierofante Cinerico consacra il fronte con un rito di cenere.</dark_red>"
+  phase: "<gold>❖ Il rito si approfondisce e il braciere reclama nuove forme.</gold>"
+  defeat: "<green>❖ L'Ierofante Cinerico viene spezzato e il rito si disperde nel vento.</green>"
+phaseBindings:
+  - phase: 1
+    id: cinder_phase_i
+    label: Brace Innescata
+    hpBelow: 1.0
+    addAbilities: []
+    removeAbilities: []
+    entryActions:
+      - type: particles
+        particle: SOUL
+        count: 20
+  - phase: 2
+    id: cinder_phase_ii
+    label: Rito Profondo
+    hpBelow: 0.66
+    addAbilities:
+      - defense_ash_reinforce
+    removeAbilities: []
+    namePrefix: "<red>Rituale</red>"
+    entryActions:
+      - type: sound
+        sound: ENTITY_EVOKER_CAST_SPELL
+        volume: 1.2
+        pitch: 0.8
+  - phase: 3
+    id: cinder_phase_iii
+    label: Braciere Sovrano
+    hpBelow: 0.33
+    addAbilities:
+      - defense_final_pulse
+      - defense_phase_rally
+    removeAbilities: []
+    nameSuffix: "<dark_red>del Braciere</dark_red>"
+    entryActions:
+      - type: particles
+        particle: FLAME
+        count: 28

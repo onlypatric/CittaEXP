@@ -1,0 +1,19 @@
+id: defense_tide_reinforce
+trigger: ON_HURT
+cooldownTicks: 240
+targeting:
+  type: SELF
+conditions:
+  - type: hpBelow
+    ratio: 0.70
+actions:
+  - type: sound
+    sound: ENTITY_DROWNED_AMBIENT_WATER
+    volume: 1.0
+    pitch: 0.8
+  - type: summon
+    spawnRef: custom:tide_reaver
+    count: 2
+  - type: summon
+    spawnRef: custom:omen_harpooner
+    count: 1

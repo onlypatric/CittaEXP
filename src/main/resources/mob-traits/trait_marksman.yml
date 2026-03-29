@@ -1,0 +1,7 @@
+id: trait_marksman
+nameSuffix: "Tiratore"
+tags:
+  - marksman
+addAbilities:
+  - defense_crossbow_volley
+removeAbilities: []

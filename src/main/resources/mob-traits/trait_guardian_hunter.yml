@@ -1,0 +1,7 @@
+id: trait_guardian_hunter
+nameSuffix: "d'Assedio"
+tags:
+  - guardian_hunter
+addAbilities:
+  - defense_guardian_strike
+removeAbilities: []

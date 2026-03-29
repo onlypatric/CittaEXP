@@ -1,0 +1,7 @@
+id: trait_overseer
+nameSuffix: "Capitano"
+tags:
+  - overseer
+addAbilities:
+  - defense_phase_rally
+removeAbilities: []

@@ -1,0 +1,40 @@
+id: frontier_bolter
+type: SKELETON
+name: "<gray>Balestriere di Frontiera</gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: frontier
+pools:
+  - defense
+  - regular
+themes:
+  - frontier
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 28.0
+  GENERIC_ATTACK_DAMAGE: 4.0
+  GENERIC_MOVEMENT_SPEED: 0.25
+equipment:
+  helmet: CHAINMAIL_HELMET
+  chestplate: LEATHER_CHESTPLATE
+  leggings: LEATHER_LEGGINGS
+  boots: CHAINMAIL_BOOTS
+  mainHand: CROSSBOW
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - frontier
+  - ranged
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_marksman
+  - trait_runner
+variants:
+  - variant_bastion
+  - variant_frontier_watch

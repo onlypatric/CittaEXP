@@ -1,0 +1,10 @@
+id: trait_runner_frenzied
+namePrefix: "<red>Furente</red>"
+stats:
+  GENERIC_MOVEMENT_SPEED: 0.05
+tags:
+  - runner
+  - frenzy
+addAbilities:
+  - defense_runner_frenzy
+removeAbilities: []

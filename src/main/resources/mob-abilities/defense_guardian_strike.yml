@@ -1,0 +1,17 @@
+id: defense_guardian_strike
+trigger: ON_TARGET
+cooldownTicks: 100
+targeting:
+  type: GUARDIAN
+conditions:
+  - type: targetExists
+actions:
+  - type: particles
+    particle: CRIT
+    count: 8
+  - type: sound
+    sound: ENTITY_ZOMBIE_ATTACK_IRON_DOOR
+    volume: 1.0
+    pitch: 0.9
+  - type: directDamage
+    amount: 4.0

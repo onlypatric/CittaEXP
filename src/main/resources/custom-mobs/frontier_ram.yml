@@ -1,0 +1,34 @@
+id: frontier_ram
+type: RAVAGER
+name: "<dark_red>Ariete del Confine</dark_red>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: frontier
+pools:
+  - defense
+  - miniboss
+themes:
+  - frontier
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 140.0
+  GENERIC_ATTACK_DAMAGE: 10.0
+  GENERIC_MOVEMENT_SPEED: 0.30
+equipment: {}
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - frontier
+  - miniboss
+mainAbilities:
+  - defense_breach_slam
+  - defense_guardian_sunder
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_bastion

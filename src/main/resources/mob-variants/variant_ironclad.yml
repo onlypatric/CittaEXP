@@ -1,0 +1,27 @@
+id: variant_ironclad
+namePrefix: "<gray>Corazzato</gray>"
+tags:
+  - ironclad
+equipment:
+  helmet:
+    material: IRON_HELMET
+    enchants:
+      protection: 3
+      unbreaking: 2
+  chestplate:
+    material: IRON_CHESTPLATE
+    enchants:
+      protection: 3
+      projectile_protection: 2
+  leggings:
+    material: IRON_LEGGINGS
+    enchants:
+      protection: 2
+      unbreaking: 2
+  boots:
+    material: IRON_BOOTS
+    enchants:
+      blast_protection: 2
+      binding_curse: 1
+addAbilities: []
+removeAbilities: []

@@ -1,0 +1,13 @@
+packId: cittaexp_defense_v3
+defaults:
+  - trait_breacher.yml
+  - trait_guardian_hunter.yml
+  - trait_hexer.yml
+  - trait_leaper.yml
+  - trait_marksman.yml
+  - trait_overseer.yml
+  - trait_ritualist.yml
+  - trait_runner.yml
+  - trait_runner_frenzied.yml
+  - trait_sapper.yml
+  - trait_tidecaller.yml

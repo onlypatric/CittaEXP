@@ -1,0 +1,24 @@
+id: defense_dragnet_pull
+trigger: ON_TARGET
+cooldownTicks: 110
+targeting:
+  type: PLAYERS_IN_RADIUS
+  radius: 6
+  maxTargets: 3
+conditions:
+  - type: waveAtLeast
+    wave: 2
+actions:
+  - type: particles
+    particle: SQUID_INK
+    count: 16
+  - type: sound
+    sound: ENTITY_DROWNED_SHOOT
+    volume: 1.0
+    pitch: 0.8
+  - type: pull
+    strength: 1.6
+  - type: applyPotion
+    effect: SLOW
+    durationTicks: 60
+    amplifier: 1

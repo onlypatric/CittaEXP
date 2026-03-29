@@ -7,6 +7,9 @@ import io.papermc.paper.registry.data.dialog.DialogBase;
 import io.papermc.paper.registry.data.dialog.action.DialogAction;
 import io.papermc.paper.registry.data.dialog.body.DialogBody;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
+import it.patric.cittaexp.discord.DiscordTownSyncService;
+import it.patric.cittaexp.economy.EconomyBalanceCategory;
+import it.patric.cittaexp.economy.EconomyValueService;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
 import it.patric.cittaexp.utils.DialogInputUtils;
 import it.patric.cittaexp.utils.DialogViewUtils;
@@ -40,11 +43,20 @@ public final class TownRenameDialogFlow {
 
     private final Plugin plugin;
     private final HuskTownsApiHook huskTownsApiHook;
+    private final DiscordTownSyncService discordTownSyncService;
+    private final EconomyValueService economyValueService;
     private final PluginConfigUtils configUtils;
 
-    public TownRenameDialogFlow(Plugin plugin, HuskTownsApiHook huskTownsApiHook) {
+    public TownRenameDialogFlow(
+            Plugin plugin,
+            HuskTownsApiHook huskTownsApiHook,
+            DiscordTownSyncService discordTownSyncService,
+            EconomyValueService economyValueService
+    ) {
         this.plugin = plugin;
         this.huskTownsApiHook = huskTownsApiHook;
+        this.discordTownSyncService = discordTownSyncService;
+        this.economyValueService = economyValueService;
         this.configUtils = new PluginConfigUtils(plugin);
     }
 
@@ -67,7 +79,8 @@ public final class TownRenameDialogFlow {
                 .afterAction(DialogBase.DialogAfterAction.CLOSE)
                 .body(List.of(DialogBody.plainMessage(configUtils.msg(
                         "city.rename.dialog.body",
-                        "<gray>Imposta nuovo nome e tag citta.</gray>"))))
+                        "<gray>Imposta nuovo nome e tag citta.</gray> <gray>Costo araldico:</gray> <gold>{cost}</gold>",
+                        Placeholder.unparsed("cost", formattedRenameCost())))))
                 .inputs(List.of(
                         DialogInputUtils.text(
                                 FIELD_NAME,
@@ -150,7 +163,7 @@ public final class TownRenameDialogFlow {
             return;
         }
 
-        BigDecimal renameCost = BigDecimal.valueOf(Math.max(0.0D, plugin.getConfig().getDouble("city.rename.cost.amount", 0.0D)));
+        BigDecimal renameCost = renameCost();
         try {
             huskTownsApiHook.editTown(player, town.getId(), mutableTown -> {
                 if (renameCost.signum() > 0 && mutableTown.getMoney().compareTo(renameCost) < 0) {
@@ -162,13 +175,14 @@ public final class TownRenameDialogFlow {
                 mutableTown.setName(newName);
                 mutableTown.setMetadataTag(TOWN_TAG_KEY, newTag);
             });
+            discordTownSyncService.registerTownMetadataEdit(town.getId(), player.getUniqueId());
 
             player.sendMessage(configUtils.msg(
                     "city.rename.dialog.success",
                     "<green>Citta rinominata:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray> <gray>(costo: {cost})</gray>",
                     Placeholder.unparsed("name", newName),
                     Placeholder.unparsed("tag", newTag),
-                    Placeholder.unparsed("cost", renameCost.stripTrailingZeros().toPlainString())
+                    Placeholder.unparsed("cost", formattedRenameCost())
             ));
         } catch (RuntimeException exception) {
             String reason = ExceptionUtils.safeMessage(exception, "errore sconosciuto");
@@ -204,6 +218,16 @@ public final class TownRenameDialogFlow {
             return Optional.empty();
         }
         return member;
+    }
+
+    private BigDecimal renameCost() {
+        double nominal = Math.max(0.0D, plugin.getConfig().getDouble("city.rename.cost.amount", 250.0D));
+        return economyValueService.effectiveMoney(EconomyBalanceCategory.TOWN_RENAME, BigDecimal.valueOf(nominal));
+    }
+
+    private String formattedRenameCost() {
+        BigDecimal renameCost = renameCost();
+        return renameCost.stripTrailingZeros().toPlainString();
     }
 
 }

@@ -6,14 +6,16 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import it.patric.cittaexp.command.CommandDescriptionRegistry;
+import it.patric.cittaexp.utils.CommandSuggestionUtils;
 import it.patric.cittaexp.utils.PluginConfigUtils;
 import it.patric.cittaexp.utils.ReasonMessageMapper;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Stream;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,26 +25,20 @@ public final class StaffLevelCommand {
 
     private static final String STAFF_PERMISSION = "cittaexp.staff.level";
 
-    private static final SuggestionProvider<CommandSourceStack> STATUS_SUGGESTIONS = (ctx, builder) -> {
-        Stream.of("pending", "approved", "rejected", "cancelled")
-                .filter(s -> s.startsWith(builder.getRemainingLowerCase()))
-                .forEach(builder::suggest);
-        return builder.buildFuture();
-    };
-
     private StaffLevelCommand() {
     }
 
     public static LiteralArgumentBuilder<CommandSourceStack> create(
             Plugin plugin,
             CityLevelRequestService requestService,
-            PluginConfigUtils cfg
+            PluginConfigUtils cfg,
+            CommandDescriptionRegistry descriptions
     ) {
         return Commands.literal("level")
                 .then(Commands.literal("list")
                         .executes(ctx -> list(ctx, requestService, cfg))
                         .then(Commands.argument("status", StringArgumentType.word())
-                                .suggests(STATUS_SUGGESTIONS)
+                                .suggests(statusSuggestions(descriptions))
                                 .executes(ctx -> list(ctx, requestService, cfg))))
                 .then(Commands.literal("approve")
                         .then(Commands.argument("requestId", LongArgumentType.longArg(1))
@@ -55,6 +51,29 @@ public final class StaffLevelCommand {
                                 .then(Commands.argument("reason", StringArgumentType.greedyString())
                                         .executes(ctx -> reject(ctx, requestService, cfg,
                                                 StringArgumentType.getString(ctx, "reason"))))));
+    }
+
+    private static SuggestionProvider<CommandSourceStack> statusSuggestions(CommandDescriptionRegistry descriptions) {
+        return (ctx, builder) -> {
+            suggestStatus(builder, descriptions, "pending", "status_pending", "Richieste in attesa di review");
+            suggestStatus(builder, descriptions, "approved", "status_approved", "Richieste approvate");
+            suggestStatus(builder, descriptions, "rejected", "status_rejected", "Richieste rifiutate");
+            suggestStatus(builder, descriptions, "cancelled", "status_cancelled", "Richieste annullate");
+            return builder.buildFuture();
+        };
+    }
+
+    private static void suggestStatus(
+            SuggestionsBuilder builder,
+            CommandDescriptionRegistry descriptions,
+            String value,
+            String tooltipKey,
+            String fallback
+    ) {
+        if (!value.startsWith(builder.getRemainingLowerCase())) {
+            return;
+        }
+        CommandSuggestionUtils.suggest(builder, value, descriptions.suggestionTooltip(tooltipKey, fallback));
     }
 
     private static int list(

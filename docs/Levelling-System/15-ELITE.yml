@@ -1,0 +1,528 @@
+storyMode:
+  chapters:
+    elite:
+      elite_01:
+        id: elite_01
+        order: 41
+        title: "Opere della Corona"
+        act: "Elite"
+        elite: true
+        minCityLevel: 201
+        primaryChapter: INDUSTRY
+        taskFamilies: [INDUSTRY, CIVIC, EXTRACTION]
+        narrativeBeat: "La città entra nell'Elite costruendo non per bisogno, ma per lasciare un segno che duri oltre il proprio tempo."
+        signatureGoal: "Avviare le prime grandi opere endgame come simbolo di prestigio e capacità totale."
+        chapterProof: "La città completa il primo grande progetto monumentale dell'era Elite."
+        completionFantasy: "Le strutture della città non sembrano più semplici edifici: sembrano dichiarazioni di potere e continuità."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Fondazioni sovrane"
+            description: "Avanza nei cantieri che trasformano il centro cittadino in un complesso di rango assoluto."
+            type: ATLAS
+            objectiveFamily: construction
+            atlasFamilyId: atlas.industry.monument
+            tier: III
+            proofType: CONSTRUCTION
+          - title: "Posa delle grandi linee"
+            description: "Colloca blocchi su scala ampia per dare forma, volume e riconoscibilità alla nuova opera."
+            type: ATLAS
+            objectiveFamily: place_block
+            atlasFamilyId: atlas.industry.monument
+            tier: III
+            proofType: CONSTRUCTION
+          - title: "Tesoro dei cantieri"
+            description: "Convoglia risorse comuni per sostenere i lavori che devono rappresentare tutta la città."
+            type: ATLAS
+            objectiveFamily: resource_contribution
+            atlasFamilyId: atlas.civic.contribution
+            tier: III
+            proofType: COUNCIL
+        milestone:
+          title: "Materiali d'eccellenza"
+          description: "Estrai risorse pregiate per sostenere finiture, simboli e dettagli degni dell'era Elite."
+          type: ATLAS
+          objectiveFamily: block_mine
+          atlasFamilyId: atlas.extract.diamond
+          tier: III
+          proofType: STOCKPILE
+        proof:
+          title: "Prima opera dell'Elite"
+          description: "Completa il grande progetto che annuncia l'ingresso della città nel livello più alto di Story Mode."
+          type: ATLAS
+          objectiveFamily: construction
+          atlasFamilyId: atlas.industry.monument
+          tier: III
+          proofType: GRAND_PROJECT
+      elite_02:
+        id: elite_02
+        order: 42
+        title: "Veglia d'Assedio"
+        act: "Elite"
+        elite: true
+        minCityLevel: 206
+        primaryChapter: COMBAT
+        taskFamilies: [COMBAT, INDUSTRY, CIVIC]
+        narrativeBeat: "Il prestigio richiama minacce più grandi, e la città deve dimostrare di saper difendere ciò che ha elevato."
+        signatureGoal: "Preparare la città a una mobilitazione totale contro una minaccia di scala superiore."
+        chapterProof: "La città regge il suo primo vero assedio Elite."
+        completionFantasy: "La città non appare solo ricca e vasta: appare pronta a resistere quando tutto viene messo alla prova."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Pattuglie delle mura alte"
+            description: "Elimina minacce ostili per mantenere sicuro il perimetro della città d'élite."
+            type: ATLAS
+            objectiveFamily: rare_mob_kill
+            atlasFamilyId: atlas.combat.rare
+            tier: III
+            proofType: DEFENSE
+          - title: "Scorte per la mobilitazione"
+            description: "Prepara supporti alchemici utili a una difesa cittadina di lunga durata."
+            type: ATLAS
+            objectiveFamily: brew_potion
+            atlasFamilyId: atlas.industry.potion
+            tier: III
+            proofType: SUPPLY
+          - title: "Cassa della guarnigione"
+            description: "Versa risorse comuni per sostenere il dispiegamento completo della difesa."
+            type: ATLAS
+            objectiveFamily: resource_contribution
+            atlasFamilyId: atlas.civic.contribution
+            tier: III
+            proofType: COUNCIL
+        milestone:
+          title: "Barriere di crisi"
+          description: "Avanza in lavori di rinforzo che rendano la città pronta a sostenere pressione costante."
+          type: ATLAS
+          objectiveFamily: construction
+          atlasFamilyId: atlas.industry.construction
+          tier: III
+          proofType: CONSTRUCTION
+        proof:
+          title: "Assedio della veglia"
+          description: "La città affronta una sessione completa di difesa per dimostrare che il suo prestigio può essere protetto."
+          type: DEFENSE
+          objectiveFamily: mob_kill
+          defenseTier: L3
+          proofType: DEFENSE
+
+      elite_03:
+        id: elite_03
+        order: 43
+        title: "Dominio delle Vie"
+        act: "Elite"
+        elite: true
+        minCityLevel: 211
+        primaryChapter: CIVIC
+        taskFamilies: [CIVIC, FRONTIER, INDUSTRY]
+        narrativeBeat: "Una città d'élite non occupa soltanto spazio: tiene unite tratte, territori e interessi lontani."
+        signatureGoal: "Consolidare la rete territoriale che rende la città il nodo dominante del mondo circostante."
+        chapterProof: "La città completa una grande espansione di collegamento e controllo."
+        completionFantasy: "Le vie della città non servono più solo i suoi quartieri: sembrano reggere l'ordine di un intero territorio."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Tratte del dominio"
+            description: "Copri grandi distanze per mantenere attivi collegamenti degni di una città ormai dominante."
+            type: ATLAS
+            objectiveFamily: transport_distance
+            atlasFamilyId: atlas.civic.transport
+            tier: III
+            proofType: SUPPLY
+          - title: "Riferimenti del territorio"
+            description: "Scopri strutture chiave che definiscano i punti di controllo della città oltre il suo centro."
+            type: ATLAS
+            objectiveFamily: structure_discovery
+            atlasFamilyId: atlas.frontier.structure
+            tier: III
+            proofType: EXPANSION
+          - title: "Presidi delle grandi vie"
+            description: "Costruisci elementi funzionali che consolidino la presenza cittadina lungo le direttrici maggiori."
+            type: ATLAS
+            objectiveFamily: construction
+            atlasFamilyId: atlas.industry.construction
+            tier: III
+            proofType: CONSTRUCTION
+        milestone:
+          title: "Contributi di rete"
+          description: "Versa risorse comuni per sostenere la grande infrastruttura territoriale della città."
+          type: ATLAS
+          objectiveFamily: resource_contribution
+          atlasFamilyId: atlas.civic.contribution
+          tier: III
+          proofType: COUNCIL
+        proof:
+          title: "Maglia del dominio"
+          description: "Completa la grande soglia di espansione che consacra la città come centro delle vie del territorio."
+          type: ATLAS
+          objectiveFamily: transport_distance
+          atlasFamilyId: atlas.civic.transport
+          tier: III
+          proofType: GRAND_PROJECT
+
+      elite_04:
+        id: elite_04
+        order: 44
+        title: "Spedizioni Supreme"
+        act: "Elite"
+        elite: true
+        minCityLevel: 216
+        primaryChapter: FRONTIER
+        taskFamilies: [FRONTIER, COMBAT, INDUSTRY]
+        narrativeBeat: "Solo le città più compiute trasformano le spedizioni estreme in una pratica stabile del proprio potere."
+        signatureGoal: "Portare la capacità esplorativa e offensiva della città al livello delle sue missioni più lontane."
+        chapterProof: "La città conclude una spedizione endgame che unisce rischio, recupero e supremazia."
+        completionFantasy: "Le squadre cittadine tornano da luoghi remoti con bottino, prova e prestigio degni dell'Elite."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Camere di prova supreme"
+            description: "Apri trial vault come segno della capacità della città di vincere spedizioni di massimo livello."
+            type: ATLAS
+            objectiveFamily: trial_vault_open
+            atlasFamilyId: atlas.frontier.trial_vault
+            tier: III
+            proofType: EXPANSION
+          - title: "Traversate estreme"
+            description: "Viaggia tra dimensioni e soglie lontane per mantenere vive le grandi spedizioni cittadine."
+            type: ATLAS
+            objectiveFamily: dimension_travel
+            atlasFamilyId: atlas.frontier.dimension
+            tier: III
+            proofType: EXPANSION
+          - title: "Supporti da spedizione"
+            description: "Prepara risorse e lavorazioni utili a sostenere missioni che richiedono piena coordinazione."
+            type: ATLAS
+            objectiveFamily: item_craft
+            atlasFamilyId: atlas.industry.craft_master
+            tier: III
+            proofType: SUPPLY
+        milestone:
+          title: "Segni del passato remoto"
+          description: "Riporta alla luce tracce antiche per trasformare l'esplorazione estrema in valore permanente per la città."
+          type: ATLAS
+          objectiveFamily: archaeology_brush
+          atlasFamilyId: atlas.frontier.archaeology
+          tier: III
+          proofType: EXPANSION
+        proof:
+          title: "Spedizione sovrana"
+          description: "Completa il grande traguardo di spedizione che dimostra che la città sa vincere anche ai limiti del mondo."
+          type: ATLAS
+          objectiveFamily: trial_vault_open
+          atlasFamilyId: atlas.frontier.trial_vault
+          tier: III
+          proofType: GRAND_PROJECT
+
+      elite_05:
+        id: elite_05
+        order: 45
+        title: "Alto Consiglio"
+        act: "Elite"
+        elite: true
+        minCityLevel: 221
+        primaryChapter: CIVIC
+        taskFamilies: [CIVIC, INDUSTRY, AGRONOMY]
+        narrativeBeat: "Alla scala dell'Elite, governare significa orchestrare lavoro, risorse e stabilità senza sprechi né vuoti."
+        signatureGoal: "Rendere il coordinamento cittadino capace di sostenere obiettivi simultanei e di lunga durata."
+        chapterProof: "La città raggiunge una soglia di convergenza totale dei propri reparti."
+        completionFantasy: "Ogni contributo sembra arrivare al posto giusto e nel momento giusto, come se l'intera città avesse un solo respiro."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Contributi dell'alto consiglio"
+            description: "Versa risorse comuni per sostenere decisioni, priorità e grandi piani di scala Elite."
+            type: ATLAS
+            objectiveFamily: resource_contribution
+            atlasFamilyId: atlas.civic.contribution
+            tier: III
+            proofType: COUNCIL
+          - title: "Ordine dei mercati"
+            description: "Rafforza l'economia avanzata che permette alla città di non interrompere mai il proprio slancio."
+            type: ATLAS
+            objectiveFamily: economy_advanced
+            atlasFamilyId: atlas.civic.economy
+            tier: III
+            proofType: COUNCIL
+          - title: "Scambi di vertice"
+            description: "Sostieni il commercio con i villager per dare continuità politica ed economica alla città."
+            type: ATLAS
+            objectiveFamily: villager_trade
+            atlasFamilyId: atlas.industry.villager_trade
+            tier: III
+            proofType: COUNCIL
+        milestone:
+          title: "Rifornimenti del consiglio"
+          description: "Prepara cibo in quantità per mantenere attivi lavori, riunioni e operazioni su scala cittadina totale."
+          type: ATLAS
+          objectiveFamily: food_craft
+          atlasFamilyId: atlas.industry.food
+          tier: III
+          proofType: SUPPLY
+        proof:
+          title: "Delibera assoluta"
+          description: "Completa la grande soglia civica che prova che la città sa convergere come un solo organismo."
+          type: ATLAS
+          objectiveFamily: resource_contribution
+          atlasFamilyId: atlas.civic.contribution
+          tier: III
+          proofType: GRAND_PROJECT
+
+      elite_06:
+        id: elite_06
+        order: 46
+        title: "Bastioni Esterni"
+        act: "Elite"
+        elite: true
+        minCityLevel: 226
+        primaryChapter: COMBAT
+        taskFamilies: [COMBAT, FRONTIER, INDUSTRY]
+        narrativeBeat: "Quando il dominio si allarga, la difesa non riguarda più il solo cuore della città ma tutto ciò che essa protegge."
+        signatureGoal: "Rendere i bastioni esterni capaci di reggere una crisi territoriale completa."
+        chapterProof: "La città supera una difesa Elite legata alla protezione delle proprie opere e dei propri confini avanzati."
+        completionFantasy: "I limiti della città non sembrano più vulnerabili: sembrano trattenuti da una volontà organizzata e durissima."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Minacce dei confini"
+            description: "Abbatti nemici rari nelle zone di massima pressione per mantenere sicuri i margini del dominio."
+            type: ATLAS
+            objectiveFamily: rare_mob_kill
+            atlasFamilyId: atlas.combat.rare
+            tier: III
+            proofType: DEFENSE
+          - title: "Attività delle frontiere oscure"
+            description: "Affronta contenuti nel Nether per rendere le guarnigioni esterne pronte a pressioni superiori."
+            type: ATLAS
+            objectiveFamily: nether_activity
+            atlasFamilyId: atlas.combat.nether
+            tier: III
+            proofType: EXPANSION
+          - title: "Rinforzi dei bastioni"
+            description: "Avanza in lavori strutturali che rendano i presidi esterni davvero affidabili."
+            type: ATLAS
+            objectiveFamily: construction
+            atlasFamilyId: atlas.industry.construction
+            tier: III
+            proofType: CONSTRUCTION
+        milestone:
+          title: "Riserve della guarnigione"
+          description: "Prepara pozioni e supporti utili a una risposta territoriale di livello massimo."
+          type: ATLAS
+          objectiveFamily: brew_potion
+          atlasFamilyId: atlas.industry.potion
+          tier: III
+          proofType: SUPPLY
+        proof:
+          title: "Crisi dei bastioni"
+          description: "La città affronta una grande prova di difesa per dimostrare che i suoi confini avanzati possono reggere l'urto."
+          type: DEFENSE
+          objectiveFamily: mob_kill
+          defenseTier: L3
+          proofType: DEFENSE
+
+      elite_07:
+        id: elite_07
+        order: 47
+        title: "Mercato dell'Eredità"
+        act: "Elite"
+        elite: true
+        minCityLevel: 231
+        primaryChapter: CIVIC
+        taskFamilies: [CIVIC, INDUSTRY, AGRONOMY]
+        narrativeBeat: "Una città d'élite non accumula solo ricchezza: trasforma prosperità e stabilità in eredità duratura."
+        signatureGoal: "Consolidare un sistema economico che sostenga prestigio, abbondanza e continuità nel tempo."
+        chapterProof: "La città raggiunge una forma di ricchezza organizzata che la rende modello stabile del territorio."
+        completionFantasy: "Mercati, dispense e scambi sembrano capaci di alimentare la città senza cedimenti né improvvisazione."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Ricchezza regolata"
+            description: "Sostieni l'economia avanzata che rende la città non solo forte, ma duratura."
+            type: ATLAS
+            objectiveFamily: economy_advanced
+            atlasFamilyId: atlas.civic.economy
+            tier: III
+            proofType: COUNCIL
+          - title: "Trattati di bottega"
+            description: "Rafforza il commercio con i villager per trasformare la prosperità in rete stabile."
+            type: ATLAS
+            objectiveFamily: villager_trade
+            atlasFamilyId: atlas.industry.villager_trade
+            tier: III
+            proofType: COUNCIL
+          - title: "Dispensa dell'eredità"
+            description: "Prepara cibo in quantità per rendere visibile la capacità della città di sostenere il proprio futuro."
+            type: ATLAS
+            objectiveFamily: food_craft
+            atlasFamilyId: atlas.industry.food
+            tier: III
+            proofType: SUPPLY
+        milestone:
+          title: "Riserva viva"
+          description: "Sostieni allevamenti e filiere di base che rendano la prosperità della città anche concreta e quotidiana."
+          type: ATLAS
+          objectiveFamily: animal_interaction
+          atlasFamilyId: atlas.agro.animals
+          tier: III
+          proofType: SUPPLY
+        proof:
+          title: "Patrimonio della città"
+          description: "Completa la grande soglia economica che consacra la città come modello di ricchezza stabile e condivisa."
+          type: ATLAS
+          objectiveFamily: economy_advanced
+          atlasFamilyId: atlas.civic.economy
+          tier: III
+          proofType: GRAND_PROJECT
+
+      elite_08:
+        id: elite_08
+        order: 48
+        title: "Spina del Mondo"
+        act: "Elite"
+        elite: true
+        minCityLevel: 236
+        primaryChapter: FRONTIER
+        taskFamilies: [FRONTIER, INDUSTRY, CIVIC]
+        narrativeBeat: "La città d'élite non collega più solo luoghi: collega livelli del mondo, rotte remote e poteri lontani."
+        signatureGoal: "Stabilire una rete suprema che unisca le grandi direttrici del dominio cittadino."
+        chapterProof: "La città completa un progetto di connessione assoluta tra spazi, dimensioni e presidi."
+        completionFantasy: "Le vie della città sembrano attraversare il mondo intero, e ogni distanza appare finalmente governabile."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Attraversamenti supremi"
+            description: "Viaggia tra dimensioni per mantenere attiva la rete più ampia mai costruita dalla città."
+            type: ATLAS
+            objectiveFamily: dimension_travel
+            atlasFamilyId: atlas.frontier.dimension
+            tier: III
+            proofType: EXPANSION
+          - title: "Punti cardinali del dominio"
+            description: "Scopri strutture chiave che definiscano i capisaldi della rete suprema cittadina."
+            type: ATLAS
+            objectiveFamily: structure_discovery
+            atlasFamilyId: atlas.frontier.structure
+            tier: III
+            proofType: EXPANSION
+          - title: "Nodi della grande rete"
+            description: "Posa blocchi e opere utili a rendere la rete di collegamento tangibile e permanente."
+            type: ATLAS
+            objectiveFamily: place_block
+            atlasFamilyId: atlas.industry.construction
+            tier: III
+            proofType: CONSTRUCTION
+        milestone:
+          title: "Trasporto intermedio"
+          description: "Copri grandissime distanze per dare continuità reale alla spina del mondo cittadina."
+          type: ATLAS
+          objectiveFamily: transport_distance
+          atlasFamilyId: atlas.civic.transport
+          tier: III
+          proofType: SUPPLY
+        proof:
+          title: "Asse del mondo"
+          description: "Completa il grande progetto di connessione che rende la città il vero asse del proprio mondo."
+          type: ATLAS
+          objectiveFamily: dimension_travel
+          atlasFamilyId: atlas.frontier.dimension
+          tier: III
+          proofType: GRAND_PROJECT
+
+      elite_09:
+        id: elite_09
+        order: 49
+        title: "Ultima Crisi"
+        act: "Elite"
+        elite: true
+        minCityLevel: 241
+        primaryChapter: COMBAT
+        taskFamilies: [COMBAT, CIVIC, INDUSTRY]
+        narrativeBeat: "Prima del vertice assoluto, la città affronta la crisi che misura tutto ciò che ha costruito e difeso."
+        signatureGoal: "Resistere alla massima pressione che il territorio possa scaricare contro la città."
+        chapterProof: "La città supera la crisi finale che precede il proprio compimento assoluto."
+        completionFantasy: "Dopo questa prova, la città non sembra più soltanto potente: sembra inevitabile."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Mobilitazione totale"
+            description: "Elimina minacce rare e persistenti per mantenere la città pronta a un conflitto di massima scala."
+            type: ATLAS
+            objectiveFamily: rare_mob_kill
+            atlasFamilyId: atlas.combat.rare
+            tier: III
+            proofType: DEFENSE
+          - title: "Supporti della crisi"
+            description: "Prepara grandi quantità di supporti alchemici per reggere una risposta cittadina totale."
+            type: ATLAS
+            objectiveFamily: brew_potion
+            atlasFamilyId: atlas.industry.potion
+            tier: III
+            proofType: SUPPLY
+          - title: "Fondo di emergenza"
+            description: "Versa risorse comuni per sostenere la città nel momento di massima pressione."
+            type: ATLAS
+            objectiveFamily: resource_contribution
+            atlasFamilyId: atlas.civic.contribution
+            tier: III
+            proofType: COUNCIL
+        milestone:
+          title: "Rinforzo della capitale"
+          description: "Avanza in lavori difensivi e strutturali che preparino il cuore cittadino all'impatto finale."
+          type: ATLAS
+          objectiveFamily: construction
+          atlasFamilyId: atlas.industry.construction
+          tier: III
+          proofType: CONSTRUCTION
+        proof:
+          title: "Assedio della crisi finale"
+          description: "La città affronta la sessione di difesa che decide se il suo dominio è davvero saldo."
+          type: DEFENSE
+          objectiveFamily: mob_kill
+          defenseTier: L3
+          proofType: DEFENSE
+
+      elite_10:
+        id: elite_10
+        order: 50
+        title: "Città Eterna"
+        act: "Elite"
+        elite: true
+        minCityLevel: 246
+        primaryChapter: INDUSTRY
+        taskFamilies: [INDUSTRY, CIVIC, FRONTIER]
+        narrativeBeat: "La città raggiunge il vertice assoluto di Story Mode e costruisce la propria forma definitiva di eredità."
+        signatureGoal: "Unire opera, dominio e volontà collettiva nel capitolo che consacra per sempre la città."
+        chapterProof: "La città completa il progetto supremo che chiude l'intera progressione permanente di Story Mode."
+        completionFantasy: "La città non appare più come un centro tra gli altri: appare come una realtà destinata a restare."
+        rewardProfile: story_elite
+        tasks:
+          - title: "Monumento dell'eternità"
+            description: "Avanza nei lavori del complesso finale che deve rappresentare tutto ciò che la città è diventata."
+            type: ATLAS
+            objectiveFamily: construction
+            atlasFamilyId: atlas.industry.monument
+            tier: III
+            proofType: CONSTRUCTION
+          - title: "Contributi dell'ultima convergenza"
+            description: "Versa risorse comuni per dimostrare che l'intera città sa ancora unirsi verso un unico destino."
+            type: ATLAS
+            objectiveFamily: resource_contribution
+            atlasFamilyId: atlas.civic.contribution
+            tier: III
+            proofType: COUNCIL
+          - title: "Passaggi oltre il confine"
+            description: "Attraversa dimensioni e soglie remote per segnare che il dominio della città supera ormai ogni limite locale."
+            type: ATLAS
+            objectiveFamily: dimension_travel
+            atlasFamilyId: atlas.frontier.dimension
+            tier: III
+            proofType: EXPANSION
+        milestone:
+          title: "Ordine perpetuo"
+          description: "Sostieni l'economia avanzata che permette all'opera finale di non essere solo grande, ma mantenibile nel tempo."
+          type: ATLAS
+          objectiveFamily: economy_advanced
+          atlasFamilyId: atlas.civic.economy
+          tier: III
+          proofType: COUNCIL
+        proof:
+          title: "Consacrazione della città eterna"
+          description: "Completa il grande progetto supremo che chiude Story Mode e consacra la città come eredità permanente del mondo."
+          type: ATLAS
+          objectiveFamily: construction
+          atlasFamilyId: atlas.industry.monument
+          tier: III
+          proofType: GRAND_PROJECT

@@ -1,0 +1,45 @@
+id: doom_guard
+type: PIGLIN_BRUTE
+name: "<gold>Guardia del Tramonto</gold>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: throne
+pools:
+  - defense
+  - elite
+themes:
+  - throne
+  - apocalypse
+stats:
+  GENERIC_MAX_HEALTH: 96.0
+  GENERIC_ATTACK_DAMAGE: 13.0
+  GENERIC_MOVEMENT_SPEED: 0.31
+equipment:
+  helmet: GOLDEN_HELMET
+  chestplate: DIAMOND_CHESTPLATE
+  leggings: DIAMOND_LEGGINGS
+  boots: GOLDEN_BOOTS
+  mainHand: GOLDEN_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - throne
+  - elite
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_breacher
+  - trait_leaper
+  - trait_overseer
+  - trait_runner_frenzied
+variants:
+  - variant_imperial_lancer
+  - variant_royal
+  - variant_last_siege
+  - variant_imperial_plate
+  - variant_blackguard

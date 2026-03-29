@@ -1,0 +1,21 @@
+id: defense_breach_slam
+trigger: ON_HIT
+cooldownTicks: 70
+targeting:
+  type: CURRENT_TARGET
+conditions:
+  - type: targetExists
+actions:
+  - type: particles
+    particle: CLOUD
+    count: 14
+  - type: sound
+    sound: ENTITY_RAVAGER_ROAR
+    volume: 1.2
+    pitch: 0.9
+  - type: directDamage
+    amount: 3.0
+  - type: knockback
+    strength: 1.6
+  - type: push
+    strength: 0.8

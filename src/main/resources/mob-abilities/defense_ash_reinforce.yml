@@ -1,0 +1,19 @@
+id: defense_ash_reinforce
+trigger: ON_HURT
+cooldownTicks: 240
+targeting:
+  type: SELF
+conditions:
+  - type: hpBelow
+    ratio: 0.70
+actions:
+  - type: sound
+    sound: ENTITY_EVOKER_PREPARE_SUMMON
+    volume: 1.0
+    pitch: 0.8
+  - type: summon
+    spawnRef: custom:ash_cultist
+    count: 2
+  - type: summon
+    spawnRef: custom:ash_hexer
+    count: 1

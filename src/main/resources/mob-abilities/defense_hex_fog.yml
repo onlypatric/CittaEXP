@@ -1,0 +1,26 @@
+id: defense_hex_fog
+trigger: ON_HURT
+cooldownTicks: 120
+targeting:
+  type: PLAYERS_IN_RADIUS
+  radius: 6
+  maxTargets: 3
+conditions:
+  - type: hpBelow
+    ratio: 0.85
+actions:
+  - type: particles
+    particle: SMOKE
+    count: 18
+  - type: sound
+    sound: ENTITY_WITCH_THROW
+    volume: 1.0
+    pitch: 0.9
+  - type: applyPotion
+    effect: SLOW
+    durationTicks: 80
+    amplifier: 1
+  - type: applyPotion
+    effect: WEAKNESS
+    durationTicks: 80
+    amplifier: 0

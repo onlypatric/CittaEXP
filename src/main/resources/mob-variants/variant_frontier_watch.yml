@@ -1,0 +1,26 @@
+id: variant_frontier_watch
+weight: 2
+nameSuffix: "della Vedetta"
+tags:
+  - frontier
+  - watch
+equipment:
+  helmet:
+    material: CHAINMAIL_HELMET
+    enchants:
+      projectile_protection: 2
+      unbreaking: 1
+  chestplate:
+    material: IRON_CHESTPLATE
+    enchants:
+      projectile_protection: 3
+  leggings:
+    material: CHAINMAIL_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: IRON_BOOTS
+    enchants:
+      projectile_protection: 2
+addAbilities: []
+removeAbilities: []

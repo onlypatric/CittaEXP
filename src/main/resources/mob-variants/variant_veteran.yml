@@ -1,0 +1,6 @@
+id: variant_veteran
+namePrefix: "<gray>Veterano</gray>"
+tags:
+  - veteran
+addAbilities: []
+removeAbilities: []

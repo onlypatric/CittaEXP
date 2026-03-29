@@ -1,0 +1,23 @@
+packId: cittaexp_defense_v3
+defaults:
+  - variant_blackguard.yml
+  - variant_abyssal.yml
+  - variant_ashen.yml
+  - variant_bastion.yml
+  - variant_breach_lancer.yml
+  - variant_breach_plated.yml
+  - variant_breach_raze.yml
+  - variant_cinder_plate.yml
+  - variant_deepguard.yml
+  - variant_frontier_lancer.yml
+  - variant_frontier_levy.yml
+  - variant_frontier_watch.yml
+  - variant_ironclad.yml
+  - variant_imperial_lancer.yml
+  - variant_imperial_plate.yml
+  - variant_last_siege.yml
+  - variant_royal.yml
+  - variant_ritual_vestment.yml
+  - variant_scorched.yml
+  - variant_tidebound.yml
+  - variant_veteran.yml

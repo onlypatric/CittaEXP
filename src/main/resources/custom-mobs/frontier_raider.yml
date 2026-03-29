@@ -1,0 +1,43 @@
+id: frontier_raider
+type: ZOMBIE
+name: "<gray>Predone di Frontiera</gray>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: frontier
+pools:
+  - defense
+  - regular
+themes:
+  - frontier
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 32.0
+  GENERIC_ATTACK_DAMAGE: 5.0
+  GENERIC_MOVEMENT_SPEED: 0.26
+equipment:
+  helmet: IRON_HELMET
+  chestplate: LEATHER_CHESTPLATE
+  leggings: LEATHER_LEGGINGS
+  boots: LEATHER_BOOTS
+  mainHand: IRON_SWORD
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - frontier
+  - regular
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_guardian_hunter
+  - trait_leaper
+  - trait_runner
+variants:
+  - variant_frontier_levy
+  - variant_frontier_lancer
+  - variant_frontier_watch
+  - variant_veteran

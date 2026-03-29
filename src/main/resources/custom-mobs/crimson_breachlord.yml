@@ -1,0 +1,88 @@
+id: crimson_breachlord
+type: PIGLIN_BRUTE
+name: "<dark_red>Signore della Breccia</dark_red>"
+showName: true
+boss: true
+packId: cittaexp_defense_v3
+arc: breach
+pools:
+  - defense
+  - boss
+themes:
+  - breach
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 280.0
+  GENERIC_ATTACK_DAMAGE: 16.0
+  GENERIC_MOVEMENT_SPEED: 0.33
+equipment:
+  helmet: GOLDEN_HELMET
+  chestplate: DIAMOND_CHESTPLATE
+  leggings: DIAMOND_LEGGINGS
+  boots: GOLDEN_BOOTS
+  mainHand: GOLDEN_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - breach
+  - boss
+mainAbilities:
+  - defense_guardian_sunder
+  - defense_breach_slam
+secondaryAbilities:
+  - defense_royal_barrage
+passiveAbilities:
+  - defense_spawn_presence
+traits: []
+variants:
+  - variant_scorched
+  - variant_royal
+  - variant_breach_plated
+bossbar:
+  enabled: true
+  title: "<dark_red><bold>{boss}</bold></dark_red> <gray>•</gray> <gold>{phase}</gold>"
+  color: RED
+  overlay: PROGRESS
+localBroadcasts:
+  spawn: "<dark_red>❖ Il Signore della Breccia conduce l'assalto sotto le mura.</dark_red>"
+  phase: "<gold>❖ Il Signore della Breccia muta linea d'urto e apre il varco.</gold>"
+  defeat: "<green>❖ Il Signore della Breccia cade tra pietra spaccata e ferri del fronte.</green>"
+phaseBindings:
+  - phase: 1
+    id: breachlord_phase_i
+    label: Fronte Rosso
+    hpBelow: 1.0
+    addAbilities: []
+    removeAbilities: []
+    entryActions:
+      - type: particles
+        particle: CRIT
+        count: 24
+  - phase: 2
+    id: breachlord_phase_ii
+    label: Varco Aperto
+    hpBelow: 0.66
+    addAbilities:
+      - defense_breach_reinforce
+    removeAbilities: []
+    namePrefix: "<red>Fendente</red>"
+    entryActions:
+      - type: sound
+        sound: ENTITY_PIGLIN_BRUTE_ANGRY
+        volume: 1.3
+        pitch: 0.9
+  - phase: 3
+    id: breachlord_phase_iii
+    label: Cuore delle Mura
+    hpBelow: 0.33
+    addAbilities:
+      - defense_final_pulse
+      - defense_phase_rally
+    removeAbilities: []
+    nameSuffix: "<dark_red>del Varco</dark_red>"
+    entryActions:
+      - type: particles
+        particle: EXPLOSION
+        count: 12

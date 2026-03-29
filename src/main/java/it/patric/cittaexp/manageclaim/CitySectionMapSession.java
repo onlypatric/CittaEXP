@@ -4,6 +4,20 @@ import java.util.UUID;
 
 public final class CitySectionMapSession {
 
+    public enum MapMode {
+        CLAIM,
+        TYPE,
+        INFO;
+
+        public MapMode next() {
+            return switch (this) {
+                case CLAIM -> TYPE;
+                case TYPE -> INFO;
+                case INFO -> CLAIM;
+            };
+        }
+    }
+
     private final UUID sessionId;
     private final UUID viewerId;
     private final int townId;
@@ -11,6 +25,8 @@ public final class CitySectionMapSession {
     private final String worldName;
     private int centerChunkX;
     private int centerChunkZ;
+    private MapMode mode;
+    private boolean claimBorderViewEnabled;
 
     public CitySectionMapSession(
             UUID sessionId,
@@ -28,6 +44,8 @@ public final class CitySectionMapSession {
         this.worldName = worldName;
         this.centerChunkX = centerChunkX;
         this.centerChunkZ = centerChunkZ;
+        this.mode = MapMode.CLAIM;
+        this.claimBorderViewEnabled = false;
     }
 
     public UUID sessionId() {
@@ -66,5 +84,21 @@ public final class CitySectionMapSession {
     public void centerTo(int chunkX, int chunkZ) {
         this.centerChunkX = chunkX;
         this.centerChunkZ = chunkZ;
+    }
+
+    public MapMode mode() {
+        return mode;
+    }
+
+    public void mode(MapMode mode) {
+        this.mode = mode == null ? MapMode.CLAIM : mode;
+    }
+
+    public boolean claimBorderViewEnabled() {
+        return claimBorderViewEnabled;
+    }
+
+    public void claimBorderViewEnabled(boolean claimBorderViewEnabled) {
+        this.claimBorderViewEnabled = claimBorderViewEnabled;
     }
 }

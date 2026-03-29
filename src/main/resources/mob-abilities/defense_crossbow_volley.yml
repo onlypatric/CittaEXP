@@ -1,0 +1,23 @@
+id: defense_crossbow_volley
+trigger: ON_TARGET
+cooldownTicks: 80
+targeting:
+  type: CURRENT_TARGET
+conditions:
+  - type: targetExists
+actions:
+  - type: sound
+    sound: ITEM_CROSSBOW_LOADING_END
+    volume: 1.0
+    pitch: 1.0
+  - type: launchProjectile
+    particle: CRIT
+    particleCount: 1
+    speed: 1.8
+    range: 18.0
+    hitboxRadius: 1.1
+    count: 1
+    spread: 0.08
+    hitActions:
+      - type: directDamage
+        amount: 4.0

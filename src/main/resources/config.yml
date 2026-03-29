@@ -1,89 +1,96 @@
 city:
   create:
+    cost: 2000.0
     dialog:
       intro:
-        title: "<gold>Creazione Citta</gold>"
-        body: "<gray>Benvenuto nella creazione citta.<newline></newline>Clicca <green>Prossimo</green> per inserire nome e tag.</gray>"
+        title: "<gold>Crea una Citta</gold>"
+        body: "<gray>Creando una citta inizierai a costruire un posto tutto tuo, da far crescere insieme agli altri tra territori, obiettivi e difesa.</gray><newline><newline><gray>Con il tempo vedrai la tua citta sbloccarsi, allargarsi e affrontare sfide sempre piu grandi.</gray><newline><newline><gray>Costo di creazione:</gray> <gold>{cost}</gold><newline><white>Clicca Continua per scegliere nome e tag.</white>"
         buttons:
           cancel: "<red>Annulla</red>"
-          next: "<green>Prossimo</green>"
+          next: "<green>Continua</green>"
       form:
-        title: "<gold>Dati Citta</gold>"
-        body: "<gray>Inserisci il nome della citta (solo alfanumerico) e un tag di 3 lettere.</gray>"
+        title: "<gold>Nome e Tag</gold>"
+        body: "<gray>Scegli il nome e il tag della tua citta.</gray><newline><newline><gray>Nome:</gray> <white>solo lettere e numeri, senza spazi.</white><newline><gray>Tag:</gray> <white>3 lettere per riconoscere la tua citta.</white><newline><newline><gray>Costo:</gray> <gold>{cost}</gold>"
         inputs:
-          name: "<yellow>Nome citta</yellow>"
-          tag: "<yellow>Tag (3 lettere)</yellow>"
+          name: "<yellow>Nome della Citta</yellow>"
+          tag: "<yellow>Tag a 3 Lettere</yellow>"
         buttons:
           cancel: "<red>Annulla</red>"
-          next: "<green>Prossimo</green>"
+          next: "<green>Crea la Citta</green>"
         errors:
-          name_required: "<red>Il nome citta deve contenere solo caratteri alfanumerici (senza spazi).</red>"
-          tag_invalid: "<red>Il tag deve contenere esattamente 3 lettere (A-Z).</red>"
-        create_in_progress: "<gray>Creazione citta in corso...</gray>"
-        create_success: "<green>Citta creata:</green> <yellow>{name}</yellow> <gray>(id: {id})</gray>"
-        create_failed: "<red>Creazione citta fallita:</red> <gray>{error}</gray>"
-        success: "<green>Dati validi:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray>"
+          name_required: "<red>Il nome deve contenere solo lettere e numeri, senza spazi.</red>"
+          tag_invalid: "<red>Il tag deve avere esattamente 3 lettere (A-Z).</red>"
+          economy_unavailable: "<red>L'economia non e disponibile in questo momento.</red>"
+          insufficient_funds: "<red>Non hai abbastanza soldi.</red> <gray>Ti servono {cost} per creare la citta.</gray>"
+          withdraw_failed: "<red>Non sono riuscito a togliere {cost} dal tuo saldo.</red>"
+          refund_failed: "<red>La citta non e stata creata e il rimborso automatico di {cost} non e riuscito.</red> <gray>Chiama lo staff.</gray>"
+        create_in_progress: "<gray>Sto creando la citta...</gray>"
+        create_success: "<green>Citta creata:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray> <gray>| ID:</gray> <white>{id}</white> <gray>| Costo:</gray> <white>{cost}</white>"
+        create_failed: "<red>Creazione fallita:</red> <gray>{error}</gray>"
+        success: "<green>Nome e tag salvati:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray>"
   disband:
     dialog:
-      title: "<red>Elimina Citta</red>"
-      body: "<gray>Conferma di voler eliminare la tua citta. Questa azione e irreversibile.</gray>"
+      title: "<red>Elimina la Citta</red>"
+      body: "<gray>Se confermi, la tua citta verra eliminata per sempre.</gray><newline><newline><red>Questa azione non si puo annullare.</red>"
       inputs:
         confirm: "<yellow>Confermo di voler eliminare definitivamente la mia citta</yellow>"
       buttons:
-        confirm: "<red>CONFERMA</red>"
-        cancel: "<gray>ANNULLA</gray>"
-      in_progress: "<gray>Richiesta eliminazione citta in corso...</gray>"
-      dispatch_failed: "<red>Impossibile eseguire la richiesta di eliminazione adesso.</red>"
+        confirm: "<red>Elimina la Citta</red>"
+        cancel: "<gray>Annulla</gray>"
+      in_progress: "<gray>Sto eliminando la citta...</gray>"
+      dispatch_failed: "<red>Non riesco a eliminare la citta in questo momento.</red>"
       errors:
         unavailable: "<red>Dialog non disponibile su questo server.</red>"
         no_town: "<red>Devi essere membro attivo di una citta.</red>"
-        no_privilege: "<red>Solo il capo citta puo eliminare la citta.</red>"
-        checkbox_required: "<red>Devi spuntare la conferma prima di procedere.</red>"
+        no_privilege: "<red>Solo il Capo puo eliminare la citta.</red>"
+        checkbox_required: "<red>Devi confermare prima di continuare.</red>"
   section:
     gui:
-      title: "<gold>Mappa Claim</gold> <gray>{town}</gray> <dark_gray>[</dark_gray><white>{x}</white><gray>,</gray><white>{z}</white><dark_gray>]</dark_gray>"
+      title: "<gold>Mappa Territori</gold> <gray>{town}</gray> <dark_gray>[</dark_gray><white>{x}</white><gray>,</gray><white>{z}</white><dark_gray>]</dark_gray>"
       nav:
         up: "<yellow>Su</yellow>"
         down: "<yellow>Giu</yellow>"
         left: "<yellow>Sinistra</yellow>"
         right: "<yellow>Destra</yellow>"
-        center: "<aqua>Centra su di te</aqua>"
+        center: "<aqua>Visualizza bordi claim</aqua>"
         close: "<red>Chiudi</red>"
       legend:
-        own: "<green>Tuo claim</green>"
-        wilderness: "<gray>Wilderness claimabile</gray>"
-        blocked: "<red>Bloccato/altrui</red>"
+        own: "<green>Claim della tua citta</green>"
+        wilderness: "<gray>Chunk libero</gray>"
+        blocked: "<red>Bloccato</red>"
       cell:
-        name: "<white>Chunk</white> <yellow>{x}</yellow><gray>,</gray><yellow>{z}</yellow>"
+        name: "<white>Settore</white> <yellow>{x}</yellow><gray>,</gray><yellow>{z}</yellow>"
         lore:
           state: "<gray>Stato:</gray> <white>{state}</white>"
-          owner: "<gray>Owner:</gray> <white>{owner}</white>"
+          owner: "<gray>Proprietario:</gray> <white>{owner}</white>"
           type: "<gray>Tipo:</gray> <white>{type}</white>"
-          reason: "<gray>Reason:</gray> <white>{reason}</white>"
-          actions: "<dark_gray>LMB: claim/unclaim | RMB: edit type</dark_gray>"
+          reason: "<gray>Dettaglio:</gray> <white>{reason}</white>"
+          actions: "<dark_gray>LMB: claim/unclaim | RMB: cambia tipo di terreno</dark_gray>"
       actions:
-        claim_success: "<green>Claim richiesto su chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
+        claim_success: "<green>Claim fatto sul chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
         claim_failed: "<red>Claim fallito:</red> <gray>{reason}</gray>"
-        unclaim_success: "<green>Unclaim richiesto su chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
+        unclaim_success: "<green>Claim rimosso dal chunk</green> <white>{x}</white><gray>,</gray><white>{z}</white><green>.</green>"
         unclaim_failed: "<red>Unclaim fallito:</red> <gray>{reason}</gray>"
-        edit_success: "<green>Tipo claim aggiornato a:</green> <yellow>{type}</yellow> <gray>({x},{z})</gray>"
-        edit_failed: "<red>Modifica claim fallita:</red> <gray>{reason}</gray>"
+        edit_success: "<green>Tipo di terreno aggiornato:</green> <yellow>{type}</yellow> <gray>({x},{z})</gray>"
+        edit_failed: "<red>Modifica fallita:</red> <gray>{reason}</gray>"
+        border_view_enabled: "<yellow>Ho mostrato nel mondo i bordi dei claim visibili in mappa.</yellow>"
+        border_view_disabled: "<gray>Ho nascosto i bordi dei claim.</gray>"
       errors:
         no_town: "<red>Devi essere membro attivo di una citta.</red>"
         world_unavailable: "<red>Mondo non disponibile per la mappa claim.</red>"
-        huskclaims_blocked: "<red>Chunk bloccato: area protetta da HuskClaims.</red>"
-        claimed_other: "<red>Chunk gia claimato da:</red> <yellow>{owner}</yellow>"
-        no_claim_privilege: "<red>Permessi insufficienti per claimare chunk.</red>"
-        no_unclaim_privilege: "<red>Permessi insufficienti per rimuovere claim.</red>"
-        no_edit_privilege: "<red>Permessi insufficienti per modificare il tipo claim.</red>"
-        claim_cap_reached: "<red>Limite claim raggiunto per il tuo stage corrente.</red>"
-        no_adjacent_claim: "<red>Puoi claimare solo chunk adiacenti ai claim gia presenti (tranne il primo claim).</red>"
-        operation_denied: "<red>Non puoi operare su questo chunk secondo le policy attive.</red>"
-        out_of_range: "<red>Chunk troppo distante. Max {range} chunk.</red>"
-        edit_not_allowed: "<red>Puoi modificare il tipo solo sui claim della tua citta.</red>"
-        spawn_claim_protected: "<red>Non puoi rimuovere il claim che contiene lo spawn citta.</red>"
+        huskclaims_blocked: "<red>Settore bloccato.</red>"
+        claimed_other: "<red>Questo chunk appartiene gia a:</red> <yellow>{owner}</yellow>"
+        no_claim_privilege: "<red>Non puoi fare claim qui.</red>"
+        no_unclaim_privilege: "<red>Non puoi rimuovere questo claim.</red>"
+        no_edit_privilege: "<red>Non puoi cambiare il tipo di questo terreno.</red>"
+        claim_cap_reached: "<red>Hai raggiunto il limite claim del tuo livello attuale.</red>"
+        no_adjacent_claim: "<red>Puoi claimare solo chunk attaccati a quelli della tua citta.</red>"
+        operation_denied: "<red>Settore bloccato.</red>"
+        out_of_range: "<red>Settore troppo distante. Max {range} settori.</red>"
+        edit_not_allowed: "<red>Puoi cambiare il tipo di terreno solo nei claim della tua citta.</red>"
+        spawn_claim_protected: "<red>Non puoi rimuovere il claim dove si trova il warp della citta.</red>"
         claim_missing_runtime: "<red>Claim non trovato o non appartenente alla tua citta.</red>"
-        generic: "<red>Operazione non disponibile su chunk {x},{z} ({reason}).</red>"
+        generic: "<red>Operazione non disponibile sul chunk {x},{z} ({reason}).</red>"
   huskclaims:
     guard:
       deny_on_guard_error: true
@@ -91,34 +98,65 @@ city:
         blocked: "<red>Claim bloccato: area gestita da una citta.</red> <gray>Usa i flussi /city per i territori citta.</gray>"
         error: "<red>Operazione claim bloccata temporaneamente per sicurezza. Riprova tra poco.</red>"
       probe:
-        summary: "[CittaEXP] huskclaims_guard: mode={mode}, hookEnabled={hookEnabled}, reason={reason}"
-        fallback_stats: "[CittaEXP] huskclaims_guard(fallback): cancelled={cancelled}, errors={errors}, lastError={lastError}"
+        summary: "[CittaEXP] confine_guard: mode={mode}, hookEnabled={hookEnabled}, reason={reason}"
+        fallback_stats: "[CittaEXP] confine_guard(fallback): cancelled={cancelled}, errors={errors}, lastError={lastError}"
+  challenges:
+    progress_bossbar:
+      title: "<gold>Sfida:</gold> <white>{challenge}</white> <gray>|</gray> <yellow>{objective}</yellow> <gray>{progress}/{target} ({percent}%)</gray>"
+    anti_abuse:
+      reason_labels:
+        abuse_block-placed: "blocco-piazzato"
+        abuse_mob-spawn-reason: "spawn-mob-negato"
+        abuse_player-throttle: "throttle-player"
+        abuse_player-cap-reached: "cap-player"
+        abuse_town-daily-cap: "cap-citta-giornaliero"
+        abuse_player-afk: "player-afk"
+        abuse_invalid-context: "contesto-non-valido"
+        abuse_dedupe-context: "dedupe-contesto"
+        abuse_suspicion-warning: "sospetto-warning"
+        abuse_suspicion-clamp: "sospetto-clamp"
+        abuse_suspicion-review: "sospetto-review"
+        template_invalid-randomrange: "template-randomrange-non-valido"
+        template_range-out-of-bounds: "template-randomrange-fuori-range"
+        template_invalid-difficulty-context: "template-contesto-difficolta-non-valido"
+    reward_command_descriptions:
+      challenge_complete_broadcast: "Annuncio globale completamento sfida."
+      race_winner_broadcast: "Annuncio globale vittoria race."
+      event_top_1_broadcast: "Annuncio podio evento mensile (Top 1)."
+      event_top_2_broadcast: "Annuncio podio evento mensile (Top 2)."
+      event_top_3_broadcast: "Annuncio podio evento mensile (Top 3)."
+      event_threshold_broadcast: "Annuncio superamento soglia evento mensile."
   list:
     gui:
-      title: "<gold>Lista Citta</gold>"
+      title: "<gold>Lista citta</gold>"
+      itemsadder:
+        font_image_id: "cittaexp_gui:city_list_9x6"
+        title_plain: "Lista citta"
+        title_offset: 0
+        texture_offset: -8
       nav:
         prev: "<yellow>Pagina precedente</yellow>"
-        prev_disabled: "<gray>Pagina precedente</gray>"
+        prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
         next: "<yellow>Pagina successiva</yellow>"
-        next_disabled: "<gray>Pagina successiva</gray>"
+        next_disabled: "<gray>Pagina successiva non disponibile</gray>"
         page: "<gold>Pagina {current}/{total}</gold>"
         count: "<gray>Citta:</gray> <white>{count}</white>"
-        sort: "<gray>Sort:</gray> <white>{sort}</white>"
+        sort: "<gray>Ordina per:</gray> <white>{sort}</white>"
         close: "<red>Chiudi</red>"
       sort:
-        title: "<gold>Ordina per:</gold> <white>{sort}</white>"
-        hint: "<gray>Clicca per cambiare ordinamento.</gray>"
+        title: "<gold>Ordina lista citta</gold> <white>{sort}</white>"
+        hint: "<gray>➜ Clicca per cambiare l'ordine della lista.</gray>"
         labels:
-          xp_custom: "XP Custom"
-          tier: "Tier"
-          money: "Money"
-          founded: "Founded"
-          members: "Members"
+          xp_custom: "XP citta"
+          tier: "Livello base"
+          money: "Saldo citta"
+          founded: "Fondazione"
+          members: "Membri"
       entry:
         display_prefix: "<bold>{name}</bold> <gray>|</gray>"
         lore:
-          custom_level: "<gray>Livello XP:</gray> <white>{level}</white> <gray>(XP {xp})</gray> <gray>| Stage:</gray> <yellow>{stage}</yellow>"
-          tier: "<gray>Tier HuskTowns:</gray> <white>{tier}</white>"
+          custom_level: "<gray>Livello citta:</gray> <white>{level}</white> <gray>(XP {xp})</gray> <gray>| Stage:</gray> <yellow>{stage}</yellow>"
+          tier: "<gray>Livello base:</gray> <white>{tier}</white>"
           members: "<gray>Membri:</gray> <white>{current}/{max}</white> <gray>| Capo:</gray> <white>{leader}</white>"
           claims: "<gray>Claim:</gray> <white>{current}/{max}</white>"
           money: "<gray>Bilancio:</gray> <white>{money}</white>"
@@ -126,12 +164,11 @@ city:
           warp_status:
             available: "<green>Warp:</green> <white>Disponibile</white>"
             no_spawn: "<gold>Warp:</gold> <gray>Non impostato</gray>"
-            private_spawn: "<red>Warp:</red> <gray>Privato</gray>"
-          click: "<green>Clicca per teletrasportarti al warp della citta.</green>"
+          click: "<green>➜ LMB per usare il warp della citta.</green>"
+          click_sort: "<yellow>➜ RMB per cambiare l'ordine della lista.</yellow>"
       actions:
         warp_denied_no_spawn: "<red>Questa citta non ha ancora un warp impostato.</red>"
-        warp_denied_private: "<red>Il warp di questa citta e privato.</red>"
-        warp_failed: "<red>Teleport non riuscito:</red> <gray>{reason}</gray>"
+        warp_failed: "<red>Warp non riuscito:</red> <gray>{reason}</gray>"
   players:
     gui:
       loading: "<gray>Caricamento membri citta in corso...</gray>"
@@ -145,32 +182,36 @@ city:
         username_unresolved: "<red>Impossibile risolvere il nome utente del target.</red>"
         session_expired: "<red>Sessione GUI scaduta. Riapri /city.</red>"
       list:
-        title: "<gold>Membri Citta</gold> <gray>{town}</gray>"
-        actions: "<gold>Azioni</gold>"
+        title: "<gold>Membri della citta</gold> <gray>{town}</gray>"
+        actions: "<gold>Gestione citta</gold>"
+        progression: "<gold>Livelli citta</gold>"
+        relations: "<aqua>Diplomazia (sola lettura)</aqua>"
       city_actions:
-        title: "<gold>Azioni Citta</gold> <gray>{town}</gray>"
-        bank: "<gold>Banca Citta</gold>"
-        leave: "<red>Abbandona citta</red>"
-        town_list: "<aqua>Lista Citta</aqua>"
-        section: "<aqua>Gestione territori</aqua>"
-        claim_settings: "<aqua>Impostazioni claim</aqua>"
+        title: "<gold>Gestione citta</gold> <gray>{town}</gray>"
+        relations: "<aqua>Diplomazia</aqua>"
+        bank: "<gold>Banca citta</gold>"
+        item_vault: "<gold>Vault citta</gold>"
+        leave: "<red>Lascia la citta</red>"
+        town_list: "<aqua>Lista citta</aqua>"
+        section: "<aqua>Mappa territori</aqua>"
+        claim_settings: "<aqua>Impostazioni territori</aqua>"
         edit: "<yellow>Modifica citta</yellow>"
-        disband: "<red>Elimina citta</red>"
-        privacy_public: "<green>Privacy warp: public</green>"
-        privacy_private: "<gold>Privacy warp: private</gold>"
-        privacy_locked: "<gray>Privacy warp bloccata su public da</gray> <yellow>{stage}</yellow>"
-        privacy_no_spawn: "<gray>Privacy warp (spawn non impostato)</gray>"
+        disband: "<red>Sciogli la citta</red>"
+        privacy_public: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_private: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_locked: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_no_spawn: "<gray>Il varco non e ancora inciso nel territorio.</gray>"
         back: "<yellow>Indietro</yellow>"
         close: "<red>Chiudi</red>"
       claim_settings:
-        title: "<gold>Impostazioni claim</gold> <gray>{town}</gray>"
-        claim: "<white>Impostazioni CLAIM</white>"
-        farm: "<green>Impostazioni FARM</green>"
-        plot: "<aqua>Impostazioni PLOT</aqua>"
-        privacy_public: "<green>Privacy warp: public</green>"
-        privacy_private: "<gold>Privacy warp: private</gold>"
-        privacy_locked: "<gray>Privacy warp bloccata su public da</gray> <yellow>{stage}</yellow>"
-        privacy_no_spawn: "<gray>Privacy warp (spawn non impostato)</gray>"
+        title: "<gold>Impostazioni territori</gold> <gray>{town}</gray>"
+        claim: "<white>Regole area principale</white>"
+        farm: "<green>Regole area agricola</green>"
+        plot: "<aqua>Regole lotti</aqua>"
+        privacy_public: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_private: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_locked: "<green>Varco cittadino sempre aperto al regno</green>"
+        privacy_no_spawn: "<gray>Il varco non e ancora inciso nel territorio.</gray>"
         back: "<yellow>Indietro</yellow>"
         close: "<red>Chiudi</red>"
         actions:
@@ -179,117 +220,444 @@ city:
         errors:
           no_town: "<red>Devi essere membro attivo di una citta.</red>"
           no_permission: "<red>Non hai i permessi per modificare le regole claim.</red>"
-          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+          staff_forbidden: "<red>Questo sigillo non puo essere mosso in visuale staff.</red>"
+      inactivity_cleanup:
+        enabled: true
+        max_offline_days: 30
       bank:
-        title: "<gold>Banca Citta</gold> <gray>{town}</gray>"
-        deposit: "<green>Deposita</green>"
-        deposit_locked: "<gray>Deposita (permesso mancante)</gray>"
-        withdraw: "<gold>Preleva</gold>"
-        withdraw_locked: "<gray>Preleva (permesso mancante)</gray>"
-        back: "<yellow>Indietro</yellow>"
-        close: "<red>Chiudi</red>"
+        title: "<gold>Banca della Citta</gold> <gray>{town}</gray>"
+        deposit: "<green>Deposita soldi</green>"
+        deposit_locked: "<gray>Deposita soldi (permesso mancante)</gray>"
+        deposit_10k: "<green>Versa 10K al Saldo citta</green>"
+        deposit_10k_locked: "<gray>Deposita 10K (permesso mancante)</gray>"
+        deposit_1k: "<green>Versa 1K al Saldo citta</green>"
+        deposit_1k_locked: "<gray>Deposita 1K (permesso mancante)</gray>"
+        withdraw: "<gold>Preleva soldi</gold>"
+        withdraw_locked: "<gray>Preleva soldi (permesso mancante)</gray>"
+        withdraw_10k: "<gold>Preleva 10K</gold>"
+        withdraw_10k_locked: "<gray>Preleva 10K (permesso mancante)</gray>"
+        withdraw_1k: "<gold>Preleva 1K</gold>"
+        withdraw_1k_locked: "<gray>Preleva 1K (permesso mancante)</gray>"
+        vault: "<gold>Apri il Vault Oggetti</gold>"
+        vault_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Qui trovi oggetti, materiali e premi della citta.</gray>"
+          - "<green>➜ Clicca per aprire il vault oggetti.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        help: "<aqua>Aiuto banca</aqua>"
+        help_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Spiega deposito, prelievo rapido e vault oggetti.</gray>"
+          - "<green>➜ Clicca per aprire l'aiuto.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        back: "<yellow>Torna alla HUB</yellow>"
         balance:
-          title: "<gold>Bilancio Citta</gold>"
-          value: "<gray>Saldo:</gray> <white>{amount}</white>"
+          title: "<gold>Saldo Citta</gold>"
+          value: "<gray>Saldo attuale:</gray> <white>{amount}</white>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:deposito_banca_vault_9x5"
+          title_plain: "Banca della Citta"
+          title_offset: 0
+          texture_offset: -8
         errors:
-          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+          staff_forbidden: "<red>Questo movimento del tesoro non puo essere firmato in visuale staff.</red>"
           no_permission_deposit: "<red>Non hai i permessi per depositare nella banca citta.</red>"
           no_permission_withdraw: "<red>Non hai i permessi per prelevare dalla banca citta.</red>"
       privacy:
-        toggle_success: "<green>Privacy warp aggiornata:</green> <white>{value}</white>"
+        toggle_success: "<green>Impostazione warp aggiornata:</green> <white>{value}</white>"
         errors:
-          staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+          staff_forbidden: "<red>Questa impostazione non si puo cambiare in visuale staff.</red>"
           no-town: "<red>Devi essere membro attivo di una citta.</red>"
-          town-spawn-required: "<red>Imposta prima il warp citta con /city setwarp.</red>"
-          no-privacy-permission: "<red>Non hai i permessi per modificare la privacy del warp.</red>"
-          privacy-policy-locked: "<red>Da BORGO II in poi la privacy warp e forzata su public.</red>"
-          town-update-failed: "<red>Aggiornamento privacy fallito. Riprova tra poco.</red>"
-          default: "<red>Aggiornamento privacy non riuscito:</red> <gray>{reason}</gray>"
+          town-spawn-required: "<red>Imposta prima il warp con /city setwarp.</red>"
+          no-privacy-permission: "<red>Non hai il permesso per cambiare il warp della citta.</red>"
+          privacy-policy-locked: "<red>Da BORGO II in poi il warp della citta e sempre pubblico.</red>"
+          town-update-failed: "<red>Non riesco ad aggiornare il warp della citta adesso.</red>"
+          default: "<red>Aggiornamento warp fallito:</red> <gray>{reason}</gray>"
+      relations:
+        title: "<gold>Diplomazia</gold> <gray>{town}</gray>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:diplomazia_9x6"
+          title_plain: "Diplomazia"
+          title_offset: 0
+          texture_offset: -8
+        empty: "<gray>Non ci sono altre citta da mostrare.</gray>"
+        labels:
+          ally: "ALLEATA"
+          enemy: "OSTILE"
+          neutral: "NEUTRA"
+        entry:
+          title_prefix: "<bold>{town}</bold> <gray>|</gray>"
+          current: "<gray>Il tuo rapporto con loro:</gray> <white>{current_relation}</white>"
+          reciprocal: "<gray>Il loro rapporto con voi:</gray> <white>{reciprocal_relation}</white>"
+          click_set: "<green>➜ Clicca per cambiare il rapporto diplomatico.</green>"
+          click_readonly: "<gray>In visuale staff questa schermata e sola lettura.</gray>"
+        nav:
+          prev: "<yellow>Pagina precedente</yellow>"
+          prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+          next: "<yellow>Pagina successiva</yellow>"
+          next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+          page: "<gold>Pagina {current}/{total}</gold>"
+          count: "<gray>Citta:</gray> <white>{count}</white>"
+          mode_member: "<gray>Puoi vedere e cambiare i rapporti della tua citta.</gray>"
+          mode_staff: "<gray>Stai guardando la diplomazia in sola lettura.</gray>"
+          back: "<yellow>Indietro</yellow>"
+          close: "<red>Chiudi</red>"
+        actions:
+          set_success: "<green>Rapporto diplomatico aggiornato:</green> <white>{target_town}</white> <gray>→</gray> <yellow>{relation}</yellow>"
+        errors:
+          feature_disabled: "<red>La diplomazia e disattivata su questo server.</red>"
+          no_town: "<red>Devi essere in una citta per usare la diplomazia.</red>"
+          no_permission: "<red>Non hai il permesso per cambiare i rapporti diplomatici.</red>"
+          read_only_staff: "<red>In visuale staff la diplomazia e sola lettura.</red>"
+          set_failed: "<red>Non riesco a cambiare il rapporto diplomatico adesso.</red>"
+      levels:
+        title: "<gold>Livelli Citta</gold> <gray>{town}</gray>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:livelli_9x6"
+          title_plain: "Livelli Citta"
+          title_offset: 0
+          texture_offset: -8
+        nav:
+          prev: "<yellow>Pagina precedente</yellow>"
+          prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+          next: "<yellow>Pagina successiva</yellow>"
+          next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+          page: "<gold>Pagina {current}/{total}</gold>"
+          back: "<yellow>Indietro</yellow>"
+          close: "<red>Chiudi</red>"
+          summary_1: "<gray>Livello:</gray> <white>{level}</white> <gray>| XP:</gray> <white>{xp}</white>"
+          summary_2: "<gray>Stage:</gray> <yellow>{stage}</yellow> <gray>| Limiti:</gray> <white>{claims}/{members}/{spawners}</white>"
+        entry:
+          title_current: "<gold>Livello {level} (attuale)</gold>"
+          title_unlocked: "<green>Livello {level}</green>"
+          title_locked: "<gray>Livello {level}</gray>"
+          required_xp: "<gray>Potere richiesto:</gray> <white>{xp}</white>"
+          stage: "<gray>Stage:</gray> <yellow>{stage}</yellow>"
+          caps: "<gray>Limiti:</gray> <white>{claims}</white> claim, <white>{members}</white> membri, <white>{spawners}</white> spawner"
+          checkpoint: "<gold>Nuovo stage:</gold> <yellow>{stage}</yellow>"
+          upgrade_cost: "<gray>Saldo richiesto:</gray> <white>{required_balance}</white> <gray>| Costo upgrade:</gray> <white>{upgrade_cost}</white>"
+          required_defense_tier: "<gray>Requisito invasione:</gray> <white>completare {tier}</white>"
+          required_defense_tier_done: "<green>Requisito invasione completato.</green>"
+          required_defense_tier_missing: "<gray>Completa prima questa invasione per salire.</gray>"
+          spawn_required: "<gray>Requisito:</gray> <white>warp citta gia impostato</white> <gray>(/city setwarp)</gray>"
+          request_status: "<gray>Stato richiesta:</gray> <white>{status}</white>"
+          request_note: "<gray>Nota staff:</gray> <white>{note}</white>"
+          regno_extra: "<aqua>Bonus:</aqua> <white>+1 claim</white>"
+          action_upgrade: "<green>➜ Clicca per provare a salire di stage.</green>"
+          action_request: "<green>➜ Clicca per mandare la richiesta allo staff.</green>"
+          action_not_available: "<gray>Questo livello non e ancora disponibile.</gray>"
+        actions:
+          not_actionable: "<gray>Questa pagina e solo informativa.</gray>"
+          upgrade_success: "<green>La citta e salita a:</green> <yellow>{stage}</yellow>"
+          upgrade_failed: "<red>Upgrade fallito:</red> <gray>{reason}</gray>"
+          request_success: "<green>Richiesta staff inviata:</green> <yellow>#{id}</yellow> <gray>per</gray> <white>{stage}</white>"
+          request_failed: "<red>Non riesco a inviare la richiesta staff:</red> <gray>{reason}</gray>"
+        errors:
+          staff_readonly: "<red>La schermata livelli si apre solo per la tua citta.</red>"
+      challenges:
+        title: "<gold>Sfide Citta</gold> <gray>{town}</gray>"
+        notifications:
+          completed:
+            title: "<green><bold>SFIDA COMPLETATA</bold></green>"
+            subtitle: "<yellow>{challenge}</yellow>"
+          race_completed:
+            title: "<gold><bold>RACE VINTA</bold></gold>"
+            subtitle: "<yellow>{challenge}</yellow>"
+        nav:
+          prev: "<yellow>Pagina precedente</yellow>"
+          prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+          next: "<yellow>Pagina successiva</yellow>"
+          next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+          page: "<gold>Pagina {current}/{total}</gold>"
+          count: "<gray>Sfide attive:</gray> <white>{count}</white>"
+          back: "<yellow>Indietro</yellow>"
+          close: "<red>Chiudi</red>"
+        tab_hint:
+          weekly_first: "<gray>Dono del primo compimento:</gray> <white>{status}</white>"
+        entry:
+          title: "<gradient:#8EC5FC:#E0C3FC><bold>{cycle}</bold></gradient> <gray>|</gray> <white>{type}</white>"
+          objective: "<gray>┃</gray> <yellow>Obiettivo:</yellow> <white>{objective}</white>"
+          objective_line: "<gray>┃</gray> <white>{objective}</white>"
+          objective_description: "<gray>Cosa devi fare:</gray> <white>{description}</white>"
+          separator: "<dark_gray>┃ <strikethrough>------------------------------</strikethrough>"
+          progress_bar: "<gray>┃</gray> {bar} <white>{percent}%</white>"
+          progress_values: "<gray>┃</gray> <gray>{progress}</gray><dark_gray>/</dark_gray><gray>{target}</gray> <dark_gray>(</dark_gray><white>{remaining}</white><gray> mancanti</gray><dark_gray>)</dark_gray>"
+          cycle: "<gray>Ciclo:</gray> <white>{cycle}</white> <gray>| Key:</gray> <white>{cycle_key}</white>"
+          category: "<gray>Categoria:</gray> <white>{category}</white>"
+          progress: "<gray>Progresso:</gray> <white>{progress}/{target}</white>"
+          progress_meta: "<gray>Completamento:</gray> <white>{percent}%</white> <gray>| Mancano:</gray> <white>{remaining}</white>"
+          mode: "<gray>Tipo:</gray> <white>{mode}</white>"
+          winner: "<gray>Primo posto:</gray> <white>{winner}</white>"
+          status: "<gray>Stato:</gray> <white>{status}</white>"
+          remaining: "<gray>Tempo residuo:</gray> <white>{remaining}</white>"
+          rewards_header: "<gray>┃</gray> <gradient:#F6D365:#FDA085><bold>Ricompense</bold></gradient>"
+          reward_xp: "<gray>┃</gray> <aqua>-</aqua> <white>{xp} XP citta</white>"
+          reward_item: "<gray>┃</gray> <green>-</green> <white>{amount}x {item}</white>"
+          reward_command_count: "<gray>┃</gray> <gold>-</gold> <white>Bonus server: {count}</white>"
+          reward_command: "<gray>┃</gray> <gold>-</gold> <white>{description}</white>"
+          footer: "<dark_gray>┗━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>"
+        errors:
+          staff_readonly: "<red>Le sfide non si aprono in visuale staff.</red>"
+      progression:
+        title: "<gold>Progressione Citta</gold> <gray>{town}</gray>"
+        summary:
+          title: "<gold>Stato Citta</gold>"
+          level_xp: "<gray>Livello:</gray> <white>{level}</white> <gray>| XP:</gray> <white>{xp}</white>"
+          stage_caps: "<gray>Stage:</gray> <yellow>{stage}</yellow> <gray>| Caps:</gray> <white>{claims}/{members}/{spawners}</white>"
+        cycle:
+          title: "<gold>{cycle}</gold>"
+          progress: "<gray>Completate:</gray> <white>{completed}/{active}</white>"
+          total: "<gray>Totale:</gray> <white>{progress}/{target}</white>"
+          remaining: "<gray>Tempo residuo:</gray> <white>{remaining}</white>"
+        top:
+          title: "<gold>Primo Artefice {cycle}</gold>"
+          entry: "<gray>#{rank}</gray> <white>{player}</white> <gray>-</gray> <yellow>{value}</yellow>"
+          empty: "<gray>Nessun contributore registrato nel ciclo attivo.</gray>"
+        streak:
+          title: "<gold>Scia di Fedelta Settimanale</gold>"
+          current: "<gray>Scia attuale:</gray> <white>{count}</white>"
+          current_bonus: "<gray>Dono corrente:</gray> <white>{bonus}</white>"
+          next_bonus: "<gray>Dono successivo:</gray> <white>{bonus}</white>"
+        event:
+          title_active: "<gold>Evento Mensile</gold>"
+          title_inactive: "<gray>Evento Mensile (off)</gray>"
+          window: "<gray>Finestra:</gray> <white>{window}</white>"
+          challenge: "<gray>Sfida:</gray> <white>{challenge}</white>"
+          position: "<gray>Posizione:</gray> <white>{position}/{participants}</white>"
+          progress: "<gray>Progresso:</gray> <white>{progress}</white> <gray>| Leader:</gray> <white>{leader}</white>"
+          threshold: "<gray>Soglia:</gray> <white>{threshold}</white> <gray>| Stato:</gray> <white>{status}</white>"
+          remaining: "<gray>Tempo residuo:</gray> <white>{remaining}</white>"
+        challenge:
+          title: "<gradient:#8EC5FC:#E0C3FC><bold>{cycle}</bold></gradient> <gray>|</gray> <white>{type}</white>"
+          objective: "<gray>┃</gray> <yellow>Obiettivo:</yellow> <white>{objective}</white>"
+          objective_line: "<gray>┃</gray> <white>{objective}</white>"
+          objective_description: "<gray>Cosa fare:</gray> <white>{description}</white>"
+          progress: "<gray>Progresso:</gray> <white>{progress}/{target}</white>"
+          progress_meta: "<gray>┃</gray> {bar} <white>{percent}%</white>"
+          mode: "<gray>┃</gray> <gray>Tipo sfida:</gray> <white>{mode}</white>"
+          remaining: "<gray>┃</gray> <gray>Tempo residuo:</gray> <white>{remaining}</white>"
+          reward: "<gray>┃</gray> <gradient:#F6D365:#FDA085><bold>Bottino di Cronaca</bold></gradient>"
+          reward_xp: "<gray>┃</gray> <aqua>-</aqua> <white>{xp} XP</white>"
+          reward_item: "<gray>┃</gray> <green>-</green> <white>{amount}x {item}</white>"
+          reward_command_count: "<gray>┃</gray> <gold>-</gold> <white>Bonus server: {count}</white>"
+          reward_command: "<gray>┃</gray> <gold>-</gold> <white>{description}</white>"
+        actions:
+          levels: "<gold>Dettaglio Livelli</gold>"
+          challenges: "<gold>Dettaglio Sfide</gold>"
+          levels_staff: "<gray>Archivio delle Ascese (sola lettura)</gray>"
+          challenges_staff: "<gray>Cronache di Sfida (sola lettura)</gray>"
+        nav:
+          prev: "<yellow>Pagina precedente</yellow>"
+          prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+          next: "<yellow>Pagina successiva</yellow>"
+          next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+          page: "<gold>Pagina {current}/{total}</gold>"
+          count: "<gray>Sfide attive:</gray> <white>{count}</white>"
+          back: "<yellow>Indietro</yellow>"
+          close: "<red>Chiudi</red>"
+        errors:
+          staff_readonly: "<red>Questo sigillo non puo essere mosso in visuale staff.</red>"
+      vault:
+        loading: "<gray>Caricamento vault citta in corso...</gray>"
+        title: "<gold>Vault citta</gold> <gray>{town}</gray>"
+        nav:
+          prev: "<yellow>Pagina precedente</yellow>"
+          prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+          next: "<yellow>Pagina successiva</yellow>"
+          next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+          can_deposit: "<gray>✦ Diritto di deposito:</gray> <white>{value}</white>"
+          can_withdraw: "<gray>✦ Diritto di prelievo:</gray> <white>{value}</white>"
+          back: "<yellow>Torna alla banca citta</yellow>"
+          side_lore:
+            - "<dark_gray>╭────────────╮</dark_gray>"
+            - "<gray>Scorri le pagine del vault usando i pulsanti laterali.</gray>"
+            - "<dark_gray>╰────────────╯</dark_gray>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:vault_items_9x6"
+          title_plain: "Vault citta"
+          title_offset: 0
+          texture_offset: -8
+        actions:
+          deposit_success: "<green>Item depositato nel vault.</green>"
+          withdraw_success: "<green>Item prelevato dal vault.</green>"
+        errors:
+          staff_forbidden: "<red>Il vault citta non puo essere aperto in visuale staff.</red>"
+          load_failed: "<red>Il vault citta non e disponibile in questo momento.</red>"
+          inventory_full: "<red>Non hai spazio sufficiente nel tuo inventario. Nessun item e stato prelevato.</red>"
+          no_deposit: "<red>Non hai il permesso per depositare nel vault.</red>"
+          no_withdraw: "<red>Non hai il permesso per prelevare dal vault.</red>"
+          vault_full: "<red>Il vault e pieno. Nessun item e stato depositato.</red>"
+          deposit_failed: "<red>Deposito non riuscito.</red>"
+          withdraw_failed: "<red>Prelievo non riuscito.</red>"
       member:
         name: "<yellow>{name}</yellow> <gray>({role})</gray>"
         lore:
           status: "<gray>Stato:</gray> <white>{status}</white>"
           role: "<gray>Ruolo:</gray> <white>{role}</white>"
           last_seen: "<gray>Ultimo accesso:</gray> <white>{last_seen}</white>"
-          click: "<green>Clicca per gestire il membro</green>"
-          readonly: "<gray>Solo visualizzazione</gray>"
+          click: "<green>➜ Apri la scheda del membro.</green>"
+          readonly: "<gray>Scheda aperta in sola lettura.</gray>"
       nav:
         prev: "<yellow>Pagina precedente</yellow>"
-        prev_disabled: "<gray>Pagina precedente</gray>"
+        prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
         next: "<yellow>Pagina successiva</yellow>"
-        next_disabled: "<gray>Pagina successiva</gray>"
+        next_disabled: "<gray>Pagina successiva non disponibile</gray>"
         page: "<gold>Pagina {current}/{total}</gold>"
         count: "<gray>Membri:</gray> <white>{count}</white>"
       detail:
-        title: "<gold>Gestione Membro</gold> <gray>{name}</gray>"
+        title: "<gold>Scheda membro</gold> <gray>{name}</gray>"
         back: "<yellow>Indietro</yellow>"
         close: "<red>Chiudi</red>"
+        tabs:
+          overview: "<gold>Panoramica</gold>"
+          native: "<aqua>Cosa puo fare</aqua>"
+          plugin: "<light_purple>Permessi speciali</light_purple>"
         info:
           title: "<yellow>Dati membro</yellow>"
           name: "<gray>Nome:</gray> <white>{name}</white>"
           role: "<gray>Ruolo:</gray> <white>{role}</white>"
-          weight: "<gray>Peso ruolo:</gray> <white>{weight}</white>"
-          staff_mode: "<gold>Modalita staff target attiva</gold>"
+          weight: "<gray>Peso nella gerarchia:</gray> <white>{weight}</white>"
+          plugin_acl: "<gray>Permessi speciali:</gray> <white>{granted}/{total}</white>"
+          staff_mode: "<gold>Visuale staff attiva</gold>"
         status:
-          title: "<yellow>Stato</yellow>"
+          title: "<yellow>Stato membro</yellow>"
           value: "<gray>{status}</gray>"
+        native:
+          title: "<aqua>Cosa puo fare</aqua>"
+          role: "<gray>Ruolo:</gray> <white>{role}</white>"
+          entry: "<aqua>•</aqua> <white>{permission}</white>"
+          missing: "<red>Non riesco a leggere questo ruolo adesso.</red>"
+        plugin:
+          title: "<light_purple>Permessi speciali</light_purple>"
+          summary: "<gray>Permessi speciali:</gray> <white>{granted}/{total}</white>"
+          editable: "<green>Il capo puo cambiare questi permessi.</green>"
+          readonly: "<gray>Solo il capo puo cambiare questi permessi.</gray>"
+          permission_lore: "<gray>➜ Clicca per cambiare questo permesso.</gray>"
+          errors:
+            no_permission: "<red>Solo il capo puo cambiare questi permessi.</red>"
+            update_failed: "<red>Non riesco ad aggiornare questi permessi adesso.</red>"
         actions:
           promote: "<green>Promuovi</green>"
-          demote: "<gold>Demuovi</gold>"
-          evict: "<red>Espelli</red>"
-          transfer: "<yellow>Trasferisci capo</yellow>"
+          demote: "<gold>Abbassa grado</gold>"
+          evict: "<red>Rimuovi</red>"
+          transfer: "<yellow>Trasferisci citta</yellow>"
+          acl_deposit: "<gray>Deposito vault</gray>"
+          acl_withdraw: "<gray>Prelievo vault</gray>"
+        errors:
+          acl_update_failed: "<red>I permessi del vault non possono essere aggiornati ora.</red>"
       actions:
         success: "<green>Azione completata:</green> <yellow>{action}</yellow> <gray>su</gray> <white>{target}</white>"
         failed: "<red>Azione fallita:</red> <gray>{reason}</gray>"
         dispatch_failed: "<red>Azione non eseguita. Riprova tra poco.</red>"
-        leave_success: "<green>Hai abbandonato la citta con successo.</green>"
+        leave_success: "<green>Hai lasciato la citta.</green>"
         leave_dispatch_failed: "<red>Uscita non eseguita. Riprova tra poco.</red>"
-        leave_staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
-        disband_staff_forbidden: "<red>Questa azione non e disponibile in modalita staff.</red>"
+        leave_staff_forbidden: "<red>Non puoi lasciare la citta dalla visuale staff.</red>"
+        disband_staff_forbidden: "<red>L'atto di scioglimento non puo essere levato in visuale staff.</red>"
     dialog:
       confirm:
         title: "<red>Conferma azione</red>"
-        body: "<gray>Confermi l'azione <yellow>{action}</yellow> su <white>{target}</white>?</gray>"
+        body: "<gray>Vuoi davvero eseguire</gray> <yellow>{action}</yellow> <gray>su</gray> <white>{target}</white><gray>?</gray>"
         buttons:
-          confirm: "<red>CONFERMA</red>"
-          cancel: "<gray>ANNULLA</gray>"
+          confirm: "<red>Conferma azione</red>"
+          cancel: "<gray>Annulla</gray>"
         errors:
           unavailable: "<red>Dialog non disponibile su questo server.</red>"
       leave_confirm:
-        title: "<red>Conferma uscita</red>"
-        body: "<gray>Vuoi davvero abbandonare la citta?</gray>"
+        title: "<red>Lascia la citta</red>"
+        body: "<gray>Se confermi, non farai piu parte di questa citta.</gray><newline><gray>Potrai rientrare solo se riceverai un nuovo invito.</gray>"
         buttons:
-          confirm: "<red>Abbandona</red>"
+          confirm: "<red>Lascia la citta</red>"
+          cancel: "<gray>Annulla</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+      relations:
+        title: "<gold>Diplomazia</gold>"
+        body: "<gray>Citta selezionata:</gray> <white>{target_town}</white><newline><gray>Relazione attuale:</gray> <white>{current_relation}</white><newline><gray>Loro vi vedono come:</gray> <white>{reciprocal_relation}</white>"
+        buttons:
+          ally: "<green>Imposta alleanza</green>"
+          enemy: "<red>Imposta nemici</red>"
+          neutral: "<yellow>Imposta neutrale</yellow>"
           cancel: "<gray>Annulla</gray>"
         errors:
           unavailable: "<red>Dialog non disponibile su questo server.</red>"
       bank:
         buttons:
-          confirm: "<green>CONFERMA</green>"
-          cancel: "<gray>ANNULLA</gray>"
+          confirm: "<green>Conferma movimento</green>"
+          cancel: "<gray>Annulla</gray>"
+        help:
+          title: "<gold>Guida banca e vault</gold>"
+          body: "<gray>✦ Deposito libero:</gray> <white>versa nella banca la cifra che vuoi.</white><newline><gray>✦ Depositi rapidi:</gray> <white>1K e 10K entrano subito nella banca citta.</white><newline><gray>✦ Prelievo libero:</gray> <white>ritira la cifra che i tuoi permessi ti consentono.</white><newline><gray>✦ Prelievi rapidi:</gray> <white>1K e 10K tornano subito nel tuo saldo.</white><newline><gray>✦ Vault citta:</gray> <white>contiene materiali, bottino e scorte condivise della citta.</white>"
+          buttons:
+            back: "<yellow>Torna alla banca citta</yellow>"
+            close: "<gray>Chiudi guida</gray>"
+          errors:
+            unavailable: "<red>Dialog non disponibile su questo server.</red>"
         amount:
-          label: "<yellow>Importo</yellow>"
+          label: "<yellow>Tributo / Somma</yellow>"
           width: 320
           max: 1000000000
         deposit:
-          title: "<gold>Deposita in banca</gold>"
-          body: "<gray>Inserisci l'importo da depositare.</gray>"
+          title: "<gold>Deposita nella banca citta</gold>"
+          body: "<gray>Scrivi quanto vuoi versare nella banca della citta.</gray>"
         withdraw:
-          title: "<gold>Preleva dalla banca</gold>"
-          body: "<gray>Inserisci l'importo da prelevare.</gray>"
+          title: "<gold>Preleva dalla banca citta</gold>"
+          body: "<gray>Scrivi quanto vuoi prelevare dalla banca della citta.</gray>"
         errors:
           unavailable: "<red>Dialog non disponibile su questo server.</red>"
-          invalid_amount: "<red>Importo non valido.</red>"
-          dispatch_failed: "<red>Operazione non eseguita. Riprova tra poco.</red>"
-          non_positive_amount: "<red>L'importo deve essere maggiore di zero.</red>"
+          invalid_amount: "<red>La somma inserita non e valida.</red>"
+          dispatch_failed: "<red>Il movimento di banca non e partito. Riprova tra poco.</red>"
+          non_positive_amount: "<red>La somma deve essere maggiore di zero.</red>"
       claim_settings:
-        title: "<gold>Impostazioni claim</gold> <gray>{type}</gray>"
-        body: "<gray>Configura i flag per il tipo</gray> <white>{type}</white><gray>. Usa i pulsanti per ON/OFF e salva quando hai finito.</gray>"
+        title: "<gold>Impostazioni territori</gold> <gray>{type}</gray>"
+        body: "<gray>Qui imposti le regole del terreno</gray> <white>{type}</white><gray>. Attiva o blocca ogni opzione e salva quando hai finito.</gray>"
         buttons:
-          toggle_on: "<green>{flag}: ON</green>"
-          toggle_off: "<red>{flag}: OFF</red>"
-          save: "<green>SALVA</green>"
-          cancel: "<gray>ANNULLA</gray>"
+          toggle_on: "<green>{flag}: APERTO</green>"
+          toggle_off: "<red>{flag}: BLOCCATO</red>"
+          save: "<green>Salva regole</green>"
+          cancel: "<gray>Annulla</gray>"
+        errors:
+          unavailable: "<red>Dialog non disponibile su questo server.</red>"
+      member:
+        title: "<gold>Scheda membro</gold> <gray>{name}</gray>"
+        body_1: "<gray>Nome:</gray> <white>{name}</white>"
+        body_2: "<gray>Ruolo:</gray> <white>{role}</white>"
+        body_3: "<gray>Stato:</gray> <white>{status}</white>"
+        body_4: "<gray>Ultimo accesso:</gray> <white>{last_seen}</white>"
+        body_5: "<gray>Permessi speciali:</gray> <white>{granted}/{total}</white>"
+        buttons:
+          hierarchy: "<yellow>Ruolo in citta</yellow>"
+          native: "<aqua>Cosa puo fare</aqua>"
+          plugin: "<light_purple>Permessi speciali</light_purple>"
+          back: "<yellow>Indietro</yellow>"
+          close: "<gray>Chiudi</gray>"
+          prev: "<yellow>Pagina precedente</yellow>"
+          next: "<yellow>Pagina successiva</yellow>"
+        hierarchy:
+          title: "<yellow>Ruolo in citta</yellow> <gray>{name}</gray>"
+          body_1: "<gray>Ruolo attuale:</gray> <white>{role}</white>"
+          body_2: "<gray>E il capo:</gray> <white>{value}</white>"
+          body_3: "<gray>Da qui puoi cambiare grado o rimuovere questo membro.</gray>"
+        native:
+          title: "<aqua>Cosa puo fare</aqua> <gray>{name}</gray>"
+          summary: "<gray>Qui vedi cosa questo ruolo puo fare in citta.</gray>"
+        plugin:
+          title: "<light_purple>Permessi speciali</light_purple> <gray>{name}</gray>"
+          line: "<gray>{permission}:</gray> <white>{state}</white>"
+          toggle: "<gray>Permesso:</gray> <white>{permission}</white>"
+          summary_manage: "<gray>Scegli cosa puo fare questo membro.</gray>"
+          summary_readonly: "<gray>Solo il capo puo cambiare questi permessi.</gray>"
+          group_title: "<light_purple>{group}</light_purple> <gray>{name}</gray>"
+          group_summary: "<gray>Sezione:</gray> <white>{group}</white>"
+          entry: "<white>{permission}</white> <dark_gray>·</dark_gray> <white>{state}</white>"
+          permission_name: "<gray>Permesso:</gray> <white>{permission}</white>"
+          permission_state: "<gray>Stato attuale:</gray> <white>{state}</white>"
+          permission_title: "<light_purple>Permesso speciale</light_purple> <gray>{name}</gray>"
+          permission_hint_manage: "<gray>Scegli se consentire o bloccare questo permesso.</gray>"
+          permission_hint_readonly: "<gray>Solo il capo puo cambiare questo permesso.</gray>"
+          enable: "<green>Consenti</green> <white>{permission}</white>"
+          enable_disabled: "<gray>Consenti</gray> <white>{permission}</white>"
+          disable: "<red>Blocca</red> <white>{permission}</white>"
+          disable_disabled: "<gray>Blocca</gray> <white>{permission}</white>"
         errors:
           unavailable: "<red>Dialog non disponibile su questo server.</red>"
   edit:
@@ -299,131 +667,1217 @@ city:
         no_town: "<red>Devi essere membro di una citta per modificarla.</red>"
         no_privilege: "<red>Permessi insufficienti per questa modifica.</red>"
       root:
-        title: "<gold>Modifica Citta</gold>"
-        body: "<gray>Seleziona quale campo vuoi modificare.</gray>"
+        title: "<gold>Modifica citta</gold>"
+        body: "<gray>Da qui il capo puo cambiare descrizione, messaggi, colore e nome della citta.</gray>"
         buttons:
-          bio: "<yellow>Bio</yellow>"
-          greeting: "<yellow>Greeting</yellow>"
-          farewell: "<yellow>Farewell</yellow>"
-          color: "<yellow>Colore</yellow>"
-          rename: "<yellow>Rinomina</yellow>"
-          cancel: "<red>Annulla</red>"
+          bio: "<yellow>Descrizione citta</yellow>"
+          greeting: "<yellow>Messaggio di benvenuto</yellow>"
+          farewell: "<yellow>Messaggio di uscita</yellow>"
+          color: "<yellow>Colore citta</yellow>"
+          rename: "<yellow>Cambia nome</yellow>"
+          cancel: "<red>Chiudi</red>"
       text:
         width: 340
         maxLength: 256
         buttons:
           save: "<green>Salva</green>"
-          cancel: "<red>Annulla</red>"
+          cancel: "<red>Ritira</red>"
         errors:
-          empty: "<red>Il valore non puo essere vuoto.</red>"
-        success: "<green>{field} aggiornato con successo.</green>"
-        failed: "<red>Modifica fallita:</red> <gray>{error}</gray>"
+          empty: "<red>Il campo non puo essere vuoto.</red>"
+        success: "<green>{field} aggiornato.</green>"
+        failed: "<red>Modifica non riuscita:</red> <gray>{error}</gray>"
         bio:
-          title: "<gold>Modifica Bio</gold>"
-          body: "<gray>Inserisci la nuova bio della citta.</gray>"
-          label: "<yellow>Bio</yellow>"
+          title: "<gold>Descrizione citta</gold>"
+          body: "<gray>Scrivi una breve descrizione della tua citta.</gray>"
+          label: "<yellow>Descrizione</yellow>"
         greeting:
-          title: "<gold>Modifica Greeting</gold>"
-          body: "<gray>Inserisci il messaggio di benvenuto.</gray>"
-          label: "<yellow>Greeting</yellow>"
+          title: "<gold>Messaggio di benvenuto</gold>"
+          body: "<gray>Questo messaggio appare quando un membro entra in gioco.</gray>"
+          label: "<yellow>Messaggio di Benvenuto</yellow>"
         farewell:
-          title: "<gold>Modifica Farewell</gold>"
-          body: "<gray>Inserisci il messaggio di uscita.</gray>"
-          label: "<yellow>Farewell</yellow>"
+          title: "<gold>Messaggio di uscita</gold>"
+          body: "<gray>Questo messaggio appare quando un membro lascia la citta.</gray>"
+          label: "<yellow>Messaggio di Congedo</yellow>"
       color:
-        title: "<gold>Scegli Colore Citta (RGB)</gold>"
-        body: "<gray>Imposta RGB (0-255), poi usa Anteprima o Salva.<newline></newline>Attuale: <white>{current}</white><newline>Anteprima: <white>{preview}</white></gray>"
-        width: 320
-        inputs:
-          red: "<red>Rosso</red>"
-          green: "<green>Verde</green>"
-          blue: "<blue>Blu</blue>"
+        title: "<gold>Colore citta</gold>"
+        body: "<gray>Scegli il colore principale della tua citta.<newline></newline>Colore attuale: <white>{current}</white><newline>Colori disponibili: <gold>{count}</gold></gray>"
         buttons:
-          preview: "<yellow>Anteprima</yellow>"
-          save: "<green>Salva</green>"
           cancel: "<red>Indietro</red>"
-        success: "<green>Colore citta aggiornato a</green> <white>{hex}</white>."
+        success: "<green>Colore citta aggiornato:</green> <white>{hex}</white> <gray>({name})</gray>."
         failed: "<red>Aggiornamento colore fallito:</red> <gray>{error}</gray>"
   level:
-    blocked_town_level: "<red>Usa /city level per gestire il livello citta.</red>"
+    blocked_town_level: "<red>Usa /city -> Gestione citta -> Livelli citta per aprire la schermata livelli.</red>"
     errors:
       no_town: "<red>Devi essere membro attivo di una citta.</red>"
       spawner_cap_reached: "<red>Limite spawner raggiunto per lo stage {stage}: {current}/{cap}</red>"
-    status:
-      header: "<gold>Livello Citta:</gold> <yellow>{town}</yellow>"
-      current: "<gray>Livello:</gray> <white>{level}</white> <gray>| XP:</gray> <white>{xp}</white> <gray>| Stage:</gray> <yellow>{stage}</yellow>"
-      next: "<gray>Prossimo stage:</gray> <yellow>{stage}</yellow> <gray>(L{required_level})</gray>"
-      requirement: "<gray>Requisito banca:</gray> <white>{required_balance}</white> <gray>| Costo upgrade:</gray> <white>{upgrade_cost}</white>"
-      max: "<green>Hai raggiunto lo stage massimo disponibile.</green>"
-      staff_required: "<gold>Questo upgrade richiede approvazione staff: usa</gold> <yellow>/city level request</yellow>."
-    upgrade:
-      success: "<green>Upgrade completato:</green> <yellow>{stage}</yellow>"
-      failed: "<red>Upgrade non riuscito:</red> <gray>{reason}</gray>"
-    request:
-      success: "<green>Richiesta creata:</green> <yellow>#{id}</yellow> <gray>per</gray> <white>{stage}</white>"
-      failed: "<red>Richiesta non creata:</red> <gray>{reason}</gray>"
     notifications:
-      level_up: "<green>La tua citta e salita al livello</green> <yellow>{level}</yellow>."
-      stage_upgraded: "<gold>Upgrade citta completato:</gold> <yellow>{stage}</yellow>"
+      level_up: "<gold><bold>NUOVO LIVELLO</bold></gold><newline><yellow><bold><u>LIVELLO {level}</u></bold></yellow><newline><gray>La tua citta e salita di livello.</gray>"
+      stage_upgraded: "<gold><bold>NUOVO STAGE</bold></gold><newline><yellow><bold><u>{stage}</u></bold></yellow><newline><gray>La tua citta ha sbloccato un nuovo stage.</gray>"
       title_every_5:
         title: "<gold>Citta Livello {level}</gold>"
         subtitle: "<yellow>Traguardo raggiunto!</yellow>"
+      upgrade_available:
+        title: "<gold><bold>UPGRADE DISPONIBILE</bold></gold>"
+        subtitle: "<yellow>{stage}</yellow> <gray>puo essere confermato ora</gray>"
     reasons:
       no-town: "devi essere membro attivo di una citta"
       not-mayor: "solo il capo citta puo eseguire questa azione"
       already-max-stage: "stage massimo gia raggiunto"
       level-too-low: "livello citta insufficiente"
+      defense-tier-required: "devi prima completare il tier invasione richiesto"
       town-spawn-required: "devi prima impostare il warp citta con /city setwarp"
       insufficient-balance-requirement: "saldo banca citta insufficiente"
-      staff-approval-required: "serve approvazione staff (usa /city level request)"
+      staff-approval-required: "serve approvazione staff (usa GUI livelli)"
+      stage-seals-incomplete: "completa i seals del tuo stage fino a III/III prima della promozione"
       pending-request-exists: "esiste gia una richiesta pending per questo stage"
       request-not-required: "questo stage non richiede richiesta staff"
       invalid-stage-transition: "transizione stage non valida"
       town-update-failed: "aggiornamento town fallito"
+  performance:
+    hopper_chunk_limit:
+      max_per_chunk: 130
+      message: "<red>Limite hopper raggiunto in questo chunk:</red> <white>{current}/{cap}</white> <gray>({chunk_x},{chunk_z})</gray>"
   privacy:
-    blocked_town_privacy: "<red>Usa la GUI /city -> Azioni Citta per gestire la privacy del warp.</red>"
+    blocked_town_privacy: "<red>Usa /city per gestire il warp della citta.</red>"
   warp:
     errors:
       no_town: "<red>Devi essere membro attivo di una citta.</red>"
       town_not_found: "<red>Citta non trovata:</red> <yellow>{town}</yellow>"
-      failed: "<red>Teleport warp fallito:</red> <gray>{reason}</gray>"
+      failed: "<red>Teleport al warp fallito:</red> <gray>{reason}</gray>"
   setwarp:
-    success: "<green>Warp citta impostato con successo.</green>"
+    success: "<green>Warp della citta impostato con successo.</green>"
     errors:
       no_town: "<red>Devi essere membro attivo di una citta.</red>"
-      no_permission: "<red>Non hai i permessi per impostare lo spawn della citta.</red>"
-      outside_claim: "<red>Devi essere dentro un claim della tua citta per impostare lo spawn.</red>"
+      no_permission: "<red>Non hai il permesso per impostare il warp della citta.</red>"
+      outside_claim: "<red>Devi essere dentro un claim della tua citta per impostare il warp.</red>"
       failed: "<red>Impostazione warp fallita:</red> <gray>{reason}</gray>"
   rename:
     cost:
-      amount: 0.0
+      amount: 250.0
     dialog:
-      title: "<gold>Rinomina Citta</gold>"
-      body: "<gray>Imposta nuovo nome e tag citta.</gray>"
+      title: "<gold>Cambia Nome alla Citta</gold>"
+      body: "<gray>Qui puoi cambiare nome e tag della citta.</gray><newline><newline><gray>Costo:</gray> <gold>{cost}</gold>"
       buttons:
-        confirm: "<green>CONFERMA</green>"
-        cancel: "<red>ANNULLA</red>"
+        confirm: "<green>Conferma</green>"
+        cancel: "<red>Annulla</red>"
       inputs:
         name:
-          label: "<yellow>Nuovo nome</yellow>"
+          label: "<yellow>Nuovo Nome della Citta</yellow>"
           width: 320
           maxLength: 32
         tag:
-          label: "<yellow>Tag (3 caratteri)</yellow>"
+          label: "<yellow>Nuovo Tag a 3 Caratteri</yellow>"
           width: 140
           maxLength: 3
-      success: "<green>Citta rinominata:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray> <gray>(costo: {cost})</gray>"
+      success: "<green>Nome citta aggiornato:</green> <yellow>{name}</yellow> <gray>[</gray><gold>{tag}</gold><gray>]</gray> <gray>| Costo:</gray> <white>{cost}</white>"
       errors:
         unavailable: "<red>Dialog non disponibile su questo server.</red>"
         no_town: "<red>Devi essere membro attivo di una citta.</red>"
-        no_privilege: "<red>Non hai i permessi per rinominare la citta.</red>"
-        name_required: "<red>Il nome citta e obbligatorio.</red>"
-        tag_invalid: "<red>Il tag deve avere esattamente 3 caratteri alfanumerici.</red>"
-        no_changes: "<red>Nessuna modifica rilevata su nome/tag.</red>"
-        name_taken: "<red>Esiste gia una citta con questo nome.</red>"
-        insufficient_funds: "<red>Fondi banca citta insufficienti per rinominare.</red>"
-        failed: "<red>Rinomina fallita:</red> <gray>{reason}</gray>"
+        no_privilege: "<red>Non hai il permesso per cambiare il nome della citta.</red>"
+        name_required: "<red>Il nuovo nome e obbligatorio.</red>"
+        tag_invalid: "<red>Il nuovo tag deve avere esattamente 3 caratteri alfanumerici.</red>"
+        no_changes: "<red>Non hai cambiato ne nome ne tag.</red>"
+        name_taken: "<red>Questo nome e gia usato da un'altra citta.</red>"
+        insufficient_funds: "<red>La banca della citta non ha abbastanza soldi.</red>"
+        failed: "<red>Cambio nome fallito:</red> <gray>{reason}</gray>"
+  hub:
+    comando:
+      defense: "<gold>Difesa citta</gold>"
+    cards:
+      command_center:
+        lore:
+          leave: "<gray>| Lascia la citta</gray>"
+    custom:
+      leave:
+        lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Da qui puoi lasciare la citta.</gray>"
+          - "<yellow>✦</yellow> <white>Prima di uscire vedrai sempre una conferma</white>"
+          - "<yellow>✦</yellow> <white>Se sei il Capo, vedrai anche l'opzione per sciogliere la citta</white>"
+          - "<red>➜ Clicca per aprire il dialog di conferma.</red>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+    leave_dialog:
+      title: "<red>Lascia la citta</red>"
+      body_1: "<gray>Se confermi, uscirai dalla tua citta.</gray>"
+      body_2: "<gray>Potrai rientrare solo se riceverai un nuovo invito.</gray>"
+      body_2_mayor: "<gray>Se sei il Capo, da qui puoi anche aprire la conferma per sciogliere la citta.</gray>"
+      leave: "<red>Lascia la citta</red>"
+      disband: "<dark_red>Sciogli la citta</dark_red>"
+      cancel: "<gray>Annulla</gray>"
+  defense:
+    announce:
+      started: "<gold>Invasione avviata.</gold> <gray>Tier</gray> <white>{tier}</white> <gray>·</gray> <white>{waves}</white> <gray>ondate in arrivo.</gray>"
+      started_forced: "<yellow>Invasione avviata dallo staff.</yellow> <gray>Tier</gray> <white>{tier}</white> <gray>·</gray> <white>{waves}</white> <gray>ondate in arrivo.</gray>"
+      wave_started: "<gold>Ondata {wave}/{total}</gold> <gray>iniziata.</gray> <white>{count}</white> <gray>mob stanno attaccando.</gray>"
+      wave_cleared: "<green>Ondata {wave}/{total} completata.</green> <gray>La prossima parte tra</gray> <white>{seconds}s</white><gray>.</gray>"
+      wave_skipped_cap: "<yellow>Ondata {wave}/{total} rimandata.</yellow> <gray>Ci sono gia troppi mob attivi.</gray>"
+      player_death_penalty: "<red>{player} e morto.</red> <gray>Il Guardiano perde il</gray> <white>{percent}%</white> <gray>di vita.</gray>"
+      victory: "<green>Invasione completata.</green> <gray>Tier</gray> <white>{tier}</white> <gray>| Ricompensa:</gray> <white>{xp} XP</white>"
+      defeat: "<red>Difesa fallita.</red> <gray>Motivo:</gray> <white>{reason}</white>"
+      custom_boss_spawn: "<dark_red>Boss in arrivo:</dark_red> <white>{boss}</white> <gray>| Fase:</gray> <white>{phase}</white>"
+      custom_boss_phase: "<gold>{boss}</gold> <gray>e passato alla fase</gray> <white>{phase}</white>"
+      custom_boss_defeat: "<green>{boss} sconfitto.</green> <white>{town}</white> <gray>resiste ancora.</gray>"
+    bossbar:
+      prep: "<gold>✦ Invasione in arrivo</gold> <gray>· Tier</gray> <white>{tier}</white> <gray>· Prima ondata tra</gray> <white>{seconds}s</white>"
+      inter_wave: "<aqua>✦ Pausa tra ondate</aqua> <gray>· Ondata</gray> <white>{next_wave}/{total_waves}</white> <gray>tra</gray> <white>{seconds}s</white>"
+      combat: "<red>✦ Difesa in corso</red> <gray>· Ondata</gray> <white>{wave}/{total_waves}</white> <gray>· Ostili:</gray> <white>{alive}</white> <gray>· Guardiano:</gray> <white>{guardian_hp}%</white>"
+      combat_boss: "<dark_red>✦ Varco Maggiore</dark_red> <gray>·</gray> <white>{boss}</white> <gray>· {phase}</gray> <gray>· Guardiano:</gray> <white>{guardian_hp}%</white>"
+    actionbar:
+      countdown: "<gold>✦ Ondata {next_wave}/{total_waves}</gold> <gray>arriva tra</gray> <white>{seconds}</white> <gray>secondi</gray>"
+    title:
+      wave_started:
+        title: "<gold><bold>ONDATA {wave}/{total}</bold></gold>"
+        subtitle: "<red>Nuovi nemici in arrivo:</red> <white>{count}</white> <gray>ostili</gray>"
+    guardian:
+      name: "<gold>Guardiano della citta</gold> <gray>{town}</gray>"
+      hologram: "<gradient:#ffd36e:#ff9a3d><bold>✦ GUARDIANO DELLA CITTA ✦</bold></gradient><newline><white><bold>{town}</bold></white><newline><gray>╚═</gray> {bar} <gray>═╝</gray><newline><gray>Integrita:</gray> <white>{hp}/{max}</white> <gray>HP</gray> <white>({percent}%)</white><newline><gray>Ondata:</gray> <white>{wave}/{total}</white> <dark_gray>•</dark_gray> <gray>Stato:</gray> {phase}"
+    mob:
+      elite_name: "<red>Elite</red> <gray>{mob}</gray>"
+      boss_name: "<dark_red>Signore d'assedio</dark_red> <gray>{mob}</gray>"
+      elite_prefix: "<red>Campione</red>"
+      boss_prefix: "<dark_red>Signore d'assedio</dark_red>"
+    errors:
+      disabled: "<red>Difesa citta disabilitata su questo server.</red>"
+      no-town: "<red>Devi essere membro attivo di una citta.</red>"
+      no-permission: "<red>Non hai i permessi per gestire la difesa citta.</red>"
+      no-active-session: "<red>Nessuna invasione attiva nella tua citta.</red>"
+      already-active: "<red>La tua citta ha gia una difesa attiva.</red>"
+      global-cap-reached: "<red>Cap globale invasioni raggiunto. Riprova tra poco.</red>"
+      level-too-low: "<red>Livello citta troppo basso per questo tier.</red>"
+      town-spawn-required: "<red>Imposta prima il warp citta con /city setwarp.</red>"
+      cooldown-active: "<red>Cooldown attivo per questo tier.</red>"
+      insufficient-balance: "<red>Fondi banca citta insufficienti.</red>"
+      spawn-world-missing: "<red>Mondo spawn citta non disponibile.</red>"
+      spawn-points-missing: "<red>Area non valida: punti spawn invasione insufficienti.</red>"
+      guardian-spawn-failed: "<red>Evocazione del Guardiano fallita.</red>"
+      balance-withdraw-failed: "<red>Prelievo banca fallito durante avvio difesa.</red>"
+      anti_cheese_build: "<red>Costruzione sigillata vicino al Guardiano durante l'assedio.</red>"
+      anti_cheese_break: "<red>Non puoi rompere blocchi vicino al Guardiano durante l'invasione.</red>"
+      anti_cheese_bucket: "<red>Acqua e lava vengono respinte vicino al Guardiano durante l'invasione.</red>"
+    gui:
+      refresh: "<yellow>Aggiorna</yellow>"
+      status:
+        active: "<green>Invasione attiva</green>"
+        none: "<gray>Stato: nessuna invasione attiva</gray>"
+      start:
+        title: "<gold>Difesa citta</gold> <gray>{town}</gray>"
+      live:
+        title: "<gold>Invasione attiva</gold> <gray>{town}</gray>"
+        itemsadder:
+          title_plain: "Invasione attiva"
+        unavailable: "<red>La schermata invasione attiva richiede la GUI custom caricata correttamente.</red>"
+        none: "<gray>Nessuna invasione attiva nella tua citta.</gray>"
+        open_start: "<yellow>Apri il menu invasioni</yellow>"
+        guardian: "<gold>Guardiano della citta</gold>"
+        guardian_lore: "<gray>Integrita:</gray> <white>{hp}/{max}</white> <gray>({percent}%)</gray>"
+        guardian_idle: "<gray>Guardiano in quiete</gray>"
+        guardian_idle_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Il Guardiano della citta non e sotto attacco.</gray>"
+          - "<gray>La sua vita resta al massimo finche non parte una nuova invasione.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        guardian_lore_lines:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Integrita residua:</gray> <white>{hp}/{max}</white>"
+          - "<gray>Vita del guardiano:</gray> <white>{percent}%</white>"
+          - "<gray>Difendi il guardiano per superare tutta l'invasione.</gray>"
+          - "<green>➜ Clicca per aggiornare la schermata.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        wave: "<gold>Stato invasione</gold>"
+        wave_lore: "<gray>Stato:</gray> <white>{phase}</white> <gray>| Ostili:</gray> <white>{mobs}</white><newline><gray>Campione:</gray> <white>{boss}</white> <gray>|</gray> <white>{boss_phase}</white><newline><gray>Integrita del campione:</gray> <white>{boss_hp}/{boss_max}</white>"
+        wave_idle: "<yellow>Apri il menu invasioni</yellow>"
+        wave_idle_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<yellow>✦</yellow> <white>Nessuna invasione e attiva</white>"
+          - "<gray>Apri il menu invasioni e scegli quale tier avviare.</gray>"
+          - "<green>➜ Clicca per aprire il menu invasioni.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        wave_lore_lines:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Ondata attuale:</gray> <white>{wave}/{total}</white>"
+          - "<gray>Stato invasione:</gray> <white>{phase}</white>"
+          - "<gray>Ostili ancora in campo:</gray> <white>{mobs}</white>"
+          - "<gray>Campione in vista:</gray> <white>{boss}</white>"
+          - "<gray>Segno del campione:</gray> <white>{boss_phase}</white>"
+          - "<green>➜ Clicca per aggiornare la schermata.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        timer: "<gold>Timer invasione</gold>"
+        timer_lore: "<gray>{seconds}s</gray>"
+        timer_idle: "<gray>Nessun timer attivo</gray>"
+        timer_idle_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Nessun conto alla rovescia attivo.</gray>"
+          - "<gray>Il timer restera fermo finche non parte una nuova invasione.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        timer_lore_lines:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Tempo residuo:</gray> <white>{seconds}s</white>"
+          - "<gray>Durata massima del tier:</gray> <white>{max_seconds}s</white>"
+          - "<gray>Integrita del campione:</gray> <white>{boss_hp}/{boss_max}</white>"
+          - "<gray>Ogni secondo perso rende piu difficile difendere la citta.</gray>"
+          - "<green>➜ Clicca per aggiornare la schermata.</green>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        stop: "<red>Interrompi invasione</red>"
+        stop_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<red>✦</red> <white>Interrompi l'invasione attiva</white>"
+          - "<gray>Interrompe subito l'invasione attiva.</gray>"
+          - "<gray>La citta non ricevera ricompense e non maturera cooldown.</gray>"
+          - "<red>➜ Clicca solo se vuoi fermare subito questa invasione.</red>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        stop_idle: "<gray>Nessuna invasione da interrompere</gray>"
+        stop_idle_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Nessuna invasione attiva da interrompere.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        stop_locked: "<gray>Interruzione non disponibile</gray>"
+        stop_locked_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Solo chi gestisce banca e difesa puo interrompere l'invasione.</gray>"
+          - "<gray>Occorre il privilegio di prelievo cittadino.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        stop_success: "<yellow>✦ L'invasione e stata interrotta.</yellow> <gray>La difesa si chiude senza ricompense.</gray>"
+      tier:
+        unavailable: "<gray>Tier invasione non ancora disponibile</gray>"
+        frame_top: "<dark_gray>╭────────────╮</dark_gray>"
+        frame_bottom: "<dark_gray>╰────────────╯</dark_gray>"
+        level_ok: "Tier disponibile"
+        level_missing: "Richiede Livello {level}"
+        cooldown_ready: "Pronto"
+        cooldown_wait: "Ripresa tra {time}"
+        requirement: "<gray>✦ Requisito livello:</gray> <white>Livello {level}</white>"
+        waves: "<gray>⚔ Ondate previste:</gray> <white>{waves}</white>"
+        guardian_hp: "<gray>🛡 Integrita del Guardiano:</gray> <white>{hp}</white>"
+        cost: "<gray>💰 Tributo d'apertura:</gray> <white>{cost}</white>"
+        reward_xp: "<gray>✦ Gloria promessa:</gray> <white>{xp} XP</white>"
+        reward_money: "<gray>🪙 Ricompensa invasione:</gray> <white>{money}</white>"
+        max_duration: "<gray>⌛ Durata massima:</gray> <white>{time}</white>"
+        reward_profile: "<gray>🎁 Tipo ricompensa:</gray> <white>{state}</white>"
+        first_clear_unique: "<gray>🏆 Prima vittoria:</gray> <white>{state}</white>"
+        state: "<gray>📜 Stato:</gray> <white>{state}</white>"
+        cooldown: "<gray>🕯 Cooldown:</gray> <white>{state}</white>"
+        action_ready: "<green>➜ Clicca per avviare questa invasione.</green>"
+        action_locked: "<gray>Questo tier non e ancora disponibile.</gray>"
+        l1:
+          title: "<gold>Difesa L1 — Bastione di Frontiera</gold>"
+        l2:
+          title: "<gold>Difesa L2 — Fossato in Allarme</gold>"
+        l3:
+          title: "<gold>Difesa L3 — Muro del Predone</gold>"
+        l4:
+          title: "<gold>Difesa L4 — Ariete del Confine</gold>"
+        l5:
+          title: "<gold>Difesa L5 — Forte delle Braci</gold>"
+        l6:
+          title: "<gold>Difesa L6 — Breccia Ferrata</gold>"
+        l7:
+          title: "<gold>Difesa L7 — Varchi Cremisi</gold>"
+        l8:
+          title: "<gold>Difesa L8 — Caduta del Bastione</gold>"
+        l9:
+          title: "<gold>Difesa L9 — Corsa degli Assediatori</gold>"
+        l10:
+          title: "<gold>Difesa L10 — Signore della Breccia</gold>"
+        l11:
+          title: "<gold>Difesa L11 — Canto di Cenere</gold>"
+        l12:
+          title: "<gold>Difesa L12 — Corte dei Sepolti</gold>"
+        l13:
+          title: "<gold>Difesa L13 — Rito delle Ossa</gold>"
+        l14:
+          title: "<gold>Difesa L14 — Piaga del Braciere</gold>"
+        l15:
+          title: "<gold>Difesa L15 — Ierofante Cinerico</gold>"
+        l16:
+          title: "<gold>Difesa L16 — Risacca Oscura</gold>"
+        l17:
+          title: "<gold>Difesa L17 — Ferri dell'Abisso</gold>"
+        l18:
+          title: "<gold>Difesa L18 — Marea del Presagio</gold>"
+        l19:
+          title: "<gold>Difesa L19 — Strappo Profondo</gold>"
+        l20:
+          title: "<gold>Difesa L20 — Araldo Abissale</gold>"
+        l21:
+          title: "<gold>Difesa L21 — Corona di Ferro</gold>"
+        l22:
+          title: "<gold>Difesa L22 — Guardia del Tramonto</gold>"
+        l23:
+          title: "<gold>Difesa L23 — Guerra del Trono</gold>"
+        l24:
+          title: "<gold>Difesa L24 — Ultimo Bastione</gold>"
+        l25:
+          title: "<gold>Difesa L25 — Re dell'Ultimo Assedio</gold>"
+  war:
+    broadcast:
+      start: "<red><bold>⚔ Guerra dichiarata</bold></red> <gray>|</gray> <white>{attacker}</white> <gray>contro</gray> <white>{defender}</white> <gray>|</gray> <gold>Posta:</gold> <white>{wager}</white>"
+      end: "<gold><bold>⚔ Guerra conclusa</bold></gold> <gray>|</gray> <white>{attacker}</white> <gray>contro</gray> <white>{defender}</white> <gray>|</gray> <yellow>{result}</yellow> <gray>|</gray> <white>Vincitore: {winner}</white> <gray>|</gray> <gold>Premio netto:</gold> <white>{payout}</white> <gray>|</gray> <dark_gray>Trattenuta: {fee}</dark_gray>"
+      end_with_xp: "<gold><bold>⚔ Guerra conclusa</bold></gold> <gray>|</gray> <white>{attacker}</white> <gray>contro</gray> <white>{defender}</white> <gray>|</gray> <yellow>{result}</yellow> <gray>|</gray> <white>Vincitore: {winner}</white> <gray>|</gray> <gold>Premio netto:</gold> <white>{payout}</white> <gray>|</gray> <dark_gray>Trattenuta: {fee}</dark_gray> <gray>|</gray> <aqua>+{xp} XP citta</aqua>"
+    title:
+      start:
+        title: "<red>Guerra dichiarata</red>"
+        subtitle: "<white>{attacker}</white> <gray>ha dichiarato guerra a</gray> <white>{defender}</white>"
+      end:
+        title: "<gold>Guerra conclusa</gold>"
+        subtitle: "<yellow>{result}</yellow> <gray>| Vincitore:</gray> <white>{winner}</white>"
+    gui:
+      list:
+        title: "<red>Guerre attive</red> <gray>{town}</gray>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:war_list_9x4"
+          title_plain: "Guerre attive"
+          title_offset: 0
+          texture_offset: -8
+        back: "<yellow>Torna alla difesa citta</yellow>"
+        back_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<yellow>✦</yellow> <white>Chiudi la schermata guerre e torna alla difesa citta.</white>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        prev: "<yellow>Pagina precedente</yellow>"
+        prev_disabled: "<gray>Pagina precedente non disponibile</gray>"
+        prev_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<yellow>✦</yellow> <white>Scorri il registro alla pagina precedente.</white>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        prev_disabled_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>La prima pagina del registro e gia aperta.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        next: "<yellow>Pagina successiva</yellow>"
+        next_disabled: "<gray>Pagina successiva non disponibile</gray>"
+        next_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<yellow>✦</yellow> <white>Scorri il registro alla pagina successiva.</white>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        next_disabled_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Sei gia all'ultima pagina del registro.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        empty: "<gray>Nessuna guerra disponibile in questo momento.</gray>"
+        target: "<red>{town}</red> <gray>⟦</gray><white>{tag}</white><gray>⟧</gray>"
+        target_relation: "<gray>Relazione attuale:</gray> <white>{relation}</white>"
+        target_reciprocal: "<gray>Loro vi vedono come:</gray> <white>{relation}</white>"
+        target_level: "<gray>Livello citta:</gray> <white>{level}</white>"
+        target_state: "<gray>Stato guerra:</gray> <white>{state}</white>"
+        target_money_if_victory: "<gray>Premio netto previsto:</gray> <gold>{money}</gold> <dark_gray>(tributo {fee})</dark_gray>"
+        target_xp_if_victory: "<gray>XP previste:</gray> <aqua>{xp} XP citta</aqua>"
+        target_click: "<green>✦ Clicca per dichiarare guerra a questa citta.</green>"
+        target_blocked: "<gray>Questa guerra non puo essere aperta ora.</gray>"
+        declare_success: "<yellow>La richiesta di guerra e stata inviata. Ora attende risposta.</yellow>"
+      live:
+        title: "<red>Guerra attiva</red> <gray>{town}</gray>"
+        itemsadder:
+          font_image_id: "cittaexp_gui:war_active_overview_9x5"
+          title_plain: "Guerra attiva"
+          title_offset: 0
+          texture_offset: -8
+        attacker: "<red>Citta attaccante</red>"
+        attacker_name: "<gray>Attaccante:</gray> <white>{town}</white>"
+        attacker_alive: "<gray>Giocatori attivi:</gray> <white>{count}</white>"
+        defender: "<aqua>Citta in difesa</aqua>"
+        defender_name: "<gray>Difensore:</gray> <white>{town}</white>"
+        defender_alive: "<gray>Giocatori attivi:</gray> <white>{count}</white>"
+        you_are: "<gray>La tua citta non partecipa a questa guerra.</gray>"
+        back: "<yellow>Torna alla difesa citta</yellow>"
+        back_lore:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<yellow>✦</yellow> <white>Chiudi la schermata guerra e torna alla difesa citta.</white>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        refresh: "<aqua>Aggiorna schermata</aqua>"
+        refresh_hint: "<aqua>Clicca per aggiornare la schermata.</aqua>"
+        overview: "<gold>Dettagli guerra</gold>"
+        wager: "<gray>Posta:</gray> <white>{money}</white>"
+        money_attacker_win: "<gray>Premio netto se vince l'attaccante:</gray> <gold>{money}</gold>"
+        money_defender_win: "<gray>Premio netto se vince il difensore:</gray> <gold>{money}</gold>"
+        money_if_victory: "<green>Se la tua citta vince:</green> <gold>{money}</gold> <dark_gray>(trattenuta {fee})</dark_gray>"
+        radius: "<gray>Raggio di guerra:</gray> <white>{radius}</white>"
+        started: "<gray>Iniziata il:</gray> <white>{time}</white>"
+        surrender: "<red>Arrenditi</red>"
+        surrender_lore: "<gray>Chiudi la guerra e fai perdere la tua citta per resa.</gray>"
+        surrender_lore_lines:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<red>✦</red> <white>Chiude subito la guerra con la resa della tua citta.</white>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        surrender_locked: "<gray>Resa non disponibile</gray>"
+        surrender_locked_lore: "<gray>Solo chi ha il permesso guerra puo arrendersi per la citta.</gray>"
+        surrender_locked_lore_lines:
+          - "<dark_gray>╭────────────╮</dark_gray>"
+          - "<gray>Serve il permesso guerra per usare la resa.</gray>"
+          - "<dark_gray>╰────────────╯</dark_gray>"
+        surrender_success: "<yellow>La resa e stata inviata. La guerra si chiudera appena il sistema conferma l'esito.</yellow>"
+        xp_attacker_win: "<gray>XP se vince l'attaccante:</gray> <aqua>{xp} XP citta</aqua>"
+        xp_defender_win: "<gray>XP se vince il difensore:</gray> <aqua>{xp} XP citta</aqua>"
+        xp_if_victory: "<green>Se la tua citta vince:</green> <aqua>{xp} XP citta</aqua>"
+    dialog:
+      unavailable:
+        title: "<red>Guerra non disponibile</red>"
+        body_1: "<gray>Le guerre non sono disponibili oppure le relazioni tra citta non sono attive.</gray>"
+        body_2: "<gray>Finche il sistema non le riattiva, non puoi aprire una nuova guerra.</gray>"
+      busy:
+        title: "<red>Guerra gia in corso</red>"
+        body_1: "<gray>C'e gia un'altra guerra attiva sul server.</gray>"
+        body_2: "<white>{attacker}</white> <gray>ha gia dichiarato guerra a</gray> <white>{defender}</white>"
+        body_3: "<gray>Finche quella guerra non si chiude, non puoi aprirne una nuova.</gray>"
+      incoming:
+        title: "<red>Richiesta di guerra ricevuta</red>"
+        body_1: "<gray>Citta attaccante:</gray> <white>{attacker}</white>"
+        body_2: "<gray>Citta bersaglio:</gray> <white>{defender}</white>"
+        body_3: "<gray>Posta:</gray> <white>{wager}</white>"
+        body_4: "<gray>Richiesta valida fino a:</gray> <white>{time}</white>"
+        body_5: "<gray>Se la guerra parte, la relazione tra le due citta passa subito a</gray> <red>Nemici</red><gray>.</gray>"
+        accept: "<green>ACCETTA GUERRA</green>"
+        close: "<gray>CHIUDI</gray>"
+      ally_warning:
+        title: "<red>Conferma cambio relazione</red>"
+        body: "<gray>Se dichiari guerra a</gray> <white>{town}</white> <gray>l'alleanza verra rimossa e la relazione passera a</gray> <red>Nemici</red><gray>.</gray>"
+        confirm: "<red>DICHIARA GUERRA</red>"
+        cancel: "<gray>ANNULLA</gray>"
+      declare:
+        title: "<red>Dichiara guerra</red>"
+        body_1: "<gray>Citta bersaglio:</gray> <white>{town}</white>"
+        body_2: "<gray>Relazione dopo la dichiarazione:</gray> <white>{relation}</white>"
+        body_3: "<gray>Posta minima richiesta:</gray> <white>{money}</white>"
+        body_4: "<gray>Cooldown dopo la guerra:</gray> <white>{hours}h</white>"
+        body_5: "<gray>Tempo per accettare:</gray> <white>{minutes}m</white>"
+        body_6_money: "<gray>Premio lordo del vincitore:</gray> <gold>{money}</gold>"
+        body_7_money: "<gray>Trattenuta di guerra:</gray> <gold>{money}</gold>"
+        body_8_money: "<gray>Premio netto previsto:</gray> <gold>{money}</gold>"
+        body_6: "<gray>XP base se la tua citta vince:</gray> <aqua>{xp} XP citta</aqua>"
+        body_7: "<gray>XP extra dalla posta:</gray> <aqua>{xp} XP citta</aqua>"
+        body_8: "<gray>XP totali previste:</gray> <aqua>{xp} XP citta</aqua>"
+        input: "<yellow>Posta guerra</yellow>"
+        confirm: "<red>CONFERMA GUERRA</red>"
+        cancel: "<gray>ANNULLA</gray>"
+      close: "<gold>Chiudi schermata</gold>"
+    errors:
+      active_global_block: "<red>C'e gia una guerra attiva sul server.</red> <gray>Finche non si chiude, non puoi aprirne una nuova.</gray>"
+      dialog_unavailable: "<red>La dialog guerra non e disponibile su questo server.</red>"
+      preview_failed: "<red>La guerra non puo essere preparata in questo momento.</red>"
+      wager-invalid: "<red>La posta guerra deve essere un valore valido e positivo.</red>"
+      town-not-found: "<red>La citta richiesta non esiste.</red>"
+      war-disabled: "<red>Le guerre sono disattivate su questo server.</red>"
+      relations-disabled: "<red>Le relazioni tra citta non sono attive. La guerra non puo partire.</red>"
+      native-wars-disabled: "<red>Il sistema guerra non e disponibile in questo momento.</red>"
+      no-declare-privilege: "<red>Non hai il permesso per dichiarare guerra.</red>"
+      active-war-global: "<red>C'e gia un'altra guerra attiva sul server.</red>"
+      same-town: "<red>Non puoi dichiarare guerra alla tua stessa citta.</red>"
+      source-level-low: "<red>La tua citta non ha ancora il livello richiesto per dichiarare guerra.</red>"
+      target-level-low: "<red>La citta scelta non ha ancora il livello minimo per entrare in guerra.</red>"
+      level-gap-too-high: "<red>La differenza di livello tra le due citta e troppo alta.</red>"
+      source-spawn-missing: "<red>La tua citta non ha un warp guerra valido.</red>"
+      target-spawn-missing: "<red>La citta bersaglio non ha un warp guerra valido.</red>"
+      already-at-war: "<red>Una delle due citta e gia coinvolta in un'altra guerra.</red>"
+      pending-target: "<red>Questa citta ha gia una richiesta di guerra in attesa.</red>"
+      source-cooldown: "<red>La tua citta e ancora in cooldown dopo l'ultima guerra.</red>"
+      target-cooldown: "<red>La citta bersaglio e ancora in cooldown.</red>"
+      attacker-minimum-funds: "<red>La banca della tua citta non copre la posta minima richiesta.</red>"
+      defender-minimum-funds: "<red>La banca della citta bersaglio non copre la posta minima richiesta.</red>"
+      wager-below-minimum: "<red>La posta scelta e sotto al minimo richiesto.</red>"
+      relation-normalize-failed: "<red>Non sono riuscito ad aggiornare la relazione tra le due citta.</red>"
+      declare-dispatch-failed: "<red>La dichiarazione di guerra non e partita correttamente.</red>"
+      accept-dispatch-failed: "<red>L'accettazione della guerra non e stata confermata.</red>"
+      surrender-dispatch-failed: "<red>La resa non e stata registrata correttamente.</red>"
+      not-at-war: "<red>La tua citta non ha nessuna guerra attiva da cui arrendersi.</red>"
+    trophy:
+      title: "<gradient:#ffd76a:#ff8c42><bold>✦ Trofeo guerra vinta ✦</bold></gradient> <gray>•</gray> <white>{winner}</white> <gray>contro</gray> <white>{loser}</white>"
+      lore:
+        frame_top: "<dark_gray>╭────────────╮</dark_gray>"
+        when: "<gold>✦</gold> <white>Data:</white> <gray>{time}</gray>"
+        attacker: "<red>⚔</red> <white>Attaccante:</white> <gray>{town}</gray>"
+        defender: "<aqua>🛡</aqua> <white>Difensore:</white> <gray>{town}</gray>"
+        winner: "<green>✦</green> <white>Vincitore:</white> <gold>{town}</gold>"
+        result: "<gray>✧ Esito:</gray> <white>{result}</white>"
+        wager: "<gray>✧ Posta:</gray> <white>{wager}</white>"
+        payout: "<gold>🪙</gold> <white>Premio netto:</white> <gold>{money}</gold>"
+        fee: "<gray>✧ Trattenuta:</gray> <white>{money}</white>"
+        xp: "<aqua>✦</aqua> <white>XP ottenute:</white> <aqua>{xp} XP citta</aqua>"
+        outro: "<gray>Il trofeo e stato inviato nel</gray> <gold>Vault citta</gold> <gray>della citta vincitrice.</gray>"
+        frame_bottom: "<dark_gray>╰────────────╯</dark_gray>"
+    sample:
+      noop: "<yellow>Questa e solo una preview: nessuna guerra reale e stata avviata.</yellow>"
+      list_click_locked: "<yellow>Questa lista e in sola visione. Usa i sample dedicati per vedere una dichiarazione di guerra o una rottura dell'alleanza.</yellow>"
 
+  wiki:
+    common:
+      buttons:
+        back: "<yellow>Indietro</yellow>"
+        index: "<gold>Indice wiki</gold>"
+        close: "<red>Chiudi</red>"
+      headers:
+        when_to_use: "<yellow><bold>Quando usarlo</bold></yellow>"
+        requirements: "<yellow><bold>Cosa serve</bold></yellow>"
+        steps: "<yellow><bold>Come si fa</bold></yellow>"
+        result: "<green><bold>Risultato</bold></green>"
+        warnings: "<red><bold>Attenzione</bold></red>"
+        commands: "<aqua><bold>Comandi utili</bold></aqua>"
+    errors:
+      unavailable: "<red>Wiki non disponibile su questo server.</red>"
+    pages:
+      home:
+        title: "<gold><bold>Wiki citta</bold></gold>"
+        subtitle: "Qui trovi subito le azioni piu utili da fare in /city."
+        when_to_use: "Apri questa pagina quando non sai da dove partire o vuoi capire quale menu usare."
+        steps:
+          - "Scegli l'azione che vuoi fare dai tasti qui sotto."
+          - "Apri la pagina pratica dedicata."
+          - "Segui i passaggi e usa i comandi consigliati se ti servono."
+        result: "Trovi subito il percorso giusto senza dover cercare in tutti i menu della citta."
+        buttons:
+          - type: page
+            target: start_here
+            label: "<yellow>Come inizio</yellow>"
+          - type: page
+            target: invite_or_join
+            label: "<yellow>Come invito o entro</yellow>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Come claimo un territorio</yellow>"
+          - type: page
+            target: use_bank
+            label: "<yellow>Come uso banca e vault</yellow>"
+          - type: page
+            target: level_up_city
+            label: "<yellow>Come faccio salire la citta</yellow>"
+          - type: page
+            target: start_invasion
+            label: "<yellow>Come avvio un'invasione</yellow>"
+          - type: page
+            target: manage_members
+            label: "<yellow>Come gestisco i membri</yellow>"
+          - type: page
+            target: link_discord
+            label: "<yellow>Come collego Discord</yellow>"
+          - type: page
+            target: basic_commands
+            label: "<yellow>Comandi utili</yellow>"
+          - type: page
+            target: other_tools
+            label: "<yellow>Altre funzioni</yellow>"
+      start_here:
+        title: "<gold><bold>Come iniziare</bold></gold>"
+        subtitle: "Percorso base per usare la citta senza perderti tra i menu."
+        when_to_use: "Usa questa pagina se hai appena creato o appena raggiunto una citta."
+        requirements:
+          - "Essere membro di una citta."
+          - "Essere verificato su Discord se vuoi usare i comandi citta."
+        steps:
+          - "Usa /city per aprire la schermata principale della citta."
+          - "Controlla i menu Membri, Territori, Banca, Livelli e Difesa."
+          - "Se qualcosa non si apre, probabilmente ti manca il ruolo o il permesso giusto."
+        result: "Sai da quale menu partire e dove trovare le funzioni principali."
+        warnings:
+          - "Se non sei verificato, /city e i suoi sotto-comandi restano bloccati."
+        commands:
+          - "/city - apre la schermata principale della tua citta"
+          - "/verify - avvia la verifica Discord"
+        buttons:
+          - type: action
+            target: hub
+            label: "<green>Apri City Hub</green>"
+          - type: page
+            target: open_city_hub
+            label: "<yellow>Capire la City Hub</yellow>"
+          - type: page
+            target: basic_commands
+            label: "<yellow>Vedere i comandi utili</yellow>"
+      open_city_hub:
+        title: "<gold><bold>Come usare la City Hub</bold></gold>"
+        subtitle: "La City Hub e il punto di accesso veloce a quasi tutto."
+        when_to_use: "Aprila se vuoi capire quale tasto usare nella schermata /city."
+        steps:
+          - "Usa /city oppure clicca il comando che apre la HUB."
+          - "Da qui puoi entrare in Membri, Territori, Banca, Livelli, Difesa e altre sezioni."
+          - "Usa il tasto Help della HUB se vuoi tornare a questa wiki mentre stai gia giocando."
+        result: "Sai quale menu aprire in base a quello che vuoi fare nella citta."
+        commands:
+          - "/city - apre direttamente la City Hub"
+        buttons:
+          - type: action
+            target: hub
+            label: "<green>Apri City Hub</green>"
+          - type: page
+            target: manage_members
+            label: "<yellow>Gestire i membri</yellow>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Gestire i territori</yellow>"
+          - type: page
+            target: use_bank
+            label: "<yellow>Usare banca e vault</yellow>"
+      invite_or_join:
+        title: "<gold><bold>Come invitare o entrare in una citta</bold></gold>"
+        subtitle: "Invitare qualcuno ed entrare in una citta sono due passaggi separati."
+        when_to_use: "Aprila quando vuoi invitare qualcuno oppure entrare in una citta con un invito ricevuto."
+        requirements:
+          - "Essere nella tua citta per invitare qualcuno."
+          - "Avere il ruolo o il permesso che permette gli inviti."
+        steps:
+          - "Per invitare, usa /city invite <player>."
+          - "Chi riceve l'invito deve accettarlo per entrare davvero."
+          - "Dopo l'ingresso, controlla la lista membri per verificare che sia dentro alla citta."
+        result: "La persona invitata entra nella citta e compare subito tra i membri."
+        warnings:
+          - "Se chi vuoi invitare non e verificato o non puo usare i comandi citta, deve prima completare /verify."
+        commands:
+          - "/city invite <player> - invia un invito a un player"
+        buttons:
+          - type: page
+            target: manage_members
+            label: "<yellow>Gestire i membri dopo l'ingresso</yellow>"
+          - type: page
+            target: special_permissions
+            label: "<yellow>Gestire i permessi speciali</yellow>"
+      manage_members:
+        title: "<gold><bold>Come gestire i membri</bold></gold>"
+        subtitle: "Da qui capisci come vedere, promuovere e rimuovere i membri della citta."
+        when_to_use: "Aprila quando vuoi cambiare ruolo, espellere un membro o controllare chi puo fare cosa."
+        requirements:
+          - "Essere nella citta."
+          - "Essere capo per le azioni piu importanti come trasferire la citta o cambiare permessi speciali."
+        steps:
+          - "Apri /city e vai nella sezione Membri."
+          - "Clicca il membro che vuoi gestire."
+          - "Usa i tasti Promuovi, Abbassa grado, Rimuovi o Trasferisci citta se li vedi disponibili."
+          - "Apri anche Permessi speciali se vuoi decidere cosa puo fare quel membro nei sistemi della citta."
+        result: "Il membro avra il ruolo o i permessi aggiornati in base alla tua scelta."
+        warnings:
+          - "Se un tasto non compare o non funziona, il tuo ruolo non ti permette quell'azione."
+          - "Trasferire la citta cambia il capo: fallo solo se sei sicuro."
+        buttons:
+          - type: page
+            target: special_permissions
+            label: "<yellow>Permessi speciali</yellow>"
+          - type: action
+            target: hub
+            label: "<green>Torna alla City Hub</green>"
+      special_permissions:
+        title: "<gold><bold>Come funzionano i permessi speciali</bold></gold>"
+        subtitle: "I permessi speciali decidono chi puo usare vault, negozi, difesa, invasioni e sfide."
+        when_to_use: "Aprila quando vuoi permettere a un membro di usare una parte precisa della citta."
+        requirements:
+          - "Essere capo."
+          - "Aprire la scheda di un membro dalla sezione Membri."
+        steps:
+          - "Apri la scheda del membro interessato."
+          - "Entra in Permessi speciali."
+          - "Apri il gruppo giusto, come Vault, Negozi, Difesa, Invasioni o Sfide."
+          - "Scegli il permesso e premi Consenti oppure Blocca."
+        result: "Quel membro potra usare solo le funzioni che hai lasciato attive."
+        warnings:
+          - "Questi permessi non sostituiscono il ruolo base del membro nella citta."
+        buttons:
+          - type: page
+            target: manage_members
+            label: "<yellow>Tornare alla gestione membri</yellow>"
+          - type: page
+            target: use_vault
+            label: "<yellow>Capire il vault</yellow>"
+          - type: page
+            target: start_invasion
+            label: "<yellow>Capire difesa e invasioni</yellow>"
+      claim_territory:
+        title: "<gold><bold>Come claimo un territorio</bold></gold>"
+        subtitle: "Claimare un chunk lo aggiunge al territorio della tua citta."
+        when_to_use: "Aprila quando vuoi espandere la tua citta."
+        requirements:
+          - "Avere il permesso di claimare."
+          - "Avere ancora claim disponibili per il livello della tua citta."
+          - "Il chunk deve essere adiacente ai claim della tua citta."
+        steps:
+          - "Apri /city e vai in Territori, oppure usa la wooden shovel sul chunk che vuoi claimare."
+          - "Controlla che il chunk non sia gia claimato da qualcun altro."
+          - "Claima il chunk dalla mappa oppure con click destro sul chunk adiacente."
+        result: "Il chunk entra nel territorio della tua citta e conta nel totale claim usati."
+        warnings:
+          - "Se il chunk non e adiacente, non puo essere claimato."
+          - "Se hai raggiunto il limite claim del tuo livello, devi prima far crescere la citta."
+        commands:
+          - "/city section - apre la mappa territori"
+        buttons:
+          - type: action
+            target: territories
+            label: "<green>Apri Territori</green>"
+          - type: page
+            target: view_claim_borders
+            label: "<yellow>Vedere i bordi claim</yellow>"
+          - type: page
+            target: remove_claim
+            label: "<yellow>Rimuovere un claim</yellow>"
+          - type: page
+            target: change_claim_type
+            label: "<yellow>Cambiare il tipo del chunk</yellow>"
+      remove_claim:
+        title: "<gold><bold>Come rimuovo un claim</bold></gold>"
+        subtitle: "Unclaimare un chunk lo toglie dal territorio della tua citta."
+        when_to_use: "Aprila quando vuoi liberare un chunk o spostare il territorio."
+        requirements:
+          - "Avere il permesso di unclaim."
+          - "Il chunk deve appartenere alla tua citta."
+        steps:
+          - "Apri Territori oppure usa la wooden shovel sul chunk gia claimato dalla tua citta."
+          - "Se usi la shovel, conferma la rimozione nella dialog."
+          - "Controlla che quel chunk non contenga elementi importanti come lo spawn della citta."
+        result: "Il chunk torna wilderness e non fa piu parte del territorio della tua citta."
+        warnings:
+          - "Se il chunk contiene lo spawn della citta, potrebbe essere protetto."
+          - "Non puoi rimuovere claim di altre citta."
+        buttons:
+          - type: action
+            target: territories
+            label: "<green>Apri Territori</green>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Claimare un altro chunk</yellow>"
+      view_claim_borders:
+        title: "<gold><bold>Come vedere i bordi claim</bold></gold>"
+        subtitle: "Puoi vedere i confini reali dei chunk claimati solo sul tuo client."
+        when_to_use: "Aprila quando vuoi leggere bene i confini della tua citta o del chunk che stai guardando."
+        steps:
+          - "Dalla mappa Territori usa il tasto Visualizza bordi claim per vedere i confini della parte mostrata in quel momento."
+          - "Se stai ispezionando il territorio nel mondo, tieni una blaze rod in mano e fai click destro per vedere il chunk attuale."
+          - "Con la blaze rod, se il chunk appartiene a una citta, vedrai anche il confine esterno completo di quella citta."
+        result: "Vedi i confini direttamente nel mondo, ma solo sul tuo client."
+        warnings:
+          - "I bordi della blaze rod spariscono quando smetti di tenerla in mano."
+        buttons:
+          - type: action
+            target: territories
+            label: "<green>Apri Territori</green>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Claimare un territorio</yellow>"
+      change_claim_type:
+        title: "<gold><bold>Come cambio il tipo di un chunk</bold></gold>"
+        subtitle: "Un chunk puo essere normale, farm oppure plot in base a come vuoi usarlo."
+        when_to_use: "Aprila quando vuoi cambiare il comportamento di un chunk gia claimato dalla tua citta."
+        requirements:
+          - "Il chunk deve essere della tua citta."
+          - "Devi avere il permesso per cambiare tipo claim."
+        steps:
+          - "Apri Territori."
+          - "Clicca col tasto giusto sul chunk della tua citta per cambiare il tipo disponibile."
+          - "Controlla il nuovo tipo prima di uscire dalla mappa."
+        result: "Il chunk usa il nuovo tipo selezionato."
+        warnings:
+          - "Se non hai il permesso corretto, il tipo non cambia."
+        buttons:
+          - type: action
+            target: territories
+            label: "<green>Apri Territori</green>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Tornare ai claim</yellow>"
+      use_bank:
+        title: "<gold><bold>Come usare la banca citta</bold></gold>"
+        subtitle: "La banca della citta gestisce soldi, non item."
+        when_to_use: "Aprila quando vuoi depositare soldi, prelevarli o controllare il saldo della citta."
+        requirements:
+          - "Avere il ruolo o il permesso corretto per usare la banca."
+        steps:
+          - "Apri /city e vai in Banca."
+          - "Usa i tasti di deposito o prelievo in base a quello che devi fare."
+          - "Controlla sempre saldo attuale e costo degli upgrade prima di spendere."
+        result: "I soldi della citta vengono aggiornati e il saldo cambia subito."
+        warnings:
+          - "Banca e vault sono due sistemi diversi: uno gestisce soldi, l'altro item."
+        commands:
+          - "/city - apri la HUB e vai in Banca"
+        buttons:
+          - type: action
+            target: bank
+            label: "<green>Apri Banca</green>"
+          - type: page
+            target: use_vault
+            label: "<yellow>Usare il vault</yellow>"
+          - type: page
+            target: level_up_city
+            label: "<yellow>Usare i soldi per la crescita</yellow>"
+      use_vault:
+        title: "<gold><bold>Come usare il vault citta</bold></gold>"
+        subtitle: "Il vault conserva materiali e item condivisi della citta."
+        when_to_use: "Aprila quando vuoi depositare o prendere materiali dal vault della tua citta."
+        requirements:
+          - "Avere il permesso per aprire, depositare o prelevare dal vault."
+        steps:
+          - "Apri la banca della citta."
+          - "Entra nella sezione vault."
+          - "Deposita gli item richiesti oppure preleva quelli che ti servono, se il tuo permesso lo permette."
+        result: "Gli item del vault vengono aggiornati subito per tutta la citta."
+        warnings:
+          - "Alcune quest richiedono di depositare materiali nel vault: controlla prima cosa serve."
+        buttons:
+          - type: action
+            target: bank
+            label: "<green>Apri Banca e Vault</green>"
+          - type: page
+            target: use_bank
+            label: "<yellow>Tornare alla banca</yellow>"
+      level_up_city:
+        title: "<gold><bold>Come faccio salire la citta</bold></gold>"
+        subtitle: "Per crescere servono XP citta, requisiti e a volte soldi o approvazioni."
+        when_to_use: "Aprila quando vuoi capire cosa manca al prossimo livello o stage della citta."
+        requirements:
+          - "Controllare la sezione Livelli della citta."
+          - "Avere abbastanza XP citta per il prossimo livello o il prossimo stage."
+        steps:
+          - "Apri /city e vai in Livelli."
+          - "Leggi il livello attuale, l'XP accumulata e quanto manca al prossimo obiettivo."
+          - "Se vedi un upgrade disponibile, controlla costo, banca, requisiti invasione e approvazione staff."
+          - "Se sei il capo, conferma esplicitamente l'upgrade quando e disponibile."
+        result: "La citta sale di livello o di stage e sblocca limiti e funzioni migliori."
+        warnings:
+          - "Alcuni stage richiedono anche approvazione staff o una certa invasione completata."
+        buttons:
+          - type: page
+            target: start_invasion
+            label: "<yellow>Capire il requisito invasione</yellow>"
+          - type: page
+            target: use_bank
+            label: "<yellow>Capire il costo in banca</yellow>"
+          - type: action
+            target: hub
+            label: "<green>Torna alla City Hub</green>"
+      start_invasion:
+        title: "<gold><bold>Come avvio un'invasione</bold></gold>"
+        subtitle: "Le invasioni fanno avanzare la citta e danno reward, ma richiedono preparazione."
+        when_to_use: "Aprila quando vuoi avviare una mob invasion o capire perche non puoi farlo."
+        requirements:
+          - "Avere accesso alla difesa della citta."
+          - "Avere i requisiti del tier che vuoi iniziare."
+          - "Avere il costo richiesto, se previsto."
+        steps:
+          - "Apri /city e vai in Difesa."
+          - "Scegli il tier invasione che vuoi fare."
+          - "Leggi requisiti, reward e stato del tier."
+          - "Conferma l'avvio se il tier e disponibile."
+        result: "Parte l'invasione del tier scelto e la tua citta deve difendersi dalle ondate."
+        warnings:
+          - "Se il tier e bloccato, controlla livello citta, reward precedenti e requisiti richiesti."
+          - "Le prime vittorie possono dare reward uniche solo una volta."
+        buttons:
+          - type: action
+            target: defense
+            label: "<green>Apri Difesa</green>"
+          - type: page
+            target: read_invasion_rewards
+            label: "<yellow>Capire le ricompense</yellow>"
+          - type: page
+            target: level_up_city
+            label: "<yellow>Capire il legame coi livelli</yellow>"
+      read_invasion_rewards:
+        title: "<gold><bold>Come leggere le ricompense delle invasioni</bold></gold>"
+        subtitle: "Ogni tier mostra reward normali e, in alcuni casi, reward uniche di prima vittoria."
+        when_to_use: "Aprila quando vuoi capire cosa ottiene davvero la citta da un tier invasione."
+        steps:
+          - "Apri la schermata Difesa."
+          - "Scorri i tier e leggi durata, reward base e reward di prima vittoria."
+          - "Controlla bene materiali, soldi, XP e item unici mostrati nella lore del tier."
+        result: "Sai cosa conviene fare prima e quale tier vale di piu per la tua citta."
+        warnings:
+          - "Le reward di prima vittoria non vengono ripetute ai clear successivi."
+        buttons:
+          - type: action
+            target: defense
+            label: "<green>Apri Difesa</green>"
+          - type: page
+            target: start_invasion
+            label: "<yellow>Tornare all'avvio invasione</yellow>"
+      link_discord:
+        title: "<gold><bold>Come collego Discord</bold></gold>"
+        subtitle: "Il collegamento Discord serve per usare i comandi citta e le funzioni collegate all'account."
+        when_to_use: "Aprila quando /city ti manda a verificarti o vuoi controllare il link Discord."
+        requirements:
+          - "Essere nel Discord corretto del server."
+        steps:
+          - "Usa /verify."
+          - "Conferma di essere nel server Discord corretto."
+          - "Segui i passaggi mostrati dal dialog fino alla fine."
+          - "Se scegli No nel primo dialog, ti viene aperto /discord per raggiungere il server giusto."
+        result: "L'account Minecraft viene collegato e puoi usare le funzioni citta che richiedono verifica."
+        warnings:
+          - "Se non completi il collegamento, /city e i sotto-comandi restano bloccati."
+        commands:
+          - "/verify - avvia o riprende il collegamento Discord"
+          - "/discord - apre il percorso per raggiungere il server Discord"
+        buttons:
+          - type: page
+            target: start_here
+            label: "<yellow>Tornare a come iniziare</yellow>"
+          - type: page
+            target: basic_commands
+            label: "<yellow>Comandi utili</yellow>"
+      basic_commands:
+        title: "<gold><bold>Comandi utili di /city</bold></gold>"
+        subtitle: "Questi sono i comandi piu utili per orientarti rapidamente."
+        when_to_use: "Usa questa pagina quando vuoi ricordarti i comandi base o spostarti piu in fretta."
+        commands:
+          - "/city - apre la schermata principale della tua citta"
+          - "/city list - apre la lista delle citta"
+          - "/city section - apre la mappa territori"
+          - "/city invite <player> - invita un player nella tua citta"
+          - "/city trust <player> <preset> - assegna trust sul chunk attuale"
+          - "/city untrust <player> - rimuove trust dal chunk attuale"
+          - "/city warp [citta] - ti teletrasporta al warp della tua citta o di un'altra"
+          - "/city setwarp - imposta il warp della tua citta nel claim in cui ti trovi"
+          - "/city chat [messaggio] - usa la chat della citta"
+          - "/verify - avvia la verifica Discord"
+        result: "Hai sotto mano i comandi piu usati per entrare nei menu giusti."
+        buttons:
+          - type: page
+            target: start_here
+            label: "<yellow>Come iniziare</yellow>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Claimare un territorio</yellow>"
+          - type: page
+            target: link_discord
+            label: "<yellow>Collegare Discord</yellow>"
+          - type: page
+            target: other_tools
+            label: "<yellow>Altre funzioni</yellow>"
+      manage_relations:
+        title: "<gold><bold>Come gestisco le relazioni tra citta</bold></gold>"
+        subtitle: "Le relazioni servono per tenere sotto controllo alleanze, neutralita e altri rapporti tra citta."
+        when_to_use: "Aprila quando vuoi capire dove si cambiano o si leggono le relazioni."
+        requirements:
+          - "Avere il ruolo o il permesso che permette di gestire la diplomazia."
+        steps:
+          - "Apri /city e vai nella sezione delle relazioni o della diplomazia."
+          - "Controlla lo stato attuale con le altre citta."
+          - "Se puoi modificarlo, scegli la relazione che vuoi impostare."
+        result: "La tua citta vede e, se autorizzata, aggiorna le relazioni con le altre citta."
+        warnings:
+          - "Non tutti i ruoli possono cambiare le relazioni."
+        buttons:
+          - type: action
+            target: hub
+            label: "<green>Torna alla City Hub</green>"
+          - type: page
+            target: basic_commands
+            label: "<yellow>Comandi utili</yellow>"
+          - type: page
+            target: start_war
+            label: "<yellow>Capire la guerra</yellow>"
+      other_tools:
+        title: "<gold><bold>Altre funzioni utili</bold></gold>"
+        subtitle: "Qui trovi le funzioni utili che non compaiono nella schermata iniziale."
+        when_to_use: "Usa questa pagina quando cerchi funzioni avanzate o meno frequenti della citta."
+        steps:
+          - "Scegli il task che ti serve dai tasti qui sotto."
+          - "Apri la pagina pratica dedicata."
+          - "Segui il flow spiegato nella pagina scelta."
+        result: "Raggiungi rapidamente anche le funzioni meno ovvie della tua citta."
+        buttons:
+          - type: page
+            target: create_city
+            label: "<yellow>Creare una citta</yellow>"
+          - type: page
+            target: browse_cities
+            label: "<yellow>Lista citta</yellow>"
+          - type: page
+            target: use_warp
+            label: "<yellow>Usare il warp</yellow>"
+          - type: page
+            target: set_city_warp
+            label: "<yellow>Impostare il warp</yellow>"
+          - type: page
+            target: use_chunk_trust
+            label: "<yellow>Trust per chunk</yellow>"
+          - type: page
+            target: city_chat
+            label: "<yellow>Chat citta</yellow>"
+          - type: page
+            target: use_city_shop
+            label: "<yellow>Negozi citta</yellow>"
+          - type: page
+            target: manage_relations
+            label: "<yellow>Relazioni tra citta</yellow>"
+          - type: page
+            target: start_war
+            label: "<yellow>Guerra tra citta</yellow>"
+      create_city:
+        title: "<gold><bold>Come creo una citta</bold></gold>"
+        subtitle: "La creazione della citta parte da un dialog guidato."
+        when_to_use: "Aprila quando vuoi fondare una nuova citta."
+        requirements:
+          - "Essere verificato su Discord."
+          - "Avere i requisiti economici richiesti dalla creazione."
+        steps:
+          - "Usa /city create."
+          - "Segui il dialog e inserisci il nome della citta quando viene richiesto."
+          - "Conferma i passaggi finali del flow di creazione."
+        result: "La tua nuova citta viene creata e puoi iniziare a gestirla da /city."
+        warnings:
+          - "Se non sei verificato, il flow di creazione non parte."
+        commands:
+          - "/city create - avvia la creazione della citta"
+        buttons:
+          - type: page
+            target: start_here
+            label: "<yellow>Come iniziare dopo la creazione</yellow>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Claimare il primo territorio</yellow>"
+      browse_cities:
+        title: "<gold><bold>Come uso la lista citta</bold></gold>"
+        subtitle: "La lista citta serve per vedere chi esiste sul server e aprire le schede utili."
+        when_to_use: "Aprila quando vuoi sfogliare le citta presenti o cercarne una in particolare."
+        steps:
+          - "Usa /city list."
+          - "Scorri la lista e apri la citta che ti interessa."
+          - "Da li puoi controllare nome, stato e altre informazioni disponibili."
+        result: "Trovi rapidamente la citta che vuoi controllare."
+        commands:
+          - "/city list - apre la lista delle citta"
+        buttons:
+          - type: page
+            target: use_warp
+            label: "<yellow>Usare il warp di una citta</yellow>"
+          - type: page
+            target: manage_relations
+            label: "<yellow>Capire le relazioni</yellow>"
+      use_warp:
+        title: "<gold><bold>Come uso il warp citta</bold></gold>"
+        subtitle: "Il warp ti porta allo spawn della tua citta oppure di una citta specifica."
+        when_to_use: "Aprila quando vuoi teletrasportarti alla tua citta o a una citta che conosci."
+        steps:
+          - "Usa /city warp per andare al warp della tua citta."
+          - "Usa /city warp <nome_citta> se vuoi raggiungere il warp di una citta precisa."
+          - "Se il teleport fallisce, controlla che la citta esista e abbia uno spawn valido."
+        result: "Vieni teletrasportato al warp della citta scelta."
+        commands:
+          - "/city warp - warp della tua citta"
+          - "/city warp <nome_citta> - warp della citta indicata"
+        buttons:
+          - type: page
+            target: set_city_warp
+            label: "<yellow>Impostare il warp della tua citta</yellow>"
+          - type: page
+            target: browse_cities
+            label: "<yellow>Trovare una citta dalla lista</yellow>"
+      set_city_warp:
+        title: "<gold><bold>Come imposto il warp della citta</bold></gold>"
+        subtitle: "Il warp si imposta stando dentro un claim della propria citta."
+        when_to_use: "Aprila quando vuoi cambiare lo spawn ufficiale della tua citta."
+        requirements:
+          - "Avere il permesso per impostare lo spawn della citta."
+          - "Stare dentro un claim della tua citta."
+        steps:
+          - "Raggiungi il punto esatto in cui vuoi mettere il warp."
+          - "Assicurati di essere dentro un claim della tua citta."
+          - "Usa /city setwarp."
+        result: "Il warp della tua citta viene aggiornato con la nuova posizione."
+        warnings:
+          - "Se sei fuori dai claim della tua citta, il comando viene rifiutato."
+        commands:
+          - "/city setwarp - imposta lo spawn della tua citta"
+        buttons:
+          - type: page
+            target: use_warp
+            label: "<yellow>Usare il warp</yellow>"
+          - type: page
+            target: claim_territory
+            label: "<yellow>Claimare il punto giusto prima di impostarlo</yellow>"
+      use_chunk_trust:
+        title: "<gold><bold>Come funziona il trust per chunk</bold></gold>"
+        subtitle: "Il trust per chunk permette al capo di dare accessi speciali solo su un chunk preciso."
+        when_to_use: "Aprila quando vuoi dare accesso a un chunk senza cambiare tutto il ruolo di una persona."
+        requirements:
+          - "Essere capo."
+          - "Stare nel chunk della tua citta su cui vuoi impostare il trust."
+        steps:
+          - "Vai nel chunk interessato."
+          - "Usa /city trust <player> <access|build|full>."
+          - "Conferma il dialog."
+          - "Usa /city trust list per controllare i trust attivi sul chunk attuale."
+          - "Usa /city untrust <player> per rimuovere il trust."
+        result: "La persona scelta ottiene solo i permessi del preset su quel chunk."
+        warnings:
+          - "Il trust vale sul chunk in cui ti trovi quando lanci il comando."
+          - "Solo il capo puo modificare questi trust."
+        commands:
+          - "/city trust <player> <access|build|full> - assegna trust sul chunk attuale"
+          - "/city trust list - mostra i trust del chunk attuale"
+          - "/city untrust <player> - rimuove il trust dal chunk attuale"
+        buttons:
+          - type: page
+            target: claim_territory
+            label: "<yellow>Capire meglio i chunk della citta</yellow>"
+          - type: page
+            target: manage_members
+            label: "<yellow>Gestire ruoli e membri</yellow>"
+      city_chat:
+        title: "<gold><bold>Come uso la chat della citta</bold></gold>"
+        subtitle: "La chat citta serve per parlare solo con i membri della tua citta."
+        when_to_use: "Aprila quando vuoi mandare un messaggio visibile solo ai membri della tua citta."
+        requirements:
+          - "Essere nella citta."
+          - "Avere il permesso per usare la chat della citta."
+        steps:
+          - "Usa /city chat <messaggio> per inviare subito un messaggio alla citta."
+          - "Se usi /city chat senza testo, il sistema usa il flow previsto dal comando per la chat cittadina."
+        result: "Il messaggio viene inviato solo ai membri della tua citta."
+        commands:
+          - "/city chat <messaggio> - invia un messaggio alla chat della citta"
+        buttons:
+          - type: page
+            target: manage_members
+            label: "<yellow>Gestire chi puo usare la chat</yellow>"
+          - type: page
+            target: basic_commands
+            label: "<yellow>Altri comandi utili</yellow>"
+      use_city_shop:
+        title: "<gold><bold>Come creo e uso un negozio citta</bold></gold>"
+        subtitle: "I negozi citta usano cartello e cassa dentro un claim della tua citta."
+        when_to_use: "Aprila quando vuoi creare un emporio cittadino o usarne uno gia esistente."
+        requirements:
+          - "Avere il permesso per creare negozi cittadini."
+          - "Essere in un claim della tua citta."
+          - "Avere un solo container adiacente al cartello."
+        steps:
+          - "Piazza un cartello vicino a una sola chest o trapped chest."
+          - "Nella prima riga metti il prezzo, per esempio B10K, S8 oppure B10K : S8."
+          - "Nella seconda riga metti il nome esatto della tua citta."
+          - "Lascia la terza riga libera."
+          - "Nella quarta riga scrivi la quantita, per esempio Q:16."
+          - "Per configurare l'item del negozio, interagisci come previsto dal tuo ruolo con l'item corretto in mano."
+        result: "Il cartello diventa un negozio cittadino valido e puo comprare o vendere in base al setup."
+        warnings:
+          - "Il cartello e la cassa devono stare entrambi dentro claim della tua citta."
+          - "Se il cartello tocca piu casse, il negozio non viene creato."
+        buttons:
+          - type: page
+            target: use_bank
+            label: "<yellow>Capire la banca della citta</yellow>"
+          - type: page
+            target: use_vault
+            label: "<yellow>Capire il vault della citta</yellow>"
+      start_war:
+        title: "<gold><bold>Come funziona la guerra tra citta</bold></gold>"
+        subtitle: "La guerra richiede relazioni attive, requisiti minimi e fondi disponibili."
+        when_to_use: "Aprila quando vuoi dichiarare guerra o capire perche una guerra non parte."
+        requirements:
+          - "Avere il permesso per dichiarare guerra."
+          - "Avere spawn valido nella tua citta."
+          - "Avere abbastanza soldi per la posta minima."
+          - "Essere nel range di livelli consentito rispetto alla citta bersaglio."
+        steps:
+          - "Apri la sezione guerra o relazioni dalla HUB della citta."
+          - "Scegli una citta bersaglio valida."
+          - "Controlla posta minima, relazioni, cooldown e spawn richiesti."
+          - "Invia la dichiarazione di guerra se il target risulta pronto."
+          - "Quando la guerra e attiva, controlla lo stato live e i reward previsti."
+        result: "La guerra viene dichiarata oppure sai esattamente quale requisito ti blocca."
+        warnings:
+          - "Una citta gia in guerra o in cooldown non puo entrare subito in una nuova guerra."
+          - "Se rompi un'alleanza per dichiarare guerra, controlla bene il warning prima di confermare."
+        buttons:
+          - type: page
+            target: manage_relations
+            label: "<yellow>Controllare le relazioni prima della guerra</yellow>"
+          - type: page
+            target: use_bank
+            label: "<yellow>Controllare i fondi della citta</yellow>"
 cittaexp:
   staff:
     level:
@@ -439,3 +1893,193 @@ cittaexp:
         success: "<yellow>Richiesta rifiutata:</yellow> <white>#{id}</white>"
         failed: "<red>Reject fallita:</red> <gray>{reason}</gray>"
         reason_required: "<red>Specifica un motivo per il reject.</red>"
+    gui_test:
+      title: "<gold>Mission Board v2</gold> <gray>(TEST)</gray>"
+      header:
+        title: "<gold>Mission Board Test</gold>"
+        l1: "<gray>Filtro:</gray> <white>{filter}</white>"
+        l2: "<gray>Ordine:</gray> <white>{sort}</white>"
+      state:
+        title: "<aqua>Stato vista</aqua>"
+        selected: "<gray>Selezionata:</gray> <white>{selected}</white>"
+        top: "<gray>Top corrente:</gray> <white>{top}</white>"
+      filter:
+        title: "<gold>Filtro</gold>"
+        current: "<gray>Attivo:</gray> <white>{value}</white>"
+      sort:
+        title: "<gold>Ordina</gold>"
+        current: "<gray>Attivo:</gray> <white>{value}</white>"
+      action:
+        detail: "<yellow>Apri preview</yellow>"
+        list: "<yellow>Torna elenco</yellow>"
+      refresh: "<yellow>Refresh</yellow>"
+      back: "<yellow>Indietro</yellow>"
+      card:
+        title: "<gold>{title}</gold>"
+        status: "<gray>Stato:</gray> <white>{status}</white>"
+        progress: "<gray>Progresso:</gray> <white>{progress}%</white>"
+        time: "<gray>Tempo:</gray> <white>{time}</white>"
+        reward: "<gray>Reward XP:</gray> <white>{xp}</white>"
+        filtered: "<red>Filtrata dalla vista corrente</red>"
+      detail:
+        hint: "<gray>Seleziona una missione e usa Azione</gray>"
+        header: "<gold>Preview:</gold> <white>{title}</white>"
+        body:
+          title: "<aqua>Dettaglio Placeholder</aqua>"
+          status: "<gray>Stato:</gray> <white>{status}</white>"
+          progress: "<gray>Completamento:</gray> <white>{progress}%</white>"
+          mode: "<gray>Filtro/Ordine:</gray> <white>{filter}</white> <gray>/</gray> <white>{sort}</white>"
+        reward:
+          title: "<gold>Reward Preview</gold>"
+          xp: "<gray>XP:</gray> <white>{xp}</white>"
+          item: "<gray>Item:</gray> <white>{item}</white>"
+    ia_hub_test:
+      itemsadder_missing: "<red>Supporto grafico non attivo.</red>"
+      font_missing: "<red>Font image non registrata:</red> <gray>{font}</gray>"
+      inventory_null: "<red>La GUI interna non e stata creata.</red>"
+      open_failed: "<red>Apertura GUI IA fallita:</red> <gray>{reason}</gray>"
+      opened: "<gray>GUI IA test aperta.</gray> <white>offsetX={x}</white> <white>offsetY={y}</white>"
+      offset_y_unsupported: "<yellow>Nota:</yellow> <gray>offsetY non e supportato in questo runtime.</gray> <gray>Per Y usa</gray> <white>y_position</white> <gray>nel file grafico dedicato.</gray>"
+      header: "<gold>HUB IA TEST</gold>"
+      crescita: "<green>Crescita</green>"
+      missioni: "<yellow>Missioni</yellow>"
+      territori: "<aqua>Territori</aqua>"
+      membri: "<white>Membri</white>"
+      tesoro: "<gold>Saldo citta</gold>"
+      centro: "<red>Centro comando</red>"
+      close: "<yellow>Chiudi</yellow>"
+      status: "<aqua>Status</aqua>"
+      leave: "<red>Lascia citta</red>"
+      help: "<aqua>Aiuto</aqua>"
+
+commands:
+  help:
+    city:
+      header: "<gold>Comandi /city</gold>"
+      row: "<gray>{syntax}</gray> <dark_gray>-</dark_gray> <white>{description}</white>"
+      example: "<dark_gray>esempio:</dark_gray> <gray>{example}</gray>"
+    cittaexp:
+      header: "<gold>Comandi /cittaexp</gold>"
+      row: "<gray>{syntax}</gray> <dark_gray>-</dark_gray> <white>{description}</white>"
+      example: "<dark_gray>esempio:</dark_gray> <gray>{example}</gray>"
+  suggestions:
+    town_arg: "Nome citta target"
+    status_pending: "Richieste in attesa di review"
+    status_approved: "Richieste approvate"
+    status_rejected: "Richieste rifiutate"
+    status_cancelled: "Richieste annullate"
+  descriptions:
+    city:
+      root:
+        syntax: "/city"
+        description: "Apri la GUI principale della tua citta."
+        example: ""
+      help:
+        syntax: "/city help"
+        description: "Mostra l'elenco rapido dei comandi /city."
+        example: ""
+      create:
+        syntax: "/city create"
+        description: "Avvia il dialog di creazione citta."
+        example: "/city create"
+      list:
+        syntax: "/city list"
+        description: "Apri la lista citta con filtri e warp."
+        example: "/city list"
+      invite:
+        syntax: "/city invite <player>"
+        description: "Invita un giocatore nella tua citta."
+        example: "/city invite Notch"
+      invite_accept:
+        syntax: "/city invite accept [player]"
+        description: "Accetta un invito citta."
+        example: "/city invite accept"
+      invite_decline:
+        syntax: "/city invite decline [player]"
+        description: "Rifiuta un invito citta."
+        example: "/city invite decline"
+      section:
+        syntax: "/city section"
+        description: "Apri la mappa territori per gestire claim, farm e lotti."
+        example: "/city section"
+      warp:
+        syntax: "/city warp [town]"
+        description: "Usa il warp della tua citta o di una citta alleata."
+        example: "/city warp"
+      setwarp:
+        syntax: "/city setwarp"
+        description: "Imposta il warp della tua citta."
+        example: "/city setwarp"
+      chat:
+        syntax: "/city chat <messaggio>"
+        description: "Invia un messaggio nella chat citta."
+        example: "/city chat Ciao team"
+    cittaexp:
+      root:
+        syntax: "/cittaexp"
+        description: "Comando root staff/diagnostica."
+        example: ""
+      help:
+        syntax: "/cittaexp help"
+        description: "Mostra l'elenco rapido dei comandi admin/staff."
+        example: ""
+      probe:
+        syntax: "/cittaexp probe"
+        description: "Mostra stato runtime/integrazioni/diagnostica."
+        example: "/cittaexp probe"
+      admin_level_list:
+        syntax: "/cittaexp admin level list [status]"
+        description: "Lista richieste stage level."
+        example: "/cittaexp admin level list pending"
+      admin_level_approve:
+        syntax: "/cittaexp admin level approve <id> [note]"
+        description: "Approva una richiesta level."
+        example: "/cittaexp admin level approve 12 ok"
+      admin_level_reject:
+        syntax: "/cittaexp admin level reject <id> <reason>"
+        description: "Rifiuta una richiesta level."
+        example: "/cittaexp admin level reject 12 requisiti mancanti"
+      admin_town_players:
+        syntax: "/cittaexp admin town players <citta>"
+        description: "Apri il Registro del Casato in visuale staff sul bersaglio."
+        example: "/cittaexp admin town players Roma"
+  shop:
+    create:
+      success: "<green>Emporio cittadino fondato.</green> <gray>{current}/{cap}</gray>"
+      errors:
+        no_town: "<red>Devi appartenere a una citta per fondare un emporio.</red>"
+        no_mayor: "<red>Solo il capo citta puo fondare un emporio cittadino.</red>"
+        stage_locked: "<red>Gli empori si sbloccano solo da</red> <gold>Cittadina I</gold><red>.</red>"
+        cap_reached: "<red>Il registro degli empori e saturo.</red> <gray>{current}/{cap}</gray>"
+        wrong_city_name: "<red>La seconda riga deve riportare il nome esatto della tua citta.</red>"
+        wrong_claim: "<red>L'emporio deve sorgere dentro un claim della tua citta.</red>"
+        invalid_container: "<red>Serve una sola chest o trapped chest adiacente al cartello.</red>"
+        multiple_containers: "<red>Il cartello tocca piu casse.</red> <gray>Serve un solo container adiacente.</gray>"
+        invalid_price: "<red>Il bando mercantile e invalido.</red> <gray>Usa B10K, S8 o B10K : S8.</gray>"
+        invalid_quantity: "<red>La quantita di scambio e invalida.</red> <gray>Usa Q:16.</gray>"
+        sign_used: "<red>Questo cartello e gia legato a un emporio.</red>"
+        container_used: "<red>Questa cassa e gia vincolata a un altro emporio.</red>"
+    configure:
+      success: "<green>Emporio configurato.</green> <yellow>{item}</yellow> <gray>x{quantity}</gray>"
+      errors:
+        not_owner_or_mayor: "<red>Solo il capo cittadino puo sigillare la merce dell'emporio.</red>"
+        requires_item: "<red>Tieni in mano l'oggetto da registrare per l'emporio.</red>"
+    trade:
+      buy:
+        success: "<green>Acquisto completato.</green> <yellow>{item}</yellow> <gray>x{quantity}</gray> <white>{price}</white>"
+      sell:
+        success: "<green>Vendita completata.</green> <yellow>{item}</yellow> <gray>x{quantity}</gray> <white>{price}</white>"
+      errors:
+        buy_disabled: "<red>Questo emporio non vende merci al pubblico.</red>"
+        sell_disabled: "<red>Questo emporio non acquista questa merce.</red>"
+        not_configured: "<red>Questo emporio non ha ancora una merce configurata.</red>"
+        stock_missing: "<red>Le scorte richieste non sono disponibili per questo scambio.</red>"
+        inventory_full: "<red>Non hai spazio sufficiente nel tuo inventario.</red>"
+        container_full: "<red>La cassa dell'emporio non ha spazio sufficiente.</red>"
+        player_funds: "<red>Saldo insufficiente.</red> <gray>Servono {price}.</gray>"
+        town_funds: "<red>Il tesoro cittadino non puo sostenere questo acquisto.</red>"
+        vault_unavailable: "<red>Vault/Economy non disponibile. Lo scambio e sospeso.</red>"
+        runtime_invalid: "<red>Questo emporio e fuori sincronia ed e stato sigillato.</red>"
+
+discord:
+  token: ""

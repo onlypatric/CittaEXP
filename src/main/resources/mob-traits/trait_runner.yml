@@ -1,0 +1,9 @@
+id: trait_runner
+nameSuffix: "Predatore"
+stats:
+  GENERIC_MOVEMENT_SPEED: 0.04
+tags:
+  - runner
+addAbilities:
+  - defense_runner_surge
+removeAbilities: []

@@ -1,0 +1,35 @@
+id: variant_imperial_lancer
+weight: 1
+namePrefix: "<gold>Picca Regale</gold>"
+tags:
+  - throne
+  - lancer
+equipment:
+  helmet:
+    material: GOLDEN_HELMET
+    enchants:
+      protection: 4
+      unbreaking: 3
+  chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      blast_protection: 4
+      mending: 1
+  leggings:
+    material: DIAMOND_LEGGINGS
+    enchants:
+      projectile_protection: 4
+      unbreaking: 3
+  boots:
+    material: NETHERITE_BOOTS
+    enchants:
+      protection: 4
+      binding_curse: 1
+  mainHand:
+    material: NETHERITE_SPEAR
+    enchants:
+      lunge: 2
+      unbreaking: 3
+      mending: 1
+addAbilities: []
+removeAbilities: []

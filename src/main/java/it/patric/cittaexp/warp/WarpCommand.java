@@ -8,7 +8,9 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import it.patric.cittaexp.command.CommandDescriptionRegistry;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
+import it.patric.cittaexp.utils.CommandSuggestionUtils;
 import it.patric.cittaexp.utils.CommandGuards;
 import it.patric.cittaexp.utils.ExceptionUtils;
 import it.patric.cittaexp.utils.PluginConfigUtils;
@@ -25,12 +27,16 @@ public final class WarpCommand {
     private WarpCommand() {
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> create(Plugin plugin, HuskTownsApiHook huskTownsApiHook) {
+    public static LiteralArgumentBuilder<CommandSourceStack> create(
+            Plugin plugin,
+            HuskTownsApiHook huskTownsApiHook,
+            CommandDescriptionRegistry descriptions
+    ) {
         PluginConfigUtils cfg = new PluginConfigUtils(plugin);
         return Commands.literal("warp")
                 .executes(ctx -> execute(ctx, huskTownsApiHook, cfg, null))
                 .then(Commands.argument("town", StringArgumentType.greedyString())
-                        .suggests((ctx, builder) -> suggestTownNames(builder, huskTownsApiHook))
+                        .suggests((ctx, builder) -> suggestTownNames(builder, huskTownsApiHook, descriptions))
                         .executes(ctx -> execute(ctx, huskTownsApiHook, cfg, StringArgumentType.getString(ctx, "town"))));
     }
 
@@ -79,14 +85,16 @@ public final class WarpCommand {
 
     private static CompletableFuture<Suggestions> suggestTownNames(
             SuggestionsBuilder builder,
-            HuskTownsApiHook huskTownsApiHook
+            HuskTownsApiHook huskTownsApiHook,
+            CommandDescriptionRegistry descriptions
     ) {
         String remaining = builder.getRemainingLowerCase();
+        String tooltip = descriptions.suggestionTooltip("town_arg", "Nome citta target");
         huskTownsApiHook.api().getTowns().stream()
                 .map(town -> town.getName().toLowerCase(Locale.ROOT))
                 .filter(name -> name.startsWith(remaining))
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEach(builder::suggest);
+                .forEach(name -> CommandSuggestionUtils.suggest(builder, name, tooltip));
         return builder.buildFuture();
     }
 

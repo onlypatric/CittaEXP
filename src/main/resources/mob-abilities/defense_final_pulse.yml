@@ -1,0 +1,26 @@
+id: defense_final_pulse
+trigger: ON_HURT
+cooldownTicks: 220
+targeting:
+  type: PLAYERS_IN_RADIUS
+  radius: 8
+  maxTargets: 5
+conditions:
+  - type: hpBelow
+    ratio: 0.35
+actions:
+  - type: particles
+    particle: EXPLOSION
+    count: 18
+  - type: sound
+    sound: ENTITY_WARDEN_SONIC_BOOM
+    volume: 1.4
+    pitch: 0.9
+  - type: directDamage
+    amount: 8.0
+  - type: knockback
+    strength: 1.8
+  - type: applyPotion
+    effect: WEAKNESS
+    durationTicks: 60
+    amplifier: 1

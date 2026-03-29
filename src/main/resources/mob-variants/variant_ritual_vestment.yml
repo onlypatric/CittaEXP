@@ -1,0 +1,28 @@
+id: variant_ritual_vestment
+weight: 2
+nameSuffix: "del Braciere"
+tags:
+  - ash
+  - ritual_vestment
+equipment:
+  helmet:
+    material: GOLDEN_HELMET
+    enchants:
+      fire_protection: 3
+      binding_curse: 1
+  chestplate:
+    material: LEATHER_CHESTPLATE
+    enchants:
+      fire_protection: 4
+      unbreaking: 2
+  leggings:
+    material: LEATHER_LEGGINGS
+    enchants:
+      protection: 2
+  boots:
+    material: GOLDEN_BOOTS
+    enchants:
+      fire_protection: 3
+      mending: 1
+addAbilities: []
+removeAbilities: []

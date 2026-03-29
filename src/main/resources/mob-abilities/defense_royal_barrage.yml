@@ -1,0 +1,25 @@
+id: defense_royal_barrage
+trigger: ON_IDLE
+cooldownTicks: 90
+targeting:
+  type: NEAREST_PLAYER
+conditions:
+  - type: targetExists
+  - type: waveAtLeast
+    wave: 4
+actions:
+  - type: sound
+    sound: ITEM_CROSSBOW_LOADING_END
+    volume: 1.0
+    pitch: 0.8
+  - type: launchProjectile
+    particle: CRIT
+    particleCount: 1
+    speed: 2.0
+    range: 20.0
+    hitboxRadius: 1.1
+    count: 3
+    spread: 0.18
+    hitActions:
+      - type: directDamage
+        amount: 5.0

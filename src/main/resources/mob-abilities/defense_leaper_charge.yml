@@ -1,0 +1,25 @@
+id: defense_leaper_charge
+trigger: ON_TARGET
+cooldownTicks: 70
+targeting:
+  type: SELF
+conditions:
+  - type: targetExists
+actions:
+  - type: particles
+    particle: CLOUD
+    count: 10
+  - type: sound
+    sound: ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR
+    volume: 0.9
+    pitch: 1.15
+  - type: applyPotionToSelf
+    effect: SPEED
+    durationTicks: 36
+    amplifier: 0
+  - type: applyPotionToSelf
+    effect: JUMP_BOOST
+    durationTicks: 36
+    amplifier: 1
+  - type: push
+    strength: 0.75

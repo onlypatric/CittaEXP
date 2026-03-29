@@ -1,5 +1,6 @@
 package it.patric.cittaexp.levels;
 
+import it.patric.cittaexp.defense.CityDefenseService;
 import it.patric.cittaexp.integration.husktowns.HuskTownsApiHook;
 import java.util.List;
 import java.util.Locale;
@@ -17,17 +18,20 @@ public final class CityLevelRequestService {
     private final StaffApprovalService approvalService;
     private final CityLevelService cityLevelService;
     private final CityLevelSettings settings;
+    private final CityDefenseService cityDefenseService;
 
     public CityLevelRequestService(
             HuskTownsApiHook huskTownsApiHook,
             StaffApprovalService approvalService,
             CityLevelService cityLevelService,
-            CityLevelSettings settings
+            CityLevelSettings settings,
+            CityDefenseService cityDefenseService
     ) {
         this.huskTownsApiHook = huskTownsApiHook;
         this.approvalService = approvalService;
         this.cityLevelService = cityLevelService;
         this.settings = settings;
+        this.cityDefenseService = cityDefenseService;
     }
 
     public RequestResult createRequest(Player player) {
@@ -39,30 +43,32 @@ public final class CityLevelRequestService {
             return new RequestResult(false, "not-mayor", null);
         }
 
-        CityLevelService.LevelStatus status = cityLevelService.statusForTown(member.get().town().getId(), true);
-        TownStage nextStage = status.nextStage();
-        if (nextStage == null) {
-            return new RequestResult(false, "already-max-stage", null);
+        CityLevelService.LevelUnlockCheck check = cityLevelService.nextUnlockCheck(member.get().town().getId(), true);
+        TownStage nextStage = check.checkpointStage();
+        if (check.targetLevel() <= 0 || nextStage == null) {
+            return new RequestResult(false, check.blockingReason() == null ? "request-not-required" : check.blockingReason(), null);
         }
-        CityLevelSettings.StageSpec nextSpec = settings.spec(nextStage);
-        if (!nextSpec.staffApprovalRequired()) {
+        if (!check.staffApprovalRequired()) {
             return new RequestResult(false, "request-not-required", null);
         }
-        if (status.level() < nextSpec.requiredLevel()) {
+        if (!check.xpReached()) {
             return new RequestResult(false, "level-too-low", null);
         }
-        if (nextStage == TownStage.VILLAGGIO_I && member.get().town().getSpawn().isEmpty()) {
+        if (!check.defenseTierCompleted()) {
+            return new RequestResult(false, "defense-tier-required", null);
+        }
+        if (!check.spawnPresent()) {
             return new RequestResult(false, "town-spawn-required", null);
         }
-        if (member.get().town().getMoney().doubleValue() < status.requiredBalance()) {
+        if (!check.bankBalanceSatisfied()) {
             return new RequestResult(false, "insufficient-balance-requirement", null);
         }
-        if (approvalService.hasPendingStageRequest(status.townId(), nextStage)) {
+        if (approvalService.hasPendingStageRequest(check.townId(), nextStage)) {
             return new RequestResult(false, "pending-request-exists", null);
         }
 
         StaffApprovalService.SubmitResult submit = approvalService.submitStageUpgradeRequest(
-                status.townId(),
+                check.townId(),
                 nextStage,
                 player.getUniqueId(),
                 "auto-manual-checkpoint-" + nextStage.name().toLowerCase(Locale.ROOT)
@@ -77,6 +83,17 @@ public final class CityLevelRequestService {
         return approvalService.listStageRequests(status).stream()
                 .map(this::toTownLevelRequest)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<TownLevelRequest> latestRequestForTownStage(int townId, TownStage stage) {
+        if (townId <= 0 || stage == null) {
+            return Optional.empty();
+        }
+        return approvalService.listStageRequests(Optional.empty()).stream()
+                .filter(request -> request.townId() == townId)
+                .filter(request -> approvalService.resolveTargetStage(request).filter(stage::equals).isPresent())
+                .findFirst()
+                .map(this::toTownLevelRequest);
     }
 
     public RequestResult approve(Player staff, long requestId, String note) {
@@ -120,7 +137,7 @@ public final class CityLevelRequestService {
     }
 
     private TownLevelRequest toTownLevelRequest(StaffApprovalRequest request) {
-        TownStage stage = approvalService.resolveTargetStage(request).orElse(TownStage.BORGO_I);
+        TownStage stage = approvalService.resolveTargetStage(request).orElse(TownStage.AVAMPOSTO_I);
         return new TownLevelRequest(
                 request.id(),
                 request.townId(),

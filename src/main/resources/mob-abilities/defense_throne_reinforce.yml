@@ -1,0 +1,19 @@
+id: defense_throne_reinforce
+trigger: ON_HURT
+cooldownTicks: 260
+targeting:
+  type: SELF
+conditions:
+  - type: hpBelow
+    ratio: 0.70
+actions:
+  - type: sound
+    sound: ENTITY_WITHER_AMBIENT
+    volume: 1.1
+    pitch: 0.9
+  - type: summon
+    spawnRef: custom:throne_legionnaire
+    count: 2
+  - type: summon
+    spawnRef: custom:throne_ballista
+    count: 1

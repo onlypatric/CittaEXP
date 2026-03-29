@@ -52,7 +52,12 @@ public final class MySqlLevelBackend {
                         town_id INT PRIMARY KEY,
                         xp_scaled BIGINT NOT NULL,
                         city_level INT NOT NULL,
+                        unlocked_level INT NOT NULL DEFAULT 1,
                         stage VARCHAR(32) NOT NULL,
+                        stage_seals_earned INT NOT NULL DEFAULT 0,
+                        stage_seals_required INT NOT NULL DEFAULT 6,
+                        stage_completed_at VARCHAR(64),
+                        subtier_completed_at VARCHAR(64),
                         updated_at VARCHAR(64) NOT NULL
                     )
                     """);
@@ -137,26 +142,43 @@ public final class MySqlLevelBackend {
                         state_value TEXT
                     )
                     """);
+            statement.execute("ALTER TABLE town_progression ADD COLUMN IF NOT EXISTS stage_seals_earned INT NOT NULL DEFAULT 0");
+            statement.execute("ALTER TABLE town_progression ADD COLUMN IF NOT EXISTS stage_seals_required INT NOT NULL DEFAULT 6");
+            statement.execute("ALTER TABLE town_progression ADD COLUMN IF NOT EXISTS stage_completed_at VARCHAR(64) NULL");
+            statement.execute("ALTER TABLE town_progression ADD COLUMN IF NOT EXISTS subtier_completed_at VARCHAR(64) NULL");
+            statement.execute("ALTER TABLE town_progression ADD COLUMN IF NOT EXISTS unlocked_level INT NOT NULL DEFAULT 1");
+            statement.execute("UPDATE town_progression SET unlocked_level = city_level WHERE unlocked_level IS NULL OR unlocked_level <= 0");
         }
     }
 
     public void upsertProgression(TownProgression progression) throws SQLException {
         executeUpdate(
                 """
-                        INSERT INTO town_progression(town_id, xp_scaled, city_level, stage, updated_at)
-                        VALUES(?, ?, ?, ?, ?)
+                        INSERT INTO town_progression(town_id, xp_scaled, city_level, unlocked_level, stage, stage_seals_earned, stage_seals_required,
+                                                     stage_completed_at, subtier_completed_at, updated_at)
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ON DUPLICATE KEY UPDATE
                             xp_scaled = VALUES(xp_scaled),
                             city_level = VALUES(city_level),
+                            unlocked_level = VALUES(unlocked_level),
                             stage = VALUES(stage),
+                            stage_seals_earned = VALUES(stage_seals_earned),
+                            stage_seals_required = VALUES(stage_seals_required),
+                            stage_completed_at = VALUES(stage_completed_at),
+                            subtier_completed_at = VALUES(subtier_completed_at),
                             updated_at = VALUES(updated_at)
                         """,
                 statement -> {
                     statement.setInt(1, progression.townId());
                     statement.setLong(2, progression.xpScaled());
                     statement.setInt(3, progression.cityLevel());
-                    statement.setString(4, progression.stage().name());
-                    statement.setString(5, progression.updatedAt().toString());
+                    statement.setInt(4, progression.cityLevel());
+                    statement.setString(5, progression.stage().name());
+                    statement.setInt(6, progression.stageSealsEarned());
+                    statement.setInt(7, progression.stageSealsRequired());
+                    statement.setString(8, progression.stageCompletedAt() == null ? null : progression.stageCompletedAt().toString());
+                    statement.setString(9, progression.subTierCompletedAt() == null ? null : progression.subTierCompletedAt().toString());
+                    statement.setString(10, progression.updatedAt().toString());
                 }
         );
     }

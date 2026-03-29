@@ -1,14 +1,15 @@
 progression:
   xpPerLevel: 100
+  curveExponent: 1.3
   levelCap: 250
   regnoExtraClaimMaxLevel: 250
   xpScale: 10000
 scan:
   intervalSeconds: 120
   allowedContainers:
-    - CHEST
-    - TRAPPED_CHEST
-    - BARREL
+  - CHEST
+  - TRAPPED_CHEST
+  - BARREL
 store:
   flushSeconds: 3
   flushBatchSize: 128
@@ -23,10 +24,10 @@ mysql:
   port: 3306
   database: cittaexp
   username: root
-  password: ""
+  password: ''
   params: useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
 upgrade:
-  requiredBalanceMultiplier: 2.0
+  requiredBalanceMultiplier: 1.5
 spawnPrivacyPolicy:
   enabled: true
   forcePublicFromStage: BORGO_II
@@ -37,66 +38,190 @@ tax:
   runMinute: 5
   checkIntervalSeconds: 60
 stages:
-  BORGO_I:
+  AVAMPOSTO_I:
     requiredLevel: 1
     upgradeCost: 0.0
     claimCap: 9
     memberCap: 3
     spawnerCap: 2
+    shopCap: 0
     monthlyTax: 0.0
     staffApprovalRequired: false
     huskTownLevel: 1
-  BORGO_II:
+  AVAMPOSTO_II:
+    requiredLevel: 4
+    upgradeCost: 1200.0
+    claimCap: 12
+    memberCap: 4
+    spawnerCap: 2
+    shopCap: 0
+    monthlyTax: 0.0
+    staffApprovalRequired: false
+    huskTownLevel: 1
+  AVAMPOSTO_III:
+    requiredLevel: 7
+    upgradeCost: 2500.0
+    claimCap: 15
+    memberCap: 4
+    spawnerCap: 3
+    shopCap: 0
+    monthlyTax: 0.0
+    staffApprovalRequired: false
+    huskTownLevel: 1
+  BORGO_I:
     requiredLevel: 10
-    upgradeCost: 10000.0
+    upgradeCost: 4000.0
     claimCap: 18
     memberCap: 5
     spawnerCap: 3
+    shopCap: 0
+    monthlyTax: 0.0
+    staffApprovalRequired: false
+    huskTownLevel: 2
+    requiredDefenseTier: l1
+  BORGO_II:
+    requiredLevel: 15
+    upgradeCost: 4000.0
+    claimCap: 23
+    memberCap: 6
+    spawnerCap: 4
+    shopCap: 0
     monthlyTax: 0.0
     staffApprovalRequired: false
     huskTownLevel: 2
   BORGO_III:
     requiredLevel: 20
-    upgradeCost: 25000.0
+    upgradeCost: 8000.0
     claimCap: 27
     memberCap: 7
     spawnerCap: 4
-    monthlyTax: 25000.0
+    shopCap: 0
+    monthlyTax: 500.0
     staffApprovalRequired: false
     huskTownLevel: 3
   VILLAGGIO_I:
-    requiredLevel: 30
-    upgradeCost: 50000.0
-    claimCap: 45
-    memberCap: 10
+    requiredLevel: 25
+    upgradeCost: 14000.0
+    claimCap: 36
+    memberCap: 9
     spawnerCap: 5
-    monthlyTax: 50000.0
+    shopCap: 0
+    monthlyTax: 1000.0
     staffApprovalRequired: true
     huskTownLevel: 4
+    requiredDefenseTier: l2
   VILLAGGIO_II:
-    requiredLevel: 50
-    upgradeCost: 75000.0
-    claimCap: 63
-    memberCap: 13
+    requiredLevel: 32
+    upgradeCost: 22000.0
+    claimCap: 47
+    memberCap: 10
+    spawnerCap: 5
+    shopCap: 0
+    monthlyTax: 1800.0
+    staffApprovalRequired: false
+    huskTownLevel: 4
+  VILLAGGIO_III:
+    requiredLevel: 39
+    upgradeCost: 32000.0
+    claimCap: 53
+    memberCap: 11
+    spawnerCap: 6
+    shopCap: 0
+    monthlyTax: 2800.0
+    staffApprovalRequired: false
+    huskTownLevel: 4
+  CITTADINA_I:
+    requiredLevel: 45
+    upgradeCost: 40000.0
+    claimCap: 59
+    memberCap: 12
     spawnerCap: 7
-    monthlyTax: 75000.0
+    shopCap: 20
+    monthlyTax: 3400.0
     staffApprovalRequired: false
     huskTownLevel: 5
-  VILLAGGIO_III:
+    requiredDefenseTier: l4
+  CITTADINA_II:
+    requiredLevel: 54
+    upgradeCost: 46000.0
+    claimCap: 67
+    memberCap: 14
+    spawnerCap: 7
+    shopCap: 30
+    monthlyTax: 3900.0
+    staffApprovalRequired: false
+    huskTownLevel: 5
+  CITTADINA_III:
+    requiredLevel: 63
+    upgradeCost: 52000.0
+    claimCap: 75
+    memberCap: 15
+    spawnerCap: 8
+    shopCap: 40
+    monthlyTax: 4500.0
+    staffApprovalRequired: false
+    huskTownLevel: 5
+  CITTA_I:
     requiredLevel: 70
-    upgradeCost: 100000.0
+    upgradeCost: 60000.0
     claimCap: 81
     memberCap: 16
     spawnerCap: 9
-    monthlyTax: 100000.0
+    shopCap: 60
+    monthlyTax: 5200.0
+    staffApprovalRequired: false
+    huskTownLevel: 6
+    requiredDefenseTier: l7
+  CITTA_II:
+    requiredLevel: 80
+    upgradeCost: 72000.0
+    claimCap: 108
+    memberCap: 27
+    spawnerCap: 10
+    shopCap: 80
+    monthlyTax: 6000.0
+    staffApprovalRequired: false
+    huskTownLevel: 6
+  CITTA_III:
+    requiredLevel: 90
+    upgradeCost: 86000.0
+    claimCap: 135
+    memberCap: 39
+    spawnerCap: 11
+    shopCap: 100
+    monthlyTax: 7000.0
     staffApprovalRequired: false
     huskTownLevel: 6
   REGNO_I:
     requiredLevel: 100
-    upgradeCost: 250000.0
+    upgradeCost: 102000.0
     claimCap: 162
     memberCap: 50
     spawnerCap: 12
-    monthlyTax: 250000.0
+    shopCap: 130
+    monthlyTax: 8200.0
     staffApprovalRequired: true
     huskTownLevel: 7
+    requiredDefenseTier: l10
+  REGNO_II:
+    requiredLevel: 125
+    upgradeCost: 124000.0
+    claimCap: 188
+    memberCap: 78
+    spawnerCap: 15
+    shopCap: 165
+    monthlyTax: 9600.0
+    staffApprovalRequired: false
+    huskTownLevel: 7
+    requiredDefenseTier: l12
+  REGNO_III:
+    requiredLevel: 150
+    upgradeCost: 150000.0
+    claimCap: 212
+    memberCap: 107
+    spawnerCap: 17
+    shopCap: 200
+    monthlyTax: 11200.0
+    staffApprovalRequired: true
+    huskTownLevel: 7
+    requiredDefenseTier: l15

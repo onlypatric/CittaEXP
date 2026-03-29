@@ -1,0 +1,490 @@
+bundles:
+  std_mine:
+    completion:
+      xpCity: 22.0
+      moneyCity: 120.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_complete_broadcast
+      vaultItems:
+        COAL: 64
+        IRON_INGOT: 16
+        COPPER_INGOT: 24
+        REDSTONE: 32
+        LAPIS_LAZULI: 16
+        GOLD_INGOT: 8
+        AMETHYST_SHARD: 16
+        QUARTZ: 24
+        RAW_IRON: 24
+        RAW_COPPER: 32
+        GLOWSTONE_DUST: 20
+        OBSIDIAN: 12
+        TUFF: 48
+      personal:
+        xpCityBonus: 2.0
+    excellence:
+      xpCity: 9.0
+      moneyCity: 60.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_excellence_broadcast
+      vaultItems:
+        IRON_BLOCK: 2
+        GOLD_INGOT: 8
+        REDSTONE_BLOCK: 4
+        LAPIS_BLOCK: 2
+        COPPER_BLOCK: 4
+        AMETHYST_BLOCK: 6
+        QUARTZ_BLOCK: 12
+        DIAMOND: 1
+    winner:
+      xpCity: 40.0
+      moneyCity: 500.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_winner_broadcast
+      vaultItems:
+        DIAMOND: 1
+        EMERALD: 1
+        GOLD_BLOCK: 1
+        IRON_BLOCK: 8
+        REDSTONE_BLOCK: 8
+        LAPIS_BLOCK: 6
+        COPPER_BLOCK: 8
+        ANCIENT_DEBRIS: 1
+  std_mob:
+    completion:
+      xpCity: 30.0
+      moneyCity: 110.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_complete_broadcast
+      vaultItems:
+        ROTTEN_FLESH: 48
+        BONE: 24
+        ARROW: 64
+        STRING: 24
+        GUNPOWDER: 20
+        SPIDER_EYE: 20
+        SLIME_BALL: 16
+        ENDER_PEARL: 6
+        PHANTOM_MEMBRANE: 6
+        GLOW_INK_SAC: 12
+        HONEY_BOTTLE: 8
+      personal:
+        xpCityBonus: 3.0
+    excellence:
+      xpCity: 12.0
+      moneyCity: 55.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_excellence_broadcast
+      vaultItems:
+        EMERALD: 1
+        ENDER_PEARL: 4
+        BLAZE_ROD: 4
+        GHAST_TEAR: 2
+        MAGMA_CREAM: 8
+        ECHO_SHARD: 2
+        PRISMARINE_SHARD: 16
+    winner:
+      xpCity: 55.0
+      moneyCity: 480.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_winner_broadcast
+      vaultItems:
+        EMERALD: 1
+        DIAMOND: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        BLAZE_ROD: 12
+        ENDER_PEARL: 16
+        GHAST_TEAR: 8
+        TOTEM_OF_UNDYING: 1
+        ECHO_SHARD: 4
+  std_crop:
+    completion:
+      xpCity: 18.0
+      moneyCity: 80.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_complete_broadcast
+      vaultItems:
+        WHEAT: 96
+        CARROT: 64
+        POTATO: 64
+        PUMPKIN: 24
+        MELON_SLICE: 48
+        BEETROOT: 48
+        SUGAR_CANE: 48
+        HAY_BLOCK: 12
+        COCOA_BEANS: 32
+        BAMBOO: 48
+        SWEET_BERRIES: 32
+      personal:
+        xpCityBonus: 2.0
+    excellence:
+      xpCity: 8.0
+      moneyCity: 35.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_excellence_broadcast
+      vaultItems:
+        GOLD_INGOT: 4
+        HAY_BLOCK: 8
+        CAKE: 4
+        GOLDEN_CARROT: 12
+        PUMPKIN_PIE: 16
+        BREAD: 32
+        COOKIE: 48
+        HONEY_BOTTLE: 8
+    winner:
+      xpCity: 32.0
+      moneyCity: 350.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_winner_broadcast
+      vaultItems:
+        GOLD_INGOT: 8
+        GOLDEN_CARROT: 24
+        GLISTERING_MELON_SLICE: 16
+        CAKE: 8
+        RABBIT_STEW: 12
+        SUSPICIOUS_STEW: 8
+        GOLDEN_APPLE: 4
+        COOKED_SALMON: 32
+  std_xp:
+    completion:
+      xpCity: 25.0
+      moneyCity: 100.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_complete_broadcast
+      vaultItems:
+        LAPIS_LAZULI: 32
+        EXPERIENCE_BOTTLE: 12
+        BOOK: 12
+        AMETHYST_SHARD: 16
+        GLOW_BERRIES: 24
+        SCULK: 24
+        COMPASS: 4
+        PAPER: 32
+      personal:
+        xpCityBonus: 2.5
+    excellence:
+      xpCity: 10.0
+      moneyCity: 50.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_excellence_broadcast
+      vaultItems:
+        DIAMOND: 1
+        EXPERIENCE_BOTTLE: 24
+        AMETHYST_SHARD: 24
+        BOOKSHELF: 8
+        ENCHANTED_BOOK: 1
+        LAPIS_BLOCK: 4
+        ENCHANTING_TABLE: 1
+    winner:
+      xpCity: 45.0
+      moneyCity: 420.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_winner_broadcast
+      vaultItems:
+        DIAMOND: 1
+        EXPERIENCE_BOTTLE: 48
+        EMERALD: 2
+        ENCHANTED_BOOK: 2
+        AMETHYST_BLOCK: 8
+        ENCHANTING_TABLE: 1
+        ECHO_SHARD: 4
+        SCULK_CATALYST: 2
+  std_playtime:
+    completion:
+      xpCity: 15.0
+      moneyCity: 40.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_complete_broadcast
+      vaultItems:
+        BREAD: 32
+        COOKED_BEEF: 24
+        TORCH: 48
+        OAK_LOG: 32
+        COAL: 32
+        COOKED_CHICKEN: 24
+        LEATHER: 16
+        RAIL: 48
+        LANTERN: 8
+        COOKED_MUTTON: 24
+      personal:
+        xpCityBonus: 1.5
+    excellence:
+      xpCity: 7.0
+      moneyCity: 20.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - challenge_excellence_broadcast
+      vaultItems:
+        EMERALD: 1
+        GOLDEN_APPLE: 2
+        COOKED_PORKCHOP: 24
+        BAKED_POTATO: 32
+        LANTERN: 12
+        HAY_BLOCK: 8
+        CAMPFIRE: 6
+        HONEY_BOTTLE: 6
+    winner:
+      xpCity: 25.0
+      moneyCity: 200.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_winner_broadcast
+      vaultItems:
+        EMERALD: 1
+        GOLDEN_APPLE: 4
+        DIAMOND: 1
+        COOKED_BEEF: 64
+        LODESTONE: 1
+  secret_epic:
+    completion:
+      xpCity: 180.0
+      moneyCity: 900.0
+      vaultItems:
+        DIAMOND_BLOCK: 2
+        EMERALD_BLOCK: 2
+        NETHERITE_INGOT: 1
+        ANCIENT_DEBRIS: 3
+        EXPERIENCE_BOTTLE: 64
+        ENCHANTED_GOLDEN_APPLE: 1
+        END_CRYSTAL: 1
+        BEACON: 1
+      personal:
+        xpCityBonus: 8.0
+    excellence:
+      xpCity: 90.0
+      moneyCity: 450.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        ANCIENT_DEBRIS: 2
+        ENCHANTED_GOLDEN_APPLE: 1
+        DIAMOND_BLOCK: 1
+        RESPAWN_ANCHOR: 2
+        TOTEM_OF_UNDYING: 1
+    winner:
+      xpCity: 240.0
+      moneyCity: 1500.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        DIAMOND_BLOCK: 2
+        EMERALD_BLOCK: 2
+        TOTEM_OF_UNDYING: 1
+        END_CRYSTAL: 1
+  race_pvp_legend:
+    completion:
+      xpCity: 60.0
+      moneyCity: 350.0
+      vaultItems:
+        ENCHANTED_GOLDEN_APPLE: 1
+        DIAMOND: 2
+        EMERALD: 4
+        TOTEM_OF_UNDYING: 1
+        EXPERIENCE_BOTTLE: 32
+    excellence:
+      xpCity: 120.0
+      moneyCity: 700.0
+      vaultItems:
+        ENCHANTED_GOLDEN_APPLE: 1
+        DIAMOND_BLOCK: 1
+        EXPERIENCE_BOTTLE: 48
+        TOTEM_OF_UNDYING: 1
+        END_CRYSTAL: 1
+    winner:
+      xpCity: 220.0
+      moneyCity: 1400.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - race_pvp_legend_broadcast
+      vaultItems:
+        NETHERITE_INGOT: 1
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        TOTEM_OF_UNDYING: 1
+        END_CRYSTAL: 1
+  secret_relic:
+    completion:
+      xpCity: 210.0
+      moneyCity: 850.0
+      vaultItems:
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        NETHERITE_INGOT: 1
+        ANCIENT_DEBRIS: 2
+        EXPERIENCE_BOTTLE: 48
+        BEACON: 1
+        LODESTONE: 2
+        RESPAWN_ANCHOR: 2
+    excellence:
+      xpCity: 105.0
+      moneyCity: 425.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        DIAMOND_BLOCK: 1
+        LODESTONE: 2
+        BEACON: 1
+        TOTEM_OF_UNDYING: 1
+    winner:
+      xpCity: 260.0
+      moneyCity: 1400.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        DIAMOND_BLOCK: 2
+        EMERALD_BLOCK: 2
+        ENCHANTED_GOLDEN_APPLE: 1
+        BEACON: 1
+        RESPAWN_ANCHOR: 3
+        TOTEM_OF_UNDYING: 1
+  secret_hunt:
+    completion:
+      xpCity: 190.0
+      moneyCity: 700.0
+      vaultItems:
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        NETHERITE_INGOT: 1
+        ARROW: 128
+        EXPERIENCE_BOTTLE: 48
+        TOTEM_OF_UNDYING: 1
+        BLAZE_ROD: 24
+        ENDER_PEARL: 24
+    excellence:
+      xpCity: 95.0
+      moneyCity: 350.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        CROSSBOW: 2
+        DIAMOND: 4
+        TOTEM_OF_UNDYING: 1
+        ARROW: 192
+    winner:
+      xpCity: 240.0
+      moneyCity: 1200.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        TOTEM_OF_UNDYING: 1
+        END_CRYSTAL: 1
+        CROSSBOW: 3
+  secret_void:
+    completion:
+      xpCity: 220.0
+      moneyCity: 800.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        ANCIENT_DEBRIS: 3
+        DIAMOND_BLOCK: 1
+        ENDER_PEARL: 32
+        EXPERIENCE_BOTTLE: 64
+        END_CRYSTAL: 1
+        TOTEM_OF_UNDYING: 1
+        GHAST_TEAR: 16
+    excellence:
+      xpCity: 110.0
+      moneyCity: 400.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        END_CRYSTAL: 1
+        DIAMOND_BLOCK: 1
+        TOTEM_OF_UNDYING: 1
+        RESPAWN_ANCHOR: 2
+    winner:
+      xpCity: 280.0
+      moneyCity: 1350.0
+      vaultItems:
+        NETHERITE_INGOT: 1
+        DIAMOND_BLOCK: 2
+        EMERALD_BLOCK: 1
+        END_CRYSTAL: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        TOTEM_OF_UNDYING: 1
+        RESPAWN_ANCHOR: 3
+  secret_council:
+    completion:
+      xpCity: 185.0
+      moneyCity: 650.0
+      vaultItems:
+        EMERALD_BLOCK: 2
+        DIAMOND_BLOCK: 1
+        GOLD_BLOCK: 3
+        EXPERIENCE_BOTTLE: 48
+        IRON_BLOCK: 16
+        COPPER_BLOCK: 16
+        LAPIS_BLOCK: 8
+    excellence:
+      xpCity: 92.0
+      moneyCity: 325.0
+      vaultItems:
+        EMERALD_BLOCK: 1
+        DIAMOND_BLOCK: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        GOLD_BLOCK: 2
+        AMETHYST_BLOCK: 8
+    winner:
+      xpCity: 235.0
+      moneyCity: 1100.0
+      vaultItems:
+        EMERALD_BLOCK: 3
+        DIAMOND_BLOCK: 1
+        NETHERITE_INGOT: 1
+        ENCHANTED_GOLDEN_APPLE: 1
+        GOLD_BLOCK: 4
+        IRON_BLOCK: 24
+  seasonal_team_phase:
+    completion:
+      xpCity: 180.0
+      moneyCity: 500.0
+      vaultItems:
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        EXPERIENCE_BOTTLE: 32
+    excellence:
+      xpCity: 90.0
+      moneyCity: 250.0
+      vaultItems:
+        DIAMOND_BLOCK: 1
+        EMERALD_BLOCK: 1
+        EXPERIENCE_BOTTLE: 16
+    winner:
+      xpCity: 480.0
+      moneyCity: 1600.0
+      commands:
+      - broadcast __formatter__
+      commandKeys:
+      - seasonal_team_phase_winner
+      vaultItems:
+        NETHERITE_INGOT: 2
+        DIAMOND_BLOCK: 3
+        EMERALD_BLOCK: 3

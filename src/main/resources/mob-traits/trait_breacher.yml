@@ -1,0 +1,7 @@
+id: trait_breacher
+nameSuffix: "di Breccia"
+tags:
+  - breacher
+addAbilities:
+  - defense_breach_slam
+removeAbilities: []

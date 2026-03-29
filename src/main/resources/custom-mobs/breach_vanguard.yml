@@ -1,0 +1,44 @@
+id: breach_vanguard
+type: VINDICATOR
+name: "<gold>Avanguardia Cremisi</gold>"
+showName: true
+boss: false
+packId: cittaexp_defense_v3
+arc: breach
+pools:
+  - defense
+  - elite
+themes:
+  - breach
+  - siege
+stats:
+  GENERIC_MAX_HEALTH: 58.0
+  GENERIC_ATTACK_DAMAGE: 8.0
+  GENERIC_MOVEMENT_SPEED: 0.29
+equipment:
+  helmet: IRON_HELMET
+  chestplate: IRON_CHESTPLATE
+  leggings: IRON_LEGGINGS
+  boots: IRON_BOOTS
+  mainHand: IRON_AXE
+flags:
+  silent: false
+  collidable: true
+  invulnerable: false
+tags:
+  - breach
+  - elite
+mainAbilities: []
+secondaryAbilities: []
+passiveAbilities:
+  - defense_spawn_presence
+traits:
+  - trait_breacher
+  - trait_leaper
+  - trait_overseer
+  - trait_runner_frenzied
+variants:
+  - variant_breach_lancer
+  - variant_ironclad
+  - variant_scorched
+  - variant_breach_plated
